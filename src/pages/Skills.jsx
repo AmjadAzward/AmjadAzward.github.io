@@ -79,13 +79,18 @@ export default function Skills() {
 
                 {groups.map((group) => (
                     <div key={group.title} className="skill-group reveal">
-                        <h3 className="skill-group-title">
-                            <i className={`fa-solid ${group.icon}`}></i> {group.title}
-                        </h3>
+                        <div className="skill-group-title">
+                            <h3 className="skill-group-title-text">
+                                <i className={`fa-solid ${group.icon}`}></i> {group.title}
+                            </h3>
+                            <span className="skill-group-count">{group.skills.length} skills</span>
+                        </div>
                         <div className="skills-mosaic">
                             {group.skills.map((skill) => (
                                 <div key={skill.label} className="skill-tile reveal-pop">
-                                    <img src={`/images/${skill.img}`} alt={skill.alt} width="34" height="34" />
+                                    <div className="skill-tile-icon">
+                                        <img src={`/images/${skill.img}`} alt={skill.alt} width="18" height="18" />
+                                    </div>
                                     <span>{skill.label}</span>
                                 </div>
                             ))}

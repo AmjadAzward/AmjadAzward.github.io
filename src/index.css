@@ -279,10 +279,10 @@ img {
     transform: scale(1);
 }
 
-/* skill-tile has its own opacity/transform for the idle dim + hover states,
-   so the pop-in reveal needs combined-class rules to win the cascade during
-   the reveal phase; scroll-reveal.js strips these classes once shown so
-   normal hover behavior takes over cleanly afterwards */
+/* skill-tile has its own transform transition for the hover state, so the
+   pop-in reveal needs combined-class rules to win the cascade during the
+   reveal phase; scroll-reveal.js strips these classes once shown so normal
+   hover behavior takes over cleanly afterwards */
 .skill-tile.reveal-pop {
     opacity: 0;
     transform: translateY(14px) scale(0.88);
@@ -290,7 +290,7 @@ img {
 }
 
 .skill-tile.reveal-pop.show {
-    opacity: 0.75;
+    opacity: 1;
     transform: translateY(0) scale(1);
 }
 
@@ -963,10 +963,10 @@ main {
     border-width: 2px;
 }
 
-/* ====== SKILLS (ICON CLOUD, NO CARDS) ====== */
+/* ====== SKILLS (CLEAN CHIP GRID) ====== */
 
 .skill-group {
-    margin-bottom: 48px;
+    margin-bottom: 44px;
 }
 
 .skill-group:last-child {
@@ -975,66 +975,86 @@ main {
 
 .skill-group-title {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 22px;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--card-border);
 }
 
-.skill-group-title i {
+.skill-group-title-text {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.98rem;
+    font-weight: 600;
+}
+
+.skill-group-title-text i {
     font-size: 0.85rem;
     color: var(--accent-soft);
 }
 
+.skill-group-count {
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
 .skills-mosaic {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 34px 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
 }
 
 .skill-tile {
     display: flex;
-    flex-direction: column;
     align-items: center;
     gap: 12px;
-    width: 84px;
-    text-align: center;
-    opacity: 0.75;
-    transition: transform 0.2s ease, opacity 0.2s ease;
+    padding: 11px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    background: rgba(255, 255, 255, 0.03);
+    transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .skill-tile:hover {
-    transform: translateY(-4px);
-    opacity: 1;
+    transform: translateY(-3px);
+    border-color: var(--accent-soft);
+    background: rgba(255, 255, 255, 0.06);
 }
 
 .skill-tile:active {
-    transform: translateY(-1px) scale(0.94);
-    opacity: 1;
+    transform: translateY(-1px) scale(0.98);
+}
+
+.skill-tile-icon {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .skill-tile img {
-    width: 36px;
-    height: 36px;
+    width: 18px;
+    height: 18px;
     object-fit: contain;
-    filter: grayscale(45%);
-    transition: filter 0.2s ease;
-}
-
-.skill-tile:hover img {
-    filter: grayscale(0%);
 }
 
 .skill-tile span {
-    font-size: 0.68rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ====== CERTIFICATIONS (CARD GRID) ====== */
@@ -1710,11 +1730,8 @@ footer {
     }
 
     .skills-mosaic {
-        gap: 24px 20px;
-    }
-
-    .skill-tile {
-        width: 72px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
     }
 
     .service-icon {
