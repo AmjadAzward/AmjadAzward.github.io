@@ -1420,6 +1420,10 @@ footer {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .contact-tile-form,
     .contact-tile-connect {
         grid-column: span 2;
