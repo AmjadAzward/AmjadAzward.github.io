@@ -583,7 +583,7 @@ main {
 
 .hero-text-inner {
     max-width: 620px;
-    padding: 60px 24px 60px clamp(48px, 9vw, 140px);
+    padding: 60px 24px 60px max(24px, calc((100vw - 1220px) / 2 + 24px));
 }
 
 .hero-bubble {
