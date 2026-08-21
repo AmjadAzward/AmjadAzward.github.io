@@ -56,31 +56,24 @@ export default function About() {
                     <div className="section-label">About</div>
                     <h2 className="section-heading">Who I Am</h2>
                     <p className="section-sub">
-                        IT undergraduate and machine learning enthusiast with knowledge in software engineering,
-                        cloud computing, networking, and automation. Skilled in problem-solving and system design,
-                        actively gaining hands-on experience through projects and certifications.
+                        IT undergraduate and machine learning enthusiast, gaining hands-on experience through
+                        real-world projects and certifications.
                     </p>
                 </div>
 
-                <div className="about-hero">
-                    <div className="about-hero-text reveal-left">
-                        <p className="about-bio-text">
-                            I'm currently in my third year of a BSc (Hons) in Computer Science with Data Science at
-                            NIBM, affiliated with Coventry University. Alongside my degree, I split my time between
-                            freelance software development at Spark Solutions and hands-on internships in
-                            AI-enabled engineering — work that has taken me across web platforms, Android apps, data
-                            warehousing, and machine learning prototypes. I back that experience with certifications
-                            from SLIIT, Cisco, Oracle, HackerRank, and the Linux Foundation, and I'm always looking
-                            for the next problem worth solving.
-                        </p>
-                        <div className="about-bio-actions">
-                            <a className="btn-primary" href="/images/Amjad Azward Resume.pdf" download>
-                                Download CV
-                            </a>
-                            <Link className="btn-ghost" to="/portfolio">
-                                View Portfolio
-                            </Link>
-                        </div>
+                <div className="about-bio reveal">
+                    <p className="about-bio-text">
+                        Third-year Computer Science undergraduate at NIBM (Coventry University), currently
+                        freelancing as a software developer and interning in AI-enabled engineering — building web,
+                        mobile, and machine learning projects along the way.
+                    </p>
+                    <div className="about-bio-actions">
+                        <a className="btn-primary" href="/images/Amjad Azward Resume.pdf" download>
+                            Download CV
+                        </a>
+                        <Link className="btn-ghost" to="/portfolio">
+                            View Portfolio
+                        </Link>
                     </div>
                 </div>
 

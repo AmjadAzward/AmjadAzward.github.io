@@ -775,75 +775,31 @@ main {
     filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.25));
 }
 
-/* ====== ABOUT (PHOTO INTRO + STAT STRIP + FLOWING TIMELINE) ====== */
+/* ====== ABOUT (CENTERED BIO + STAT STRIP + FLOWING TIMELINE) ====== */
 
-.about-hero {
-    display: flex;
-    align-items: center;
-    gap: 64px;
-    margin-bottom: 60px;
-}
-
-.about-photo-frame {
-    position: relative;
-    flex: 0 0 232px;
-    width: 232px;
-    height: 232px;
-}
-
-.about-photo-frame::before {
-    content: "";
-    position: absolute;
-    inset: -12px;
-    border-radius: 50%;
-    background: conic-gradient(from 160deg, var(--accent-soft), var(--accent), var(--accent-purple), var(--accent-blue), var(--accent-soft));
-    filter: blur(1px);
-    animation: aboutRingSpin 14s linear infinite;
-}
-
-@keyframes aboutRingSpin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.about-photo-frame::after {
-    content: "";
-    position: absolute;
-    inset: -34px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(56, 189, 248, 0.22), transparent 68%);
-    z-index: -1;
-}
-
-.about-photo-frame img {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 5px solid var(--bg-dark);
-    display: block;
-}
-
-.about-hero-text {
-    flex: 1 1 auto;
-    min-width: 0;
+.about-bio {
+    max-width: 720px;
+    margin: 0 auto 64px;
+    text-align: center;
 }
 
 .about-bio-text {
     color: var(--text-muted);
     line-height: 1.9;
-    font-size: 1.02rem;
-    max-width: 640px;
+    font-size: 1rem;
+    margin-bottom: 16px;
+}
+
+.about-bio-text:last-of-type {
+    margin-bottom: 0;
 }
 
 .about-bio-actions {
     display: flex;
+    justify-content: center;
     align-items: center;
     gap: 14px;
-    margin-top: 24px;
+    margin-top: 28px;
     flex-wrap: wrap;
 }
 
@@ -895,10 +851,42 @@ main {
     color: var(--text-muted);
 }
 
+.about-timeline-columns {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+.about-timeline-columns::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 4px;
+    bottom: 4px;
+    width: 1px;
+    background: var(--card-border);
+    transform: translateX(-50%);
+}
+
+.about-timeline-col-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 28px;
+}
+
+.about-timeline-col-heading i {
+    font-size: 0.9rem;
+    color: var(--accent-soft);
+}
+
 .about-timeline {
     position: relative;
-    max-width: 720px;
-    margin: 0 auto;
     padding-left: 54px;
 }
 
@@ -911,19 +899,6 @@ main {
     width: 2px;
     background: linear-gradient(180deg, var(--accent-blue), var(--accent), var(--accent-purple));
     opacity: 0.5;
-}
-
-.about-timeline-group-label {
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--accent-soft);
-    margin: 0 0 22px 0;
-}
-
-.about-timeline-group-label:not(:first-child) {
-    margin-top: 40px;
 }
 
 .about-timeline-item {
@@ -1494,20 +1469,6 @@ footer {
 
     .bento-tile-cta {
         grid-column: span 2;
-    }
-
-    .about-hero {
-        flex-direction: column;
-        text-align: center;
-        gap: 28px;
-    }
-
-    .about-bio-text {
-        max-width: 100%;
-    }
-
-    .about-bio-actions {
-        justify-content: center;
     }
 
     .about-stat {
