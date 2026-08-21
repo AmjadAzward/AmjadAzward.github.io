@@ -949,6 +949,31 @@ main {
 
 /* ====== SKILLS (ICON CLOUD, NO CARDS) ====== */
 
+.skill-group {
+    margin-bottom: 48px;
+}
+
+.skill-group:last-child {
+    margin-bottom: 0;
+}
+
+.skill-group-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 22px;
+}
+
+.skill-group-title i {
+    font-size: 0.85rem;
+    color: var(--accent-soft);
+}
+
 .skills-mosaic {
     display: flex;
     flex-wrap: wrap;

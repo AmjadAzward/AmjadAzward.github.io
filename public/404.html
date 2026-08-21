@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Amjad Azward - Portfolio</title>
+    <script>
+        // GitHub Pages has no server-side rewrites, so a direct visit or refresh on
+        // a client-side route (e.g. /about) hits this 404 page. Redirect back to
+        // the SPA root with the intended path packed into a query string; index.html
+        // unpacks it and restores the URL before React Router takes over.
+        var path = window.location.pathname + window.location.search + window.location.hash;
+        window.location.replace(
+            window.location.origin + "/?redirect=" + encodeURIComponent(path)
+        );
+    </script>
+</head>
+
+<body></body>
+
+</html>
