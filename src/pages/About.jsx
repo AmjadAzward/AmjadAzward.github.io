@@ -86,30 +86,42 @@ export default function About() {
                     ))}
                 </div>
 
-                <div className="about-timeline reveal-left">
-                    <div className="about-timeline-group-label">Education</div>
-                    {education.map((item) => (
-                        <div key={item.title} className="about-timeline-item">
-                            <div className="about-timeline-icon">
-                                <i className={`fa-solid ${item.icon}`}></i>
-                            </div>
-                            <div className="about-timeline-title">{item.title}</div>
-                            <div className="about-timeline-sub">{item.sub}</div>
-                            <div className="about-timeline-meta">{item.meta}</div>
+                <div className="about-timeline-columns">
+                    <div className="reveal-left">
+                        <h3 className="about-timeline-col-heading">
+                            <i className="fa-solid fa-graduation-cap"></i> Education
+                        </h3>
+                        <div className="about-timeline">
+                            {education.map((item) => (
+                                <div key={item.title} className="about-timeline-item">
+                                    <div className="about-timeline-icon">
+                                        <i className={`fa-solid ${item.icon}`}></i>
+                                    </div>
+                                    <div className="about-timeline-title">{item.title}</div>
+                                    <div className="about-timeline-sub">{item.sub}</div>
+                                    <div className="about-timeline-meta">{item.meta}</div>
+                                </div>
+                            ))}
                         </div>
-                    ))}
+                    </div>
 
-                    <div className="about-timeline-group-label">Experience</div>
-                    {experience.map((item) => (
-                        <div key={item.title} className="about-timeline-item">
-                            <div className="about-timeline-icon">
-                                <i className={`fa-solid ${item.icon}`}></i>
-                            </div>
-                            <div className="about-timeline-title">{item.title}</div>
-                            <div className="about-timeline-sub">{item.sub}</div>
-                            <div className="about-timeline-meta">{item.meta}</div>
+                    <div className="reveal-left">
+                        <h3 className="about-timeline-col-heading">
+                            <i className="fa-solid fa-briefcase"></i> Experience
+                        </h3>
+                        <div className="about-timeline">
+                            {experience.map((item) => (
+                                <div key={item.title} className="about-timeline-item">
+                                    <div className="about-timeline-icon">
+                                        <i className={`fa-solid ${item.icon}`}></i>
+                                    </div>
+                                    <div className="about-timeline-title">{item.title}</div>
+                                    <div className="about-timeline-sub">{item.sub}</div>
+                                    <div className="about-timeline-meta">{item.meta}</div>
+                                </div>
+                            ))}
                         </div>
-                    ))}
+                    </div>
                 </div>
             </div>
         </section>

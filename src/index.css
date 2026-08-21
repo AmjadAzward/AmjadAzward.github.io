@@ -1480,6 +1480,15 @@ footer {
         display: none;
     }
 
+    .about-timeline-columns {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .about-timeline-columns::before {
+        display: none;
+    }
+
     .about-timeline {
         padding-left: 44px;
     }
