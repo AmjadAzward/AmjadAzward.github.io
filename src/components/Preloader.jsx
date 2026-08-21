@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import LogoMark from "./LogoMark.jsx";
 
 export default function Preloader() {
     const [hide, setHide] = useState(false);
@@ -24,7 +25,9 @@ export default function Preloader() {
         <div id="preloader" className={hide ? "hide" : ""}>
             <div className="preloader-inner">
                 <div className="preloader-orbit">
-                    <div className="preloader-core">A</div>
+                    <div className="preloader-core">
+                        <LogoMark />
+                    </div>
                 </div>
             </div>
         </div>

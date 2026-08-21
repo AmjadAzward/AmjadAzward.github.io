@@ -3,9 +3,9 @@ import usePageTitle from "../hooks/usePageTitle.js";
 import useScrollReveal from "../hooks/useScrollReveal.js";
 
 const stats = [
-    { number: "9+", label: "Projects Built" },
-    { number: "9+", label: "Certifications" },
-    { number: "3.81", label: "CGPA" },
+    { number: "30+", label: "Projects Built" },
+    { number: "160+", label: "Certifications" },
+    { number: "3.87", label: "CGPA" },
     { number: "3", label: "Roles Held" },
 ];
 
