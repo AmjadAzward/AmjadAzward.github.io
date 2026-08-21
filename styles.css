@@ -376,10 +376,10 @@ header {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.logo-mark img {
+.logo-mark svg {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    display: block;
 }
 
 .logo-mark:hover {
