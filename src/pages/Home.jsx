@@ -11,10 +11,10 @@ export default function Home() {
     return (
         <section id="home" className="hero-section">
             <div className="hero-stage">
-                <div className="hero-stage-kicker reveal">Software</div>
+                <div className="hero-stage-kicker reveal">Data Science</div>
                 <div className="hero-stage-visual">
                     <div className="hero-stage-glow"></div>
-                    <span className="hero-stage-giant reveal-scale">Engineer</span>
+                    <span className="hero-stage-giant reveal-scale">Undergraduate</span>
                     <div className="hero-stage-photo">
                         <img src="/images/profile.png" alt="Profile photo of Amjad Azward" />
                     </div>
