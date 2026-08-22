@@ -89,6 +89,15 @@ body {
     flex-direction: column;
 }
 
+/* React mounts into #root, an unstyled div between body and the app's
+   header/main/footer, so body's sticky-footer flex rules never reached
+   them without this passthrough. */
+#root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
 h1,
 h2,
 h3,
@@ -484,6 +493,7 @@ header {
 main {
     margin-top: 76px;
     flex: 1 1 auto;
+    min-height: 0;
     display: flex;
     flex-direction: column;
 }
@@ -577,7 +587,7 @@ main {
     justify-content: center;
     text-align: center;
     flex: 1 1 auto;
-    padding: 64px 24px 28px;
+    padding: min(90px, 7vh) 24px min(28px, 3vh);
     overflow: hidden;
 }
 
@@ -593,6 +603,8 @@ main {
 .hero-stage-visual {
     position: relative;
     width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -600,13 +612,13 @@ main {
 
 .hero-stage-giant {
     font-family: "Sora", "Inter", sans-serif;
-    font-size: clamp(2.5rem, min(15vw, 15vh), 11.5rem);
+    font-size: clamp(2.5rem, min(17vw, 12vh), 10.5rem);
     font-weight: 800;
     line-height: 0.85;
     letter-spacing: -0.02em;
     text-transform: uppercase;
     white-space: nowrap;
-    background: linear-gradient(120deg, var(--accent-soft), var(--accent), var(--accent-purple));
+    background: linear-gradient(120deg, var(--accent-soft), var(--accent), var(--accent-blue));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -614,40 +626,54 @@ main {
     user-select: none;
 }
 
-.hero-below-photo {
-    flex: 0 0 auto;
-    height: min(320px, 24vh);
+.hero-stage-photo {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    height: min(820px, 62vh);
+    pointer-events: none;
 }
 
-.hero-below-photo img {
-    height: 100%;
-    width: auto;
-    max-width: 100%;
-    display: block;
-    object-fit: contain;
-    filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.5));
+.hero-stage-text {
+    position: absolute;
+    left: max(24px, calc((100vw - 1220px) / 2 + 24px));
+    top: 60%;
+    transform: translateY(-50%);
+    z-index: 3;
+    max-width: 320px;
+    text-align: left;
+    padding: 20px;
+    border-radius: var(--radius-lg);
+    background: var(--label-bg);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid var(--label-border);
 }
 
-.hero-below {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 4px 24px 0;
+.hero-stage-actions {
+    position: absolute;
+    right: max(24px, calc((100vw - 1220px) / 2 + 24px));
+    top: 60%;
+    transform: translateY(-50%);
+    z-index: 3;
+    max-width: 220px;
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 40px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 20px;
+    border-radius: var(--radius-lg);
+    background: var(--label-bg);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid var(--label-border);
 }
 
-.hero-below-centered {
+.hero-stage-actions .btn-primary,
+.hero-stage-actions .btn-ghost {
     justify-content: center;
-}
-
-.hero-below-text {
-    flex: 1 1 420px;
 }
 
 .hero-bubble {
@@ -664,34 +690,30 @@ main {
     letter-spacing: 0.04em;
     color: var(--accent-soft);
     margin-bottom: 12px;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.hero-below-heading {
-    font-size: clamp(1.02rem, 1.5vw, 1.2rem);
+.hero-stage-text-heading {
+    font-size: 0.98rem;
     font-weight: 600;
     line-height: 1.5;
-    margin-bottom: 8px;
-    max-width: 520px;
+    margin-bottom: 10px;
 }
 
-.hero-below-heading .role-dev {
-    color: var(--accent-blue);
-}
-
-.hero-subtitle {
-    font-size: 0.85rem;
+.hero-stage-text-sub {
+    font-size: 0.82rem;
     color: var(--text-muted);
     line-height: 1.6;
-    max-width: 470px;
 }
 
-.hero-actions {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    flex: 0 0 auto;
+.hero-stage-photo img {
+    height: 100%;
+    width: auto;
+    max-width: none;
+    display: block;
+    object-fit: contain;
+    -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5));
 }
 
 .btn-primary,
@@ -1633,23 +1655,13 @@ footer {
         padding-top: 40px;
     }
 
-    .hero-below {
-        flex-direction: column;
-        text-align: center;
-        justify-content: center;
+    .hero-stage-photo {
+        height: min(420px, 40vh);
     }
 
-    .hero-below-photo {
-        order: -1;
-    }
-
-    .hero-below-heading,
-    .hero-subtitle {
-        margin-inline: auto;
-    }
-
-    .hero-actions {
-        justify-content: center;
+    .hero-stage-text,
+    .hero-stage-actions {
+        display: none;
     }
 
     .nav {
@@ -1799,9 +1811,8 @@ footer {
         font-size: clamp(3rem, 20vw, 6rem);
     }
 
-    .hero-below-photo {
-        width: 100px;
-        height: 100px;
+    .hero-stage-photo {
+        height: min(300px, 34vh);
     }
 
     .bento-grid {
