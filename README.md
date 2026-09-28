@@ -76,13 +76,14 @@ bun run preview
 
 ## Available Scripts
 
-| Command | Description |
-| --- | --- |
-| `bun run dev` | Start the local development server |
-| `bun run build` | Create a production build |
-| `bun run preview` | Preview the production build locally |
-| `bun run lint` | Check the project with ESLint |
-| `bun run format` | Format the codebase with Prettier |
+| Command             | Description                                   |
+| ------------------- | --------------------------------------------- |
+| `bun run dev`       | Start the local development server            |
+| `bun run build`     | Create a production build                     |
+| `bun run preview`   | Preview the production build locally          |
+| `bun run lint`      | Check the project with ESLint                 |
+| `bun run typecheck` | Check TypeScript without creating build files |
+| `bun run format`    | Format the codebase with Prettier             |
 
 ## Project Structure
 
@@ -99,9 +100,15 @@ public/            Static assets, profile image, favicon, and CV
 .github/workflows/ GitHub Pages deployment workflow
 ```
 
-## Deployment
+## CI/CD and Deployment
 
-The portfolio is deployed through GitHub Pages. Every push to the `main` branch triggers the workflow in `.github/workflows/deploy-pages.yml`, which installs dependencies, builds the static site, and publishes it automatically.
+GitHub Actions runs the workflow in `.github/workflows/deploy-pages.yml`:
+
+- Pull requests targeting `main` run dependency installation, linting, type-checking, and a production build.
+- Pushes to `main` run the same quality checks before deploying to GitHub Pages.
+- Failed checks prevent deployment.
+- Dependency caching and concurrency controls keep repeat runs efficient and prevent outdated deployments.
+- The workflow can also be started manually from the GitHub Actions page.
 
 Live site: [amjadazward.github.io/azward-portfolio](https://amjadazward.github.io/azward-portfolio/)
 
