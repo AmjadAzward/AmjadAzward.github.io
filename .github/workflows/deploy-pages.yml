@@ -68,6 +68,9 @@ jobs:
         if: github.event_name != 'pull_request'
         run: |
           touch dist/client/.nojekyll
+          if [[ ! -f dist/client/index.html ]]; then
+            cp dist/client/_shell.html dist/client/index.html
+          fi
           cp dist/client/_shell.html dist/client/404.html
 
       - name: Upload Pages artifact
