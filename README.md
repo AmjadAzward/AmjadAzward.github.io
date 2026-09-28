@@ -2,11 +2,11 @@
 
 A modern editorial portfolio showcasing my work across software engineering, data science, cloud technologies, and machine learning.
 
-[![Portfolio CI/CD](https://github.com/AmjadAzward/azward-portfolio/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/AmjadAzward/azward-portfolio/actions/workflows/deploy-pages.yml)
-[![Live on GitHub Pages](https://img.shields.io/badge/Live-GitHub%20Pages-0969da?logo=github)](https://amjadazward.github.io/azward-portfolio/)
+[![Portfolio CI/CD](https://github.com/AmjadAzward/AmjadAzward.github.io/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/AmjadAzward/AmjadAzward.github.io/actions/workflows/deploy-pages.yml)
+[![Live on GitHub Pages](https://img.shields.io/badge/Live-GitHub%20Pages-0969da?logo=github)](https://amjadazward.github.io/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-[View Live Portfolio](https://amjadazward.github.io/azward-portfolio/) | [Explore Repository](https://github.com/AmjadAzward/azward-portfolio) | [Connect on LinkedIn](https://www.linkedin.com/in/amjadazward)
+[View Live Portfolio](https://amjadazward.github.io/) | [Explore Repository](https://github.com/AmjadAzward/AmjadAzward.github.io) | [Connect on LinkedIn](https://www.linkedin.com/in/amjadazward)
 
 ## About the Portfolio
 
@@ -114,8 +114,8 @@ Install [Bun](https://bun.sh/docs/installation).
 ### Install and Run
 
 ```bash
-git clone https://github.com/AmjadAzward/azward-portfolio.git
-cd azward-portfolio
+git clone https://github.com/AmjadAzward/AmjadAzward.github.io.git
+cd AmjadAzward.github.io
 bun install
 bun run dev
 ```
@@ -137,7 +137,7 @@ Open the local address displayed in the terminal.
 ## Project Structure
 
 ```text
-azward-portfolio/
+AmjadAzward.github.io/
 |-- .github/workflows/   CI/CD and GitHub Pages deployment
 |-- public/              Static assets, favicon, profile image, and CV
 |-- src/
@@ -166,9 +166,9 @@ azward-portfolio/
 
 The production website is hosted on GitHub Pages and automatically updated from `main`.
 
-- Live site: [amjadazward.github.io/azward-portfolio](https://amjadazward.github.io/azward-portfolio/)
-- Actions: [CI/CD workflow runs](https://github.com/AmjadAzward/azward-portfolio/actions)
-- Repository: [github.com/AmjadAzward/azward-portfolio](https://github.com/AmjadAzward/azward-portfolio)
+- Live site: [amjadazward.github.io](https://amjadazward.github.io/)
+- Actions: [CI/CD workflow runs](https://github.com/AmjadAzward/AmjadAzward.github.io/actions)
+- Repository: [github.com/AmjadAzward/AmjadAzward.github.io](https://github.com/AmjadAzward/AmjadAzward.github.io)
 
 ## Connect
 
