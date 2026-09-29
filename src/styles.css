@@ -3140,7 +3140,7 @@ body::before {
 
 @media (min-width: 1440px) {
   .site-section {
-    max-width: 1680px;
+    max-width: 1560px;
     padding-inline: clamp(2rem, 4vw, 5rem);
   }
 
@@ -3149,12 +3149,12 @@ body::before {
   }
 
   .site-header-inner {
-    max-width: 1760px;
+    max-width: 1600px;
   }
 
   .site-footer {
     width: calc(100% - clamp(4rem, 8vw, 10rem));
-    max-width: 1760px;
+    max-width: 1600px;
   }
 
   .home-stage {
@@ -3164,7 +3164,7 @@ body::before {
   .home-stage-inner {
     grid-template-columns: minmax(0, 1fr) minmax(27rem, 0.65fr);
     gap: clamp(5rem, 8vw, 10rem);
-    max-width: 1680px;
+    max-width: 1520px;
   }
 
   .home-identity,
@@ -3173,7 +3173,7 @@ body::before {
   }
 
   .home-name {
-    font-size: clamp(5rem, 4.8vw, 6.25rem);
+    font-size: clamp(4.8rem, 4.6vw, 6rem);
   }
 
   .home-intro {
@@ -3182,12 +3182,12 @@ body::before {
   }
 
   .home-visual-entry {
-    width: min(100%, 31rem);
+    width: min(100%, 29rem);
   }
 
   .home-visual {
-    height: min(62vh, 38rem);
-    min-height: 32rem;
+    height: min(60vh, 36rem);
+    min-height: 31rem;
   }
 
   .about-profile-copy {
