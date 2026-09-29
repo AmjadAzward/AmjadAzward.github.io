@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle2, LoaderCircle, Send } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { PageHeading, Reveal, Section, SocialLinks } from "@/components/portfolio-ui";
 import { Button } from "@/components/ui/button";
 import { makeHead } from "@/lib/head";
 
 const CONTACT_EMAIL = "amjadazward693@gmail.com";
+const CONTACT_RETURN_URL = "https://amjadazward.github.io/contact?sent=1";
 
 export const Route = createFileRoute("/contact")({
   head: makeHead(
@@ -17,52 +18,12 @@ export const Route = createFileRoute("/contact")({
 });
 
 function Contact() {
-  const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [sent, setSent] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setState("sending");
-
-    const formElement = event.currentTarget;
-    const form = new FormData(formElement);
-
-    if (form.get("_honey")) {
-      setState("sent");
-      formElement.reset();
-      return;
-    }
-
-    const submission = {
-      name: String(form.get("name") ?? "").trim(),
-      email: String(form.get("email") ?? "").trim(),
-      subject: String(form.get("subject") ?? "Portfolio enquiry").trim(),
-      message: String(form.get("message") ?? "").trim(),
-      _subject: `Portfolio enquiry: ${String(form.get("subject") ?? "New message").trim()}`,
-      _template: "table",
-      _captcha: "false",
-    };
-
-    try {
-      const response = await fetch(`https://formsubmit.co/ajax/${CONTACT_EMAIL}`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(submission),
-      });
-      const result = (await response.json()) as { success?: boolean | string };
-
-      if (!response.ok || result.success === false || result.success === "false") {
-        throw new Error("Message delivery failed");
-      }
-
-      formElement.reset();
-      setState("sent");
-    } catch {
-      setState("error");
-    }
-  }
+  useEffect(() => {
+    setSent(new URLSearchParams(window.location.search).get("sent") === "1");
+  }, []);
 
   return (
     <Section>
@@ -75,7 +36,17 @@ function Contact() {
       />
       <div className="contact-layout grid gap-10 lg:grid-cols-[1.3fr_.7fr]">
         <Reveal>
-          <form onSubmit={submit} className="grid gap-5" aria-label="Contact form">
+          <form
+            action={`https://formsubmit.co/${CONTACT_EMAIL}`}
+            method="POST"
+            onSubmit={() => setIsSending(true)}
+            className="grid gap-5"
+            aria-label="Contact form"
+          >
+            <input type="hidden" name="_subject" value="New portfolio enquiry" />
+            <input type="hidden" name="_template" value="table" />
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="_next" value={CONTACT_RETURN_URL} />
             <input
               type="text"
               name="_honey"
@@ -93,8 +64,8 @@ function Contact() {
               Message
               <textarea name="message" required rows={7} className="field" />
             </label>
-            <Button type="submit" size="lg" className="w-fit" disabled={state === "sending"}>
-              {state === "sending" ? (
+            <Button type="submit" size="lg" className="w-fit" disabled={isSending}>
+              {isSending ? (
                 <>
                   Sending <LoaderCircle className="animate-spin" />
                 </>
@@ -104,7 +75,7 @@ function Contact() {
                 </>
               )}
             </Button>
-            {state === "sent" && (
+            {sent && !isSending && (
               <p
                 role="status"
                 className="border-l-2 border-secondary-accent pl-4 text-sm text-secondary-accent"
@@ -113,18 +84,6 @@ function Contact() {
                   <CheckCircle2 className="size-4" /> Message sent successfully. I'll get back to
                   you soon.
                 </span>
-              </p>
-            )}
-            {state === "error" && (
-              <p
-                role="alert"
-                className="border-l-2 border-destructive pl-4 text-sm text-destructive"
-              >
-                The message could not be sent. Please try again or email me directly at{" "}
-                <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-4">
-                  {CONTACT_EMAIL}
-                </a>
-                .
               </p>
             )}
           </form>
