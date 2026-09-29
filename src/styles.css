@@ -3140,12 +3140,12 @@ body::before {
 
 @media (min-width: 1440px) {
   .site-section {
-    max-width: 1560px;
-    padding-inline: clamp(2rem, 4vw, 5rem);
+    max-width: 1680px;
+    padding-inline: clamp(5rem, 8vw, 9rem);
   }
 
   .site-header {
-    padding-inline: clamp(2rem, 4vw, 5rem);
+    padding-inline: clamp(5rem, 8vw, 9rem);
   }
 
   .site-header-inner {
@@ -3153,12 +3153,12 @@ body::before {
   }
 
   .site-footer {
-    width: calc(100% - clamp(4rem, 8vw, 10rem));
+    width: calc(100% - clamp(10rem, 16vw, 18rem));
     max-width: 1600px;
   }
 
   .home-stage {
-    padding-inline: clamp(2rem, 4vw, 5rem);
+    padding-inline: clamp(5rem, 8vw, 9rem);
   }
 
   .home-stage-inner {
