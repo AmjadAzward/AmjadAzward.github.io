@@ -3140,7 +3140,7 @@ body::before {
 
 @media (min-width: 1440px) {
   .site-section {
-    max-width: 1760px;
+    max-width: 1680px;
     padding-inline: clamp(2rem, 4vw, 5rem);
   }
 
