@@ -3138,6 +3138,54 @@ body::before {
   }
 }
 
+@media (min-width: 1440px) {
+  .site-header {
+    padding-inline: clamp(2rem, 4vw, 5rem);
+  }
+
+  .site-header-inner {
+    max-width: 1760px;
+  }
+
+  .site-footer {
+    width: calc(100% - clamp(4rem, 8vw, 10rem));
+    max-width: 1760px;
+  }
+
+  .home-stage {
+    padding-inline: clamp(2rem, 4vw, 5rem);
+  }
+
+  .home-stage-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(27rem, 0.65fr);
+    gap: clamp(5rem, 8vw, 10rem);
+    max-width: 1680px;
+  }
+
+  .home-identity,
+  .home-name {
+    max-width: 48rem;
+  }
+
+  .home-name {
+    font-size: clamp(5rem, 4.8vw, 6.25rem);
+  }
+
+  .home-intro {
+    max-width: 40rem;
+    font-size: clamp(1rem, 0.92vw, 1.12rem);
+  }
+
+  .home-visual-entry {
+    width: min(100%, 31rem);
+  }
+
+  .home-visual {
+    height: min(62vh, 38rem);
+    min-height: 32rem;
+  }
+}
+
 @media (pointer: fine) and (min-width: 768px) {
   .cursor-dot,
   .cursor-ring {
