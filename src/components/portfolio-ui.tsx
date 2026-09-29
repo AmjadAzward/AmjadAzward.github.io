@@ -45,7 +45,7 @@ export function Section({ children, className }: { children: ReactNode; classNam
   return (
     <section
       className={cn(
-        "relative mx-auto w-full max-w-[1200px] px-5 py-20 md:px-8 md:py-28",
+        "site-section relative mx-auto w-full max-w-[1200px] px-5 py-20 md:px-8 md:py-28",
         className,
       )}
     >

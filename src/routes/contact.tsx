@@ -43,7 +43,7 @@ function Contact() {
         ghost="CONNECT"
         description="Have an idea, an opportunity, or a difficult problem? I'd like to hear about it."
       />
-      <div className="grid gap-10 lg:grid-cols-[1.3fr_.7fr]">
+      <div className="contact-layout grid gap-10 lg:grid-cols-[1.3fr_.7fr]">
         <Reveal>
           <form onSubmit={submit} className="grid gap-5" aria-label="Contact form">
             <div className="grid gap-5 sm:grid-cols-2">
