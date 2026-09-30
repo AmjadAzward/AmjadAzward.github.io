@@ -66,6 +66,7 @@ function Contact() {
           >
             <input type="hidden" name="access_key" value={CONTACT_ACCESS_KEY} />
             <input type="hidden" name="from_name" value="Amjad Azward Portfolio" />
+            <input type="hidden" name="subject" value="New portfolio enquiry - Amjad Azward" />
             <input
               type="checkbox"
               name="botcheck"
@@ -77,7 +78,7 @@ function Contact() {
               <Field name="name" label="Name" type="text" />
               <Field name="email" label="Email" type="email" />
             </div>
-            <Field name="subject" label="Subject" type="text" />
+            <Field name="enquiry_topic" label="Subject" type="text" />
             <label className="field-label">
               Message
               <textarea name="message" required rows={7} className="field" />
