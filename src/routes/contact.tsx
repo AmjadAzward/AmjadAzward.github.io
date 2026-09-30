@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CheckCircle2, LoaderCircle, Send } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState, type FormEvent } from "react";
 import { PageHeading, Reveal, Section, SocialLinks } from "@/components/portfolio-ui";
 import { Button } from "@/components/ui/button";
 import { makeHead } from "@/lib/head";
 
 const CONTACT_EMAIL = "amjadazward693@gmail.com";
+const CONTACT_ENDPOINT = "https://api.web3forms.com/submit";
+const CONTACT_ACCESS_KEY = "309d96b1-1f9b-4034-8f69-b4805cb50564";
 const CONTACT_RETURN_URL = "https://amjadazward.github.io/contact?sent=1";
 
 export const Route = createFileRoute("/contact")({
@@ -18,12 +20,31 @@ export const Route = createFileRoute("/contact")({
 });
 
 function Contact() {
-  const [sent, setSent] = useState(false);
-  const [isSending, setIsSending] = useState(false);
+  const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
-  useEffect(() => {
-    setSent(new URLSearchParams(window.location.search).get("sent") === "1");
-  }, []);
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setState("sending");
+
+    const formElement = event.currentTarget;
+
+    try {
+      const response = await fetch(CONTACT_ENDPOINT, {
+        method: "POST",
+        body: new FormData(formElement),
+      });
+      const result = (await response.json()) as { success?: boolean };
+
+      if (!response.ok || !result.success) {
+        throw new Error("Message delivery failed");
+      }
+
+      formElement.reset();
+      setState("sent");
+    } catch {
+      setState("error");
+    }
+  }
 
   return (
     <Section>
@@ -37,21 +58,19 @@ function Contact() {
       <div className="contact-layout grid gap-10 lg:grid-cols-[1.3fr_.7fr]">
         <Reveal>
           <form
-            action={`https://formsubmit.co/${CONTACT_EMAIL}`}
+            action={CONTACT_ENDPOINT}
             method="POST"
-            onSubmit={() => setIsSending(true)}
+            onSubmit={submit}
             className="grid gap-5"
             aria-label="Contact form"
           >
-            <input type="hidden" name="_subject" value="New portfolio enquiry" />
-            <input type="hidden" name="_template" value="table" />
-            <input type="hidden" name="_captcha" value="false" />
-            <input type="hidden" name="_next" value={CONTACT_RETURN_URL} />
+            <input type="hidden" name="access_key" value={CONTACT_ACCESS_KEY} />
+            <input type="hidden" name="from_name" value="Amjad Azward Portfolio" />
+            <input type="hidden" name="redirect" value={CONTACT_RETURN_URL} />
             <input
-              type="text"
-              name="_honey"
+              type="checkbox"
+              name="botcheck"
               tabIndex={-1}
-              autoComplete="off"
               className="hidden"
               aria-hidden="true"
             />
@@ -64,8 +83,8 @@ function Contact() {
               Message
               <textarea name="message" required rows={7} className="field" />
             </label>
-            <Button type="submit" size="lg" className="w-fit" disabled={isSending}>
-              {isSending ? (
+            <Button type="submit" size="lg" className="w-fit" disabled={state === "sending"}>
+              {state === "sending" ? (
                 <>
                   Sending <LoaderCircle className="animate-spin" />
                 </>
@@ -75,7 +94,7 @@ function Contact() {
                 </>
               )}
             </Button>
-            {sent && !isSending && (
+            {state === "sent" && (
               <p
                 role="status"
                 className="border-l-2 border-secondary-accent pl-4 text-sm text-secondary-accent"
@@ -84,6 +103,18 @@ function Contact() {
                   <CheckCircle2 className="size-4" /> Message sent successfully. I'll get back to
                   you soon.
                 </span>
+              </p>
+            )}
+            {state === "error" && (
+              <p
+                role="alert"
+                className="border-l-2 border-destructive pl-4 text-sm text-destructive"
+              >
+                The message could not be sent. Please try again or email me directly at{" "}
+                <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-4">
+                  {CONTACT_EMAIL}
+                </a>
+                .
               </p>
             )}
           </form>
