@@ -7,7 +7,7 @@ import { makeHead } from "@/lib/head";
 
 const CONTACT_EMAIL = "amjadazward693@gmail.com";
 const CONTACT_ENDPOINT = "https://api.web3forms.com/submit";
-const CONTACT_ACCESS_KEY = "309d96b1-1f9b-4034-8f69-b4805cb50564";
+const CONTACT_ACCESS_KEY = "b2c720b0-5dfd-4a15-9f50-0368f17c7298";
 
 export const Route = createFileRoute("/contact")({
   head: makeHead(
