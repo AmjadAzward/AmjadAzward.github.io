@@ -8,7 +8,6 @@ import { makeHead } from "@/lib/head";
 const CONTACT_EMAIL = "amjadazward693@gmail.com";
 const CONTACT_ENDPOINT = "https://api.web3forms.com/submit";
 const CONTACT_ACCESS_KEY = "309d96b1-1f9b-4034-8f69-b4805cb50564";
-const CONTACT_RETURN_URL = "https://amjadazward.github.io/contact?sent=1";
 
 export const Route = createFileRoute("/contact")({
   head: makeHead(
@@ -31,6 +30,7 @@ function Contact() {
     try {
       const response = await fetch(CONTACT_ENDPOINT, {
         method: "POST",
+        headers: { Accept: "application/json" },
         body: new FormData(formElement),
       });
       const result = (await response.json()) as { success?: boolean };
@@ -66,7 +66,6 @@ function Contact() {
           >
             <input type="hidden" name="access_key" value={CONTACT_ACCESS_KEY} />
             <input type="hidden" name="from_name" value="Amjad Azward Portfolio" />
-            <input type="hidden" name="redirect" value={CONTACT_RETURN_URL} />
             <input
               type="checkbox"
               name="botcheck"
