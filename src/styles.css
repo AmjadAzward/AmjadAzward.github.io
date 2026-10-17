@@ -4401,6 +4401,19 @@ body::before {
   }
 }
 
+.about-profile-intro,
+.about-profile-copy h2 {
+  max-width: none;
+}
+
+@media (min-width: 768px) {
+  .about-profile-copy h2 {
+    font-size: clamp(1.65rem, 3.5vw, 4.2rem);
+    letter-spacing: -0.06em;
+    white-space: nowrap;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
