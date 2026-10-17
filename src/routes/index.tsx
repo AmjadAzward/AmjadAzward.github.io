@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
-import { useEffect, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { motion, useReducedMotion } from "motion/react";
+import { lazy, Suspense } from "react";
 
 import { ActionLink, ExternalIcon } from "@/components/portfolio-ui";
 import { makeHead } from "@/lib/head";
-import homePortrait from "../../img/2-enhanced.jpg?url";
+
+const MiniAIRobotHero = lazy(() => import("@/components/mini-ai-robot/mini-ai-robot-hero"));
 
 export const Route = createFileRoute("/")({
   head: makeHead(
@@ -15,70 +16,23 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-function HeroVisual({ reduce }: { reduce: boolean }) {
-  const [canTilt, setCanTilt] = useState(false);
-  const pointerX = useMotionValue(0);
-  const pointerY = useMotionValue(0);
-  const spring = { stiffness: 150, damping: 20, mass: 0.45 };
-
-  const rotateX = useSpring(useTransform(pointerY, [-0.5, 0.5], [5.5, -5.5]), spring);
-  const rotateY = useSpring(useTransform(pointerX, [-0.5, 0.5], [-6.5, 6.5]), spring);
-  const subjectX = useSpring(useTransform(pointerX, [-0.5, 0.5], [-11, 11]), spring);
-  const subjectY = useSpring(useTransform(pointerY, [-0.5, 0.5], [-8, 8]), spring);
-  const motionEnabled = !reduce && canTilt;
-
-  useEffect(() => {
-    const query = window.matchMedia("(pointer: fine) and (hover: hover)");
-    const update = () => setCanTilt(query.matches);
-
-    update();
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
-  }, []);
-
-  const resetTilt = () => {
-    pointerX.set(0);
-    pointerY.set(0);
-  };
-
-  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!motionEnabled || event.pointerType === "touch") return;
-
-    const bounds = event.currentTarget.getBoundingClientRect();
-    pointerX.set((event.clientX - bounds.left) / bounds.width - 0.5);
-    pointerY.set((event.clientY - bounds.top) / bounds.height - 0.5);
-  };
-
+function HeroRobot({ reduce }: { reduce: boolean }) {
   return (
     <motion.div
-      initial={reduce ? false : { opacity: 0, y: 34, scale: 0.96 }}
+      initial={reduce ? false : { opacity: 0, y: 24, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.72, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
       className="home-visual-entry"
     >
-      <motion.div
-        className="home-visual"
-        style={{ rotateX, rotateY }}
-        onPointerMove={handlePointerMove}
-        onPointerLeave={resetTilt}
-        onPointerCancel={resetTilt}
+      <Suspense
+        fallback={
+          <div className="mini-robot-shell mini-robot-route-loading" aria-hidden>
+            <span>AI</span>
+          </div>
+        }
       >
-        <div className="home-visual-surface">
-          <figure className="home-portrait">
-            <motion.span className="home-portrait-subject" style={{ x: subjectX, y: subjectY }}>
-              <img
-                src={homePortrait}
-                alt="Portrait of Amjad Azward"
-                width={1287}
-                height={1222}
-                decoding="async"
-                fetchPriority="high"
-                draggable={false}
-              />
-            </motion.span>
-          </figure>
-        </div>
-      </motion.div>
+        <MiniAIRobotHero />
+      </Suspense>
     </motion.div>
   );
 }
@@ -119,7 +73,7 @@ function Home() {
           </div>
         </motion.div>
 
-        <HeroVisual reduce={reduce} />
+        <HeroRobot reduce={reduce} />
       </div>
     </section>
   );

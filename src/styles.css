@@ -501,6 +501,172 @@ body::before {
   perspective: 1400px;
 }
 
+.mini-robot-experience {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mini-robot-shell {
+  position: relative;
+  width: 100%;
+  height: min(58vh, 32rem);
+  min-height: 27rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--primary) 30%, var(--border));
+  border-radius: 4rem 1.4rem 4rem 1.4rem;
+  background:
+    radial-gradient(
+      circle at 50% 52%,
+      color-mix(in oklab, var(--primary) 12%, transparent),
+      transparent 55%
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(in oklab, var(--card) 72%, transparent),
+      color-mix(in oklab, var(--background) 88%, transparent)
+    );
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 8%, transparent),
+    0 30px 90px color-mix(in oklab, var(--primary) 10%, transparent);
+  isolation: isolate;
+}
+
+.mini-robot-shell::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  content: "";
+  opacity: 0.12;
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--primary) 35%, transparent) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--primary) 35%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 42px 42px;
+  mask-image: radial-gradient(circle at center, black, transparent 76%);
+}
+
+.mini-robot-halo {
+  position: absolute;
+  z-index: -1;
+  top: 49%;
+  left: 50%;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--primary) 18%, transparent),
+    transparent 68%
+  );
+  filter: blur(8px);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.mini-robot-canvas {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  touch-action: pan-y;
+}
+
+.mini-robot-canvas canvas {
+  display: block;
+  outline: none;
+  touch-action: pan-y;
+}
+
+.mini-robot-static {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.mini-robot-static svg {
+  display: block;
+  width: min(88%, 22rem);
+  max-height: 92%;
+  filter: drop-shadow(0 24px 34px color-mix(in oklab, var(--foreground) 22%, transparent));
+}
+
+.robot-static-loading {
+  opacity: 0.72;
+}
+
+.mini-robot-loading-label {
+  position: absolute;
+  bottom: 1.15rem;
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.mini-robot-route-loading {
+  display: grid;
+  place-items: center;
+}
+
+.mini-robot-route-loading > span {
+  display: grid;
+  width: 3.1rem;
+  height: 3.1rem;
+  place-items: center;
+  border: 1px solid color-mix(in oklab, var(--primary) 42%, var(--border));
+  border-radius: 50%;
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+}
+
+.mini-robot-replay {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.48rem;
+  margin-top: 0.7rem;
+  padding: 0.58rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--card) 54%, transparent);
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 0.25s ease,
+    border-color 0.25s ease,
+    background-color 0.25s ease;
+}
+
+.mini-robot-replay:hover:not(:disabled) {
+  border-color: color-mix(in oklab, var(--primary) 48%, var(--border));
+  background: color-mix(in oklab, var(--primary) 8%, transparent);
+  color: var(--primary);
+}
+
+.mini-robot-replay:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.mini-robot-replay svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
 .home-visual {
   position: relative;
   z-index: 2;
@@ -3227,6 +3393,11 @@ body::before {
     width: min(100%, 29rem);
   }
 
+  .mini-robot-shell {
+    height: min(61vh, 36rem);
+    min-height: 31rem;
+  }
+
   .home-visual {
     height: min(60vh, 36rem);
     min-height: 31rem;
@@ -3505,6 +3676,11 @@ body::before {
     justify-self: center;
   }
 
+  .mini-robot-shell {
+    height: min(62vh, 35rem);
+    min-height: 32rem;
+  }
+
   .home-visual {
     width: 100%;
     max-width: 32rem;
@@ -3560,6 +3736,16 @@ body::before {
   .home-visual {
     height: 27rem;
     min-height: 27rem;
+  }
+
+  .mini-robot-shell {
+    height: 25rem;
+    min-height: 25rem;
+    border-radius: 2.5rem 1rem 2.5rem 1rem;
+  }
+
+  .mini-robot-static svg {
+    width: min(82%, 19rem);
   }
 
   .home-visual-surface {
