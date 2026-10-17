@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckCircle2, LoaderCircle, Send } from "lucide-react";
+import { CheckCircle2, LoaderCircle, Send, ShieldCheck } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { PageHeading, Reveal, Section, SocialLinks } from "@/components/portfolio-ui";
 import { Button } from "@/components/ui/button";
@@ -75,30 +75,57 @@ function Contact() {
               aria-hidden="true"
             />
             <div className="grid gap-5 sm:grid-cols-2">
-              <Field name="name" label="Name" type="text" />
-              <Field name="email" label="Email" type="email" />
+              <Field
+                name="name"
+                label="Name"
+                type="text"
+                placeholder="Your name"
+                autoComplete="name"
+              />
+              <Field
+                name="email"
+                label="Email"
+                type="email"
+                placeholder="you@example.com"
+                autoComplete="email"
+              />
             </div>
-            <Field name="enquiry_topic" label="Subject" type="text" />
+            <Field
+              name="enquiry_topic"
+              label="Subject"
+              type="text"
+              placeholder="What would you like to build?"
+              autoComplete="off"
+            />
             <label className="field-label">
               Message
-              <textarea name="message" required rows={7} className="field" />
+              <textarea
+                name="message"
+                required
+                minLength={20}
+                rows={7}
+                className="field"
+                placeholder="Share a little about your idea, goals, and timeline."
+              />
             </label>
-            <Button type="submit" size="lg" className="w-fit" disabled={state === "sending"}>
-              {state === "sending" ? (
-                <>
-                  Sending <LoaderCircle className="animate-spin" />
-                </>
-              ) : (
-                <>
-                  Send Message <Send />
-                </>
-              )}
-            </Button>
+            <div className="contact-submit-row">
+              <Button type="submit" size="lg" className="w-fit" disabled={state === "sending"}>
+                {state === "sending" ? (
+                  <>
+                    Sending <LoaderCircle className="animate-spin" />
+                  </>
+                ) : (
+                  <>
+                    Send Message <Send />
+                  </>
+                )}
+              </Button>
+              <p className="contact-privacy-note">
+                <ShieldCheck aria-hidden /> Your details are used only to reply to this enquiry.
+              </p>
+            </div>
             {state === "sent" && (
-              <p
-                role="status"
-                className="border-l-2 border-secondary-accent pl-4 text-sm text-secondary-accent"
-              >
+              <p role="status" aria-live="polite" className="form-status form-status-success">
                 <span className="inline-flex items-center gap-2">
                   <CheckCircle2 className="size-4" /> Message sent successfully. I'll get back to
                   you soon.
@@ -106,10 +133,7 @@ function Contact() {
               </p>
             )}
             {state === "error" && (
-              <p
-                role="alert"
-                className="border-l-2 border-destructive pl-4 text-sm text-destructive"
-              >
+              <p role="alert" aria-live="assertive" className="form-status form-status-error">
                 The message could not be sent. Please try again or email me directly at{" "}
                 <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-4">
                   {CONTACT_EMAIL}
@@ -146,11 +170,31 @@ function Contact() {
   );
 }
 
-function Field({ name, label, type }: { name: string; label: string; type: string }) {
+function Field({
+  name,
+  label,
+  type,
+  placeholder,
+  autoComplete,
+}: {
+  name: string;
+  label: string;
+  type: string;
+  placeholder: string;
+  autoComplete: string;
+}) {
   return (
     <label className="field-label">
       {label}
-      <input name={name} type={type} required className="field" />
+      <input
+        name={name}
+        type={type}
+        required
+        minLength={type === "text" ? 2 : undefined}
+        className="field"
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+      />
     </label>
   );
 }

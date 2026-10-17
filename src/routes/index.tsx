@@ -53,7 +53,7 @@ function HeroVisual({ reduce }: { reduce: boolean }) {
     <motion.div
       initial={reduce ? false : { opacity: 0, y: 34, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 1, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.72, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
       className="home-visual-entry"
     >
       <motion.div
@@ -95,10 +95,10 @@ function Home() {
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
           className="home-identity"
         >
-          <p className="home-kicker">Software engineering · Data science</p>
+          <p className="home-kicker">Software engineering - Data science</p>
           <h1 className="home-name">
             <span>Building useful</span>
             <em>digital systems.</em>

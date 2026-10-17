@@ -2,6 +2,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { AnimatePresence, animate, motion, useInView, useReducedMotion } from "motion/react";
 import {
   ArrowDown,
+  ArrowUp,
   ArrowUpRight,
   Download,
   Github,
@@ -32,10 +33,10 @@ export function Reveal({
   return (
     <motion.div
       className={className}
-      initial={reduce ? false : { opacity: 0, y: 20, scale: 0.99 }}
+      initial={reduce ? false : { opacity: 0, y: 14, scale: 0.995 }}
       whileInView={reduce ? {} : { opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, amount: 0.14 }}
-      transition={{ duration: 0.82, delay, ease: cinematicEase }}
+      transition={{ duration: 0.62, delay, ease: cinematicEase }}
     >
       {children}
     </motion.div>
@@ -170,10 +171,16 @@ export function SocialLinks({ labels = false }: { labels?: boolean }) {
             target="_blank"
             rel="noreferrer"
             aria-label={s.label}
+            title={s.label}
             className={cn("social-link", labels && "w-auto px-3")}
           >
             <Icon size={16} />
             {labels && <span>{s.label}</span>}
+            {!labels && (
+              <span className="social-tooltip" aria-hidden>
+                {s.label}
+              </span>
+            )}
           </a>
         );
       })}
@@ -207,6 +214,25 @@ function ThemeToggle() {
 }
 function Header() {
   const [open, setOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [open]);
 
   return (
     <header className="site-header">
@@ -221,6 +247,7 @@ function Header() {
               key={item.to}
               to={item.to}
               activeOptions={{ exact: item.to === "/" }}
+              activeProps={{ "aria-current": "page" }}
               className="nav-link"
             >
               {item.label}
@@ -244,9 +271,10 @@ function Header() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0, y: -12, scale: 0.985 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.99 }}
+            transition={{ duration: 0.32, ease: cinematicEase }}
             className="mobile-menu lg:hidden"
           >
             <div className="flex items-center justify-between">
@@ -298,6 +326,36 @@ function Footer() {
     </footer>
   );
 }
+function ScrollToTop() {
+  const [visible, setVisible] = useState(false);
+  const reduce = useReducedMotion();
+
+  useEffect(() => {
+    const update = () => setVisible(window.scrollY > 560);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
+
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.button
+          type="button"
+          className="scroll-top"
+          initial={reduce ? false : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 8 }}
+          onClick={() => window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" })}
+          aria-label="Scroll to top"
+          title="Scroll to top"
+        >
+          <ArrowUp aria-hidden />
+        </motion.button>
+      )}
+    </AnimatePresence>
+  );
+}
 function CustomCursor() {
   const dot = useRef<HTMLDivElement>(null);
   const ring = useRef<HTMLDivElement>(null);
@@ -347,11 +405,22 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [location.pathname, reduce]);
   return (
     <>
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <CustomCursor />
       <div className="site-atmosphere" aria-hidden>
         <span className="atmosphere-contours" />
       </div>
       <Header />
+      <motion.div
+        key={`progress-${location.pathname}`}
+        className="route-progress"
+        initial={reduce ? false : { scaleX: 0, opacity: 1 }}
+        animate={reduce ? { opacity: 0 } : { scaleX: 1, opacity: 0 }}
+        transition={{ duration: 0.48, ease: cinematicEase }}
+        aria-hidden
+      />
       <AnimatePresence mode="wait" initial={false}>
         <motion.main
           id="main-content"
@@ -359,13 +428,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           initial={reduce ? false : { opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           exit={reduce ? { opacity: 0 } : { opacity: 0, y: -8 }}
-          transition={{ duration: reduce ? 0.12 : 0.48, ease: cinematicEase }}
+          transition={{ duration: reduce ? 0.08 : 0.34, ease: cinematicEase }}
           className={cn("relative z-[1] min-h-screen pt-16", isHome && "home-main")}
         >
           {children}
         </motion.main>
       </AnimatePresence>
       <Footer />
+      <ScrollToTop />
     </>
   );
 }

@@ -1,8 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Award, BookOpenCheck, Building2, CalendarDays } from "lucide-react";
+import { Award, BookOpenCheck, Building2, CalendarDays, Expand } from "lucide-react";
 
 import { ExternalIcon, PageHeading, Reveal, Section } from "@/components/portfolio-ui";
 import { TiltSurface } from "@/components/tilt-surface";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { certifications } from "@/data/portfolio";
 import { makeHead } from "@/lib/head";
 
@@ -82,14 +90,48 @@ function Certifications() {
                 <article className="cert-card">
                   <span className="cert-hologram" aria-hidden />
                   <div className="cert-card-media">
-                    <img
-                      src={certificate.image}
-                      alt=""
-                      aria-hidden
-                      loading="lazy"
-                      decoding="async"
-                      fetchPriority="low"
-                    />
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <button
+                          type="button"
+                          className="cert-preview-trigger"
+                          aria-label={`Preview ${certificate.title}`}
+                        >
+                          <img
+                            src={certificate.image}
+                            alt={`${certificate.title} certificate`}
+                            loading="lazy"
+                            decoding="async"
+                            fetchPriority="low"
+                            sizes="(max-width: 640px) 100vw, (max-width: 900px) 50vw, 33vw"
+                          />
+                          <span className="cert-preview-cue">
+                            <Expand aria-hidden /> Preview
+                          </span>
+                        </button>
+                      </DialogTrigger>
+                      <DialogContent className="certificate-dialog">
+                        <DialogHeader>
+                          <DialogTitle>{certificate.title}</DialogTitle>
+                          <DialogDescription>
+                            Issued by {certificate.issuer} in {certificate.year}.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <img
+                          src={certificate.image}
+                          alt={`${certificate.title} certificate - enlarged view`}
+                          className="certificate-dialog-image"
+                        />
+                        <a
+                          className="certificate-dialog-link"
+                          href={certificate.verify}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Verify credential <ExternalIcon />
+                        </a>
+                      </DialogContent>
+                    </Dialog>
                     <span className="cert-card-index" aria-hidden>
                       {String(index + 1).padStart(2, "0")}
                     </span>

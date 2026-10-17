@@ -82,11 +82,11 @@ function Portfolio() {
                 <div className="portfolio-featured-media">
                   <img
                     src={featuredProject.image}
-                    alt=""
-                    aria-hidden
+                    alt={`Preview of ${featuredProject.title}`}
                     loading="lazy"
                     decoding="async"
                     fetchPriority="low"
+                    sizes="(max-width: 900px) 100vw, 65vw"
                   />
                   <span aria-hidden>FEATURED / 01</span>
                 </div>
@@ -116,11 +116,11 @@ function Portfolio() {
                   <div className="portfolio-card-media">
                     <img
                       src={project.image}
-                      alt=""
-                      aria-hidden
+                      alt={`Preview of ${project.title}`}
                       loading="lazy"
                       decoding="async"
                       fetchPriority="low"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1439px) 50vw, 33vw"
                     />
                     <span aria-hidden>{String(index + 2).padStart(2, "0")}</span>
                   </div>
@@ -131,16 +131,17 @@ function Portfolio() {
                     </div>
                     <div className="portfolio-card-title-row">
                       <h3>{project.title}</h3>
-                      <a
-                        href={project.github}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label={`${project.title} on GitHub`}
-                      >
-                        <ExternalIcon />
-                      </a>
                     </div>
                     <p>{project.desc}</p>
+                    <a
+                      className="portfolio-card-link"
+                      href={project.github}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`View ${project.title} on GitHub`}
+                    >
+                      View on GitHub <ExternalIcon />
+                    </a>
                   </div>
                 </article>
               </TiltSurface>

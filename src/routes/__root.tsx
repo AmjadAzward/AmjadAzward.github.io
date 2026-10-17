@@ -16,23 +16,21 @@ import { AppShell } from "../components/portfolio-ui";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Go home
+    <section className="system-page" aria-labelledby="not-found-title">
+      <div className="system-page-panel">
+        <p className="eyebrow">ERROR / 404</p>
+        <span className="system-page-code" aria-hidden>
+          404
+        </span>
+        <h1 id="not-found-title">This route went off grid.</h1>
+        <p>The page you're looking for doesn't exist or has been moved.</p>
+        <div className="system-page-actions">
+          <Link to="/" className="system-primary-action">
+            Return home
           </Link>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -43,33 +41,30 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+    <section className="system-page" aria-labelledby="error-title">
+      <div className="system-page-panel">
+        <p className="eyebrow">SYSTEM / RETRY</p>
+        <span className="system-page-code" aria-hidden>
+          !
+        </span>
+        <h1 id="error-title">This page didn't load.</h1>
+        <p>Something went wrong on our end. You can try refreshing or head back home.</p>
+        <div className="system-page-actions">
           <button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="system-primary-action"
           >
             Try again
           </button>
-          <a
-            href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-          >
+          <a href="/" className="system-secondary-action">
             Go home
           </a>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
