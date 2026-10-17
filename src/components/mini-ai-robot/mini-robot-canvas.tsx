@@ -345,50 +345,50 @@ function MiniRobot({
     );
     animatePiece(
       leftLegRef.current,
-      { position: [-2.75, -2.15, 0.55], rotation: [0.25, -0.4, 0.7] },
+      { position: [-1.85, -1.92, 0.55], rotation: [0.25, -0.4, 0.7] },
       { position: [-0.43, -1.42, 0], rotation: [0, 0, 0] },
       clampProgress(elapsed, 1.08, 1.72),
     );
     animatePiece(
       rightLegRef.current,
-      { position: [2.75, -2.05, -0.35], rotation: [-0.25, 0.45, -0.75] },
+      { position: [1.85, -1.92, -0.35], rotation: [-0.25, 0.45, -0.75] },
       { position: [0.43, -1.42, 0], rotation: [0, 0, 0] },
       clampProgress(elapsed, 1.2, 1.84),
     );
     animatePiece(
       leftFootRef.current,
-      { position: [-2.45, -2.85, 1.15], rotation: [0.45, -0.5, 0.35] },
+      { position: [-1.65, -2.5, 1.15], rotation: [0.45, -0.5, 0.35] },
       { position: [-0.43, -2.01, 0.14], rotation: [0, 0, 0] },
       clampProgress(elapsed, 1.38, 1.94),
     );
     animatePiece(
       rightFootRef.current,
-      { position: [2.45, -2.75, 1.05], rotation: [0.4, 0.5, -0.35] },
+      { position: [1.65, -2.5, 1.05], rotation: [0.4, 0.5, -0.35] },
       { position: [0.43, -2.01, 0.14], rotation: [0, 0, 0] },
       clampProgress(elapsed, 1.48, 2),
     );
 
     animatePiece(
       leftArmRef.current,
-      { position: [-3.18, 0.62, 0.4], rotation: [0.2, -0.4, 1.05] },
+      { position: [-2.45, 0.62, 0.4], rotation: [0.2, -0.4, 1.05] },
       { position: [-1.13, -0.18, 0], rotation: [0, 0, 0.08] },
       clampProgress(elapsed, 2, 2.66),
     );
     animatePiece(
       rightArmRef.current,
-      { position: [3.18, 0.55, -0.25], rotation: [-0.2, 0.45, -1.05] },
+      { position: [2.45, 0.55, -0.25], rotation: [-0.2, 0.45, -1.05] },
       { position: [1.13, -0.18, 0], rotation: [0, 0, -0.08] },
       clampProgress(elapsed, 2.08, 2.72),
     );
     animatePiece(
       leftHandRef.current,
-      { position: [-2.95, -0.95, 1.05], rotation: [0.5, 0.4, 0.6] },
+      { position: [-2.2, -0.95, 1.05], rotation: [0.5, 0.4, 0.6] },
       { position: [-1.17, -0.86, 0], rotation: [0, 0, 0] },
       clampProgress(elapsed, 2.32, 2.88),
     );
     animatePiece(
       rightHandRef.current,
-      { position: [2.95, -1.05, 0.9], rotation: [-0.5, -0.4, -0.6] },
+      { position: [2.2, -1.05, 0.9], rotation: [-0.5, -0.4, -0.6] },
       { position: [1.17, -0.86, 0], rotation: [0, 0, 0] },
       clampProgress(elapsed, 2.4, 2.94),
     );
@@ -401,7 +401,7 @@ function MiniRobot({
 
     animatePiece(
       headRef.current,
-      { position: [0, 2.92, -1.25], rotation: [-0.28, 0.48, -0.22] },
+      { position: [0, 2.68, -1.25], rotation: [-0.28, 0.48, -0.22] },
       { position: [0, 2.02, 0], rotation: [0, 0, 0] },
       clampProgress(elapsed, 3, 3.86),
     );
@@ -457,7 +457,9 @@ function MiniRobot({
       const float =
         !reducedMotion && elapsed > 5 ? Math.sin(state.clock.elapsedTime * 1.45) * 0.055 : 0;
       robotRef.current.position.y = bounce + float;
-      const scale = 1.1 + (!reducedMotion ? Math.sin(bounceProgress * Math.PI) * 0.035 : 0);
+      const activatedScale = MathUtils.lerp(1, 1.1, smooth(clampProgress(elapsed, 3.72, 4.28)));
+      const scale =
+        activatedScale + (!reducedMotion ? Math.sin(bounceProgress * Math.PI) * 0.035 : 0);
       robotRef.current.scale.setScalar(scale);
     }
 
