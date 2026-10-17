@@ -19,6 +19,7 @@ import {
 } from "@/components/portfolio-ui";
 import { education, experience, stats } from "@/data/portfolio";
 import { makeHead } from "@/lib/head";
+import homePortrait from "../../img/2-enhanced.jpg?url";
 
 export const Route = createFileRoute("/about")({
   head: makeHead(
@@ -109,35 +110,49 @@ function About() {
               </h2>
             </div>
 
-            <div className="about-profile-details">
-              <p className="about-profile-lead">
-                I’m a third-year Computer Science undergraduate at NIBM, affiliated with Coventry
-                University, currently freelancing as a software developer and gaining industry
-                experience through AI-enabled engineering internships.
-              </p>
-              <p className="about-profile-supporting">
-                My work moves across web, mobile, cloud, and machine learning - with a practical
-                focus on creating useful systems, learning quickly, and improving every iteration.
-              </p>
+            <div className="about-profile-content">
+              <div className="about-profile-details">
+                <p className="about-profile-lead">
+                  I’m a third-year Computer Science undergraduate at NIBM, affiliated with Coventry
+                  University, currently freelancing as a software developer and gaining industry
+                  experience through AI-enabled engineering internships.
+                </p>
+                <p className="about-profile-supporting">
+                  My work moves across web, mobile, cloud, and machine learning - with a practical
+                  focus on creating useful systems, learning quickly, and improving every iteration.
+                </p>
 
-              <ul className="about-profile-facts" aria-label="Profile details">
-                <li>
-                  <MapPin aria-hidden />
-                  Colombo, Sri Lanka
-                </li>
-                <li>
-                  <Sparkles aria-hidden />
-                  Software + data
-                </li>
-              </ul>
+                <ul className="about-profile-facts" aria-label="Profile details">
+                  <li>
+                    <MapPin aria-hidden />
+                    Colombo, Sri Lanka
+                  </li>
+                  <li>
+                    <Sparkles aria-hidden />
+                    Software + data
+                  </li>
+                </ul>
 
-              <div className="about-actions">
-                <ActionLink to="/portfolio">View Portfolio</ActionLink>
-                <ActionLink to="/cv.pdf" variant="outline" download>
-                  <DownloadIcon />
-                  Download CV
-                </ActionLink>
+                <div className="about-actions">
+                  <ActionLink to="/portfolio">View Portfolio</ActionLink>
+                  <ActionLink to="/cv.pdf" variant="outline" download>
+                    <DownloadIcon />
+                    Download CV
+                  </ActionLink>
+                </div>
               </div>
+
+              <figure className="about-profile-visual">
+                <img
+                  src={homePortrait}
+                  alt="Portrait of Amjad Azward"
+                  width={1287}
+                  height={1222}
+                  loading="lazy"
+                  decoding="async"
+                  sizes="(max-width: 900px) 100vw, 34vw"
+                />
+              </figure>
             </div>
           </div>
         </section>

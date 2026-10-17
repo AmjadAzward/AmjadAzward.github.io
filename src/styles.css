@@ -1358,23 +1358,65 @@ body::before {
 .about-profile-copy {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(25rem, 0.95fr);
-  align-items: center;
-  gap: clamp(2.5rem, 6vw, 6.5rem);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(2rem, 4vw, 3.5rem);
   padding: clamp(1.8rem, 4vw, 3.6rem);
   isolation: isolate;
 }
 
 .about-profile-intro,
-.about-profile-details {
+.about-profile-details,
+.about-profile-content,
+.about-profile-visual {
   position: relative;
   z-index: 1;
   min-width: 0;
 }
 
+.about-profile-intro {
+  max-width: 58rem;
+}
+
+.about-profile-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(18rem, 0.62fr);
+  align-items: center;
+  gap: clamp(2.5rem, 6vw, 6.5rem);
+  padding-top: clamp(2rem, 4vw, 3.5rem);
+  border-top: 1px solid var(--border);
+}
+
 .about-profile-details {
-  padding: 0.5rem 0 0.5rem clamp(1.5rem, 3vw, 3.5rem);
-  border-left: 1px solid var(--border);
+  padding: 0.25rem 0;
+}
+
+.about-profile-visual {
+  width: min(100%, 24rem);
+  aspect-ratio: 0.86;
+  justify-self: end;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--primary) 28%, var(--border));
+  border-radius: 3.2rem 1.25rem 3.2rem 1.25rem;
+  background: var(--card);
+  box-shadow:
+    0 28px 70px color-mix(in oklab, var(--foreground) 12%, transparent),
+    inset 0 1px 0 color-mix(in oklab, white 8%, transparent);
+}
+
+.about-profile-visual img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 32%;
+  filter: saturate(0.95) contrast(1.04);
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.about-profile-visual:hover img {
+  transform: scale(1.025);
 }
 
 .about-profile-copy::before {
@@ -3192,8 +3234,11 @@ body::before {
 
   .about-profile-copy {
     min-height: 42rem;
-    grid-template-columns: minmax(0, 1.08fr) minmax(30rem, 0.92fr);
     padding: clamp(3rem, 4vw, 4.75rem);
+  }
+
+  .about-profile-content {
+    grid-template-columns: minmax(0, 1.15fr) minmax(22rem, 0.55fr);
   }
 
   .about-profile-copy h2 {
@@ -3322,10 +3367,18 @@ body::before {
     min-height: 0;
   }
 
+  .about-profile-content {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+
   .about-profile-details {
-    padding: 2rem 0 0;
-    border-top: 1px solid var(--border);
-    border-left: 0;
+    padding: 0;
+  }
+
+  .about-profile-visual {
+    width: min(100%, 28rem);
+    justify-self: center;
   }
 
   .about-profile-copy {
@@ -3607,6 +3660,15 @@ body::before {
 
   .about-profile-copy h2 {
     font-size: clamp(2.4rem, 11vw, 3.5rem);
+  }
+
+  .about-profile-content {
+    padding-top: 1.5rem;
+  }
+
+  .about-profile-visual {
+    width: min(100%, 22rem);
+    border-radius: 2.4rem 1rem 2.4rem 1rem;
   }
 
   .about-profile-lead {
