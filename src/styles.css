@@ -514,58 +514,15 @@ body::before {
   height: min(58vh, 32rem);
   min-height: 27rem;
   overflow: hidden;
-  border: 1px solid color-mix(in oklab, var(--primary) 30%, var(--border));
-  border-radius: 4rem 1.4rem 4rem 1.4rem;
-  background:
-    radial-gradient(
-      circle at 50% 52%,
-      color-mix(in oklab, var(--primary) 12%, transparent),
-      transparent 55%
-    ),
-    linear-gradient(
-      145deg,
-      color-mix(in oklab, var(--card) 72%, transparent),
-      color-mix(in oklab, var(--background) 88%, transparent)
-    );
-  box-shadow:
-    inset 0 1px 0 color-mix(in oklab, white 8%, transparent),
-    0 30px 90px color-mix(in oklab, var(--primary) 10%, transparent);
   isolation: isolate;
 }
 
 .mini-robot-shell::before {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  content: "";
-  opacity: 0.12;
-  background-image:
-    linear-gradient(color-mix(in oklab, var(--primary) 35%, transparent) 1px, transparent 1px),
-    linear-gradient(
-      90deg,
-      color-mix(in oklab, var(--primary) 35%, transparent) 1px,
-      transparent 1px
-    );
-  background-size: 42px 42px;
-  mask-image: radial-gradient(circle at center, black, transparent 76%);
+  display: none;
 }
 
 .mini-robot-halo {
-  position: absolute;
-  z-index: -1;
-  top: 49%;
-  left: 50%;
-  width: 70%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    color-mix(in oklab, var(--primary) 18%, transparent),
-    transparent 68%
-  );
-  filter: blur(8px);
-  transform: translate(-50%, -50%);
-  pointer-events: none;
+  display: none;
 }
 
 .mini-robot-canvas {
@@ -3741,7 +3698,6 @@ body::before {
   .mini-robot-shell {
     height: 25rem;
     min-height: 25rem;
-    border-radius: 2.5rem 1rem 2.5rem 1rem;
   }
 
   .mini-robot-static svg {
