@@ -316,6 +316,7 @@ function MiniRobot({
   const elapsedRef = useRef(0);
   const hoveredRef = useRef(false);
   const clickTimeRef = useRef(-100);
+  const pointerRef = useRef({ x: 0, y: 0 });
 
   const materials = useMemo(createMaterials, []);
   const geometries = useMemo(createGeometries, []);
@@ -323,6 +324,34 @@ function MiniRobot({
   useEffect(() => {
     startTimeRef.current = null;
   }, [replayToken, reducedMotion]);
+
+  useEffect(() => {
+    const resetPointer = () => {
+      pointerRef.current.x = 0;
+      pointerRef.current.y = 0;
+    };
+
+    if (reducedMotion) {
+      resetPointer();
+      return;
+    }
+
+    const handlePointerMove = (event: PointerEvent) => {
+      if (event.pointerType === "touch") return;
+      pointerRef.current.x = MathUtils.clamp((event.clientX / window.innerWidth) * 2 - 1, -1, 1);
+      pointerRef.current.y = MathUtils.clamp(1 - (event.clientY / window.innerHeight) * 2, -1, 1);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    window.addEventListener("blur", resetPointer);
+    document.documentElement.addEventListener("mouseleave", resetPointer);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("blur", resetPointer);
+      document.documentElement.removeEventListener("mouseleave", resetPointer);
+    };
+  }, [reducedMotion]);
 
   useEffect(
     () => () => {
@@ -438,8 +467,36 @@ function MiniRobot({
         ? MathUtils.clamp(Math.abs(sinceClick - 0.19) / 0.11, 0.08, 1)
         : 1;
     const blinkScale = Math.min(autoBlink, clickBlink);
-    if (leftEyeRef.current) leftEyeRef.current.scale.y = blinkScale;
-    if (rightEyeRef.current) rightEyeRef.current.scale.y = blinkScale;
+    const trackingAmount = reducedMotion ? 0 : smooth(clampProgress(elapsed, 4.28, 4.88));
+    const eyeOffsetX = pointerRef.current.x * 0.1 * trackingAmount;
+    const eyeOffsetY = pointerRef.current.y * 0.075 * trackingAmount;
+
+    if (leftEyeRef.current) {
+      leftEyeRef.current.scale.y = blinkScale;
+      leftEyeRef.current.position.x = MathUtils.lerp(
+        leftEyeRef.current.position.x,
+        -0.52 + eyeOffsetX,
+        0.16,
+      );
+      leftEyeRef.current.position.y = MathUtils.lerp(
+        leftEyeRef.current.position.y,
+        0.08 + eyeOffsetY,
+        0.16,
+      );
+    }
+    if (rightEyeRef.current) {
+      rightEyeRef.current.scale.y = blinkScale;
+      rightEyeRef.current.position.x = MathUtils.lerp(
+        rightEyeRef.current.position.x,
+        0.52 + eyeOffsetX,
+        0.16,
+      );
+      rightEyeRef.current.position.y = MathUtils.lerp(
+        rightEyeRef.current.position.y,
+        0.08 + eyeOffsetY,
+        0.16,
+      );
+    }
 
     if (pulseRef.current) {
       const activationPulse = clampProgress(elapsed, 4.08, 4.92);
@@ -465,11 +522,9 @@ function MiniRobot({
 
     if (headRef.current && elapsed >= 4) {
       const activationTilt = -0.1 * smooth(clampProgress(elapsed, 4.12, 4.82)) * (1 - idle);
-      const pointerX = reducedMotion ? 0 : state.pointer.x;
-      const pointerY = reducedMotion ? 0 : state.pointer.y;
       const idleTilt = reducedMotion ? 0 : Math.sin(state.clock.elapsedTime * 0.72) * 0.035 * idle;
-      const targetX = activationTilt - pointerY * 0.075 * idle;
-      const targetY = pointerX * 0.16 * idle;
+      const targetX = activationTilt - pointerRef.current.y * 0.16 * trackingAmount;
+      const targetY = pointerRef.current.x * 0.28 * trackingAmount;
       const targetZ = idleTilt + clickAmount * 0.16;
       headRef.current.rotation.x = MathUtils.lerp(headRef.current.rotation.x, targetX, 0.08);
       headRef.current.rotation.y = MathUtils.lerp(headRef.current.rotation.y, targetY, 0.08);
