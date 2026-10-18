@@ -5,6 +5,22 @@ const MiniRobotCanvas = lazy(() => import("./mini-robot-canvas"));
 
 type DisplayMode = "checking" | "3d" | "static";
 
+function useDarkMode() {
+  const [darkMode, setDarkMode] = useState(true);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const update = () => setDarkMode(root.classList.contains("dark"));
+    const observer = new MutationObserver(update);
+
+    update();
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  return darkMode;
+}
+
 function supportsWebGL() {
   try {
     const canvas = document.createElement("canvas");
@@ -24,7 +40,13 @@ function prefersLightweightScene() {
   return isSmall || connection?.saveData === true || connection?.effectiveType === "2g";
 }
 
-export function RobotStaticFallback() {
+export function RobotStaticFallback({ darkMode }: { darkMode: boolean }) {
+  const bodyStart = darkMode ? "#ffffff" : "#172a46";
+  const bodyMiddle = darkMode ? "#eaf2ff" : "#1f3b60";
+  const bodyEnd = darkMode ? "#b9d3ee" : "#0b172a";
+  const joint = darkMode ? "#64748b" : "#081426";
+  const innerBody = darkMode ? "#dce9f7" : "#183253";
+
   return (
     <div
       className="mini-robot-static"
@@ -34,9 +56,9 @@ export function RobotStaticFallback() {
       <svg viewBox="0 0 320 430" aria-hidden>
         <defs>
           <linearGradient id="robot-body" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#ffffff" />
-            <stop offset="0.55" stopColor="#eaf2ff" />
-            <stop offset="1" stopColor="#b9d3ee" />
+            <stop offset="0" stopColor={bodyStart} />
+            <stop offset="0.55" stopColor={bodyMiddle} />
+            <stop offset="1" stopColor={bodyEnd} />
           </linearGradient>
           <radialGradient id="robot-glow">
             <stop offset="0" stopColor="#42a5ff" stopOpacity=".92" />
@@ -52,24 +74,24 @@ export function RobotStaticFallback() {
 
         <g>
           <rect x="103" y="211" width="114" height="118" rx="34" fill="url(#robot-body)" />
-          <rect x="117" y="229" width="86" height="70" rx="23" fill="#dce9f7" />
+          <rect x="117" y="229" width="86" height="70" rx="23" fill={innerBody} />
           <circle cx="160" cy="264" r="24" fill="#101827" />
           <circle cx="160" cy="264" r="15" fill="#42a5ff" />
           <circle cx="160" cy="264" r="7" fill="#d8f4ff" />
 
           <rect x="64" y="226" width="35" height="82" rx="17" fill="url(#robot-body)" />
-          <circle cx="86" cy="230" r="15" fill="#64748b" />
+          <circle cx="86" cy="230" r="15" fill={joint} />
           <rect x="221" y="226" width="35" height="82" rx="17" fill="url(#robot-body)" />
-          <circle cx="234" cy="230" r="15" fill="#64748b" />
+          <circle cx="234" cy="230" r="15" fill={joint} />
           <circle cx="81" cy="310" r="20" fill="url(#robot-body)" />
           <circle cx="239" cy="310" r="20" fill="url(#robot-body)" />
 
-          <rect x="120" y="324" width="33" height="49" rx="15" fill="#64748b" />
-          <rect x="167" y="324" width="33" height="49" rx="15" fill="#64748b" />
+          <rect x="120" y="324" width="33" height="49" rx="15" fill={joint} />
+          <rect x="167" y="324" width="33" height="49" rx="15" fill={joint} />
           <rect x="102" y="360" width="57" height="34" rx="16" fill="url(#robot-body)" />
           <rect x="161" y="360" width="57" height="34" rx="16" fill="url(#robot-body)" />
 
-          <rect x="144" y="181" width="32" height="36" rx="10" fill="#64748b" />
+          <rect x="144" y="181" width="32" height="36" rx="10" fill={joint} />
           <rect x="54" y="40" width="212" height="158" rx="52" fill="url(#robot-body)" />
           <rect x="72" y="62" width="176" height="112" rx="39" fill="#101827" />
           <rect x="89" y="72" width="7" height="91" rx="4" fill="#38bdf8" opacity=".5" />
@@ -104,6 +126,7 @@ export function RobotStaticFallback() {
 
 export default function MiniAIRobotHero() {
   const reducedMotion = useReducedMotion() ?? false;
+  const darkMode = useDarkMode();
   const shellRef = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<DisplayMode>("checking");
   const [inView, setInView] = useState(true);
@@ -132,10 +155,10 @@ export default function MiniAIRobotHero() {
         <span className="mini-robot-halo" aria-hidden />
         {mode === "3d" ? (
           <Suspense fallback={null}>
-            <MiniRobotCanvas reducedMotion={reducedMotion} inView={inView} />
+            <MiniRobotCanvas reducedMotion={reducedMotion} inView={inView} darkMode={darkMode} />
           </Suspense>
         ) : mode === "static" ? (
-          <RobotStaticFallback />
+          <RobotStaticFallback darkMode={darkMode} />
         ) : null}
       </div>
     </div>

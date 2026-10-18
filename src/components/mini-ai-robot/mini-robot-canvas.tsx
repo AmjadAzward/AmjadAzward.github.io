@@ -16,10 +16,13 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
 
 const COLORS = {
   body: "#eaf2ff",
+  bodyLightMode: "#142844",
   eye: "#42a5ff",
   cyan: "#38bdf8",
   face: "#101827",
+  faceLightMode: "#050c18",
   joint: "#64748b",
+  jointLightMode: "#0a1930",
   dark: "#07101e",
 };
 
@@ -289,7 +292,7 @@ function RobotLeg({
   );
 }
 
-function MiniRobot({ reducedMotion }: { reducedMotion: boolean }) {
+function MiniRobot({ reducedMotion, darkMode }: { reducedMotion: boolean; darkMode: boolean }) {
   const robotRef = useRef<Group>(null);
   const torsoRef = useRef<Group>(null);
   const headRef = useRef<Group>(null);
@@ -318,6 +321,12 @@ function MiniRobot({ reducedMotion }: { reducedMotion: boolean }) {
   useEffect(() => {
     startTimeRef.current = null;
   }, [reducedMotion]);
+
+  useEffect(() => {
+    materials.body.color.set(darkMode ? COLORS.body : COLORS.bodyLightMode);
+    materials.face.color.set(darkMode ? COLORS.face : COLORS.faceLightMode);
+    materials.joint.color.set(darkMode ? COLORS.joint : COLORS.jointLightMode);
+  }, [darkMode, materials]);
 
   useEffect(() => {
     const resetPointer = () => {
@@ -514,6 +523,37 @@ function MiniRobot({ reducedMotion }: { reducedMotion: boolean }) {
       robotRef.current.scale.setScalar(scale);
     }
 
+    const waveUp = smooth(clampProgress(elapsed, 5.05, 5.52));
+    const waveDown = 1 - smooth(clampProgress(elapsed, 6.88, 7.3));
+    const waveAmount = reducedMotion ? 0 : waveUp * waveDown;
+    const waveOscillation =
+      waveAmount > 0 ? Math.sin((elapsed - 5.48) * Math.PI * 4.2) * waveAmount : 0;
+
+    if (rightArmRef.current && elapsed >= 5) {
+      rightArmRef.current.position.x = MathUtils.lerp(1.13, 1.35, waveAmount);
+      rightArmRef.current.position.y = MathUtils.lerp(-0.18, 0.48, waveAmount);
+      rightArmRef.current.rotation.set(
+        0,
+        0,
+        MathUtils.lerp(-0.08, 2.08, waveAmount) + waveOscillation * 0.14,
+      );
+    }
+
+    if (rightHandRef.current && elapsed >= 5) {
+      rightHandRef.current.position.x = MathUtils.lerp(
+        1.17,
+        1.64 + waveOscillation * 0.08,
+        waveAmount,
+      );
+      rightHandRef.current.position.y = MathUtils.lerp(
+        -0.86,
+        0.9 + Math.abs(waveOscillation) * 0.035,
+        waveAmount,
+      );
+      rightHandRef.current.position.z = MathUtils.lerp(0, 0.12, waveAmount);
+      rightHandRef.current.rotation.z = waveOscillation * 0.28;
+    }
+
     if (headRef.current && elapsed >= 4) {
       const activationTilt = -0.1 * smooth(clampProgress(elapsed, 4.12, 4.82)) * (1 - idle);
       const idleTilt = reducedMotion ? 0 : Math.sin(state.clock.elapsedTime * 0.72) * 0.035 * idle;
@@ -599,15 +639,17 @@ function MiniRobot({ reducedMotion }: { reducedMotion: boolean }) {
 export default function MiniRobotCanvas({
   reducedMotion,
   inView,
+  darkMode,
 }: {
   reducedMotion: boolean;
   inView: boolean;
+  darkMode: boolean;
 }) {
   return (
     <div
       className="mini-robot-canvas"
       role="img"
-      aria-label="Interactive miniature AI companion assembling itself from floating components"
+      aria-label="Interactive miniature AI companion assembling itself, waving hello, and following the pointer"
     >
       <Canvas
         dpr={[1, 1.5]}
@@ -621,12 +663,17 @@ export default function MiniRobotCanvas({
           gl.setClearColor(0x000000, 0);
         }}
       >
-        <ambientLight intensity={1.65} color="#cfe4ff" />
-        <directionalLight position={[4, 6, 7]} intensity={2.15} color="#ffffff" />
+        <ambientLight intensity={darkMode ? 1.65 : 1.15} color="#cfe4ff" />
+        <directionalLight position={[4, 6, 7]} intensity={darkMode ? 2.15 : 1.65} color="#ffffff" />
         <directionalLight position={[-4, 1, 5]} intensity={0.72} color="#42a5ff" />
         <pointLight position={[0, 2, 4]} intensity={0.8} color="#38bdf8" distance={10} />
-        <MiniRobot reducedMotion={reducedMotion} />
+        <MiniRobot reducedMotion={reducedMotion} darkMode={darkMode} />
       </Canvas>
+      {!reducedMotion && (
+        <span className="mini-robot-greeting" aria-hidden>
+          HI
+        </span>
+      )}
     </div>
   );
 }

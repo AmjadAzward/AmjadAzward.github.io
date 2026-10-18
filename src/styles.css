@@ -538,6 +538,60 @@ body::before {
   touch-action: pan-y;
 }
 
+.mini-robot-greeting {
+  position: absolute;
+  z-index: 2;
+  top: 22%;
+  left: 8%;
+  display: grid;
+  min-width: 2.7rem;
+  height: 2.25rem;
+  place-items: center;
+  padding-inline: 0.65rem;
+  border: 1px solid color-mix(in oklab, var(--primary) 58%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--background) 72%, transparent);
+  box-shadow:
+    0 0 24px color-mix(in oklab, var(--primary) 24%, transparent),
+    inset 0 0 18px color-mix(in oklab, var(--primary) 9%, transparent);
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  opacity: 0;
+  backdrop-filter: blur(10px);
+  pointer-events: none;
+  animation: mini-robot-greeting 2.25s 5.05s both;
+}
+
+.mini-robot-greeting::after {
+  position: absolute;
+  right: -0.28rem;
+  bottom: 0.22rem;
+  width: 0.52rem;
+  height: 0.52rem;
+  border-top: 1px solid color-mix(in oklab, var(--primary) 58%, transparent);
+  border-right: 1px solid color-mix(in oklab, var(--primary) 58%, transparent);
+  background: color-mix(in oklab, var(--background) 80%, transparent);
+  content: "";
+  transform: rotate(45deg);
+}
+
+@keyframes mini-robot-greeting {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate3d(0.35rem, 0.4rem, 0) scale(0.82);
+  }
+
+  14%,
+  78% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
 .mini-robot-static {
   position: absolute;
   z-index: 1;
