@@ -7,6 +7,8 @@ import {
   Group,
   MathUtils,
   MeshStandardMaterial,
+  Shape,
+  ShapeGeometry,
   SphereGeometry,
   SRGBColorSpace,
   TorusGeometry,
@@ -40,6 +42,7 @@ type PartClickHandler = (event: ThreeEvent<MouseEvent>, part: RobotPart, side?: 
 
 const FINAL_POSE: PiecePose = { position: [0, 0, 0], rotation: [0, 0, 0] };
 const ROBOT_VERTICAL_OFFSET = -0.32;
+const FACE_EXPRESSION_COUNT = 10;
 const BLUE = new Color(COLORS.eye);
 const DARK = new Color(COLORS.dark);
 
@@ -97,6 +100,16 @@ function rounded(width: number, height: number, depth: number, radius: number) {
   return new RoundedBoxGeometry(width, height, depth, 4, radius);
 }
 
+function heartGeometry() {
+  const heart = new Shape();
+  heart.moveTo(0, -0.24);
+  heart.bezierCurveTo(-0.05, -0.12, -0.32, 0.02, -0.32, 0.18);
+  heart.bezierCurveTo(-0.32, 0.38, -0.08, 0.44, 0, 0.25);
+  heart.bezierCurveTo(0.08, 0.44, 0.32, 0.38, 0.32, 0.18);
+  heart.bezierCurveTo(0.32, 0.02, 0.05, -0.12, 0, -0.24);
+  return new ShapeGeometry(heart, 14);
+}
+
 function createGeometries() {
   return {
     head: rounded(2.45, 1.95, 1.05, 0.28),
@@ -110,6 +123,11 @@ function createGeometries() {
     neck: new CylinderGeometry(0.22, 0.27, 0.5, 20),
     joint: new SphereGeometry(0.23, 16, 12),
     eye: new SphereGeometry(0.26, 20, 12),
+    heartEye: heartGeometry(),
+    brow: rounded(0.48, 0.055, 0.055, 0.02),
+    mouthLine: rounded(0.26, 0.05, 0.055, 0.02),
+    mouthRing: new TorusGeometry(0.12, 0.026, 8, 24),
+    tear: new SphereGeometry(0.09, 14, 10),
     core: new SphereGeometry(0.25, 20, 14),
     coreRing: new TorusGeometry(0.33, 0.055, 10, 28),
     sideDetail: new CylinderGeometry(0.08, 0.08, 0.7, 12),
@@ -161,6 +179,14 @@ function RobotHead({
   groupRef,
   leftEyeRef,
   rightEyeRef,
+  leftHeartRef,
+  rightHeartRef,
+  leftBrowRef,
+  rightBrowRef,
+  mouthLeftRef,
+  mouthRightRef,
+  mouthRingRef,
+  tearRef,
   geometries,
   materials,
   onPartClick,
@@ -168,6 +194,14 @@ function RobotHead({
   groupRef: React.RefObject<Group | null>;
   leftEyeRef: React.RefObject<Group | null>;
   rightEyeRef: React.RefObject<Group | null>;
+  leftHeartRef: React.RefObject<Group | null>;
+  rightHeartRef: React.RefObject<Group | null>;
+  leftBrowRef: React.RefObject<Group | null>;
+  rightBrowRef: React.RefObject<Group | null>;
+  mouthLeftRef: React.RefObject<Group | null>;
+  mouthRightRef: React.RefObject<Group | null>;
+  mouthRingRef: React.RefObject<Group | null>;
+  tearRef: React.RefObject<Group | null>;
   geometries: RobotGeometries;
   materials: RobotMaterials;
   onPartClick: PartClickHandler;
@@ -186,6 +220,30 @@ function RobotHead({
         </group>
         <group ref={rightEyeRef} position={[0.52, 0.08, 0.69]}>
           <mesh geometry={geometries.eye} material={materials.eye} scale={[1.08, 0.62, 0.22]} />
+        </group>
+        <group ref={leftHeartRef} position={[-0.52, 0.08, 0.705]} visible={false}>
+          <mesh geometry={geometries.heartEye} material={materials.eye} />
+        </group>
+        <group ref={rightHeartRef} position={[0.52, 0.08, 0.705]} visible={false}>
+          <mesh geometry={geometries.heartEye} material={materials.eye} />
+        </group>
+        <group ref={leftBrowRef} position={[-0.52, 0.4, 0.705]} visible={false}>
+          <mesh geometry={geometries.brow} material={materials.eye} />
+        </group>
+        <group ref={rightBrowRef} position={[0.52, 0.4, 0.705]} visible={false}>
+          <mesh geometry={geometries.brow} material={materials.eye} />
+        </group>
+        <group ref={mouthLeftRef} position={[-0.12, -0.39, 0.705]} visible={false}>
+          <mesh geometry={geometries.mouthLine} material={materials.eye} />
+        </group>
+        <group ref={mouthRightRef} position={[0.12, -0.39, 0.705]} visible={false}>
+          <mesh geometry={geometries.mouthLine} material={materials.eye} />
+        </group>
+        <group ref={mouthRingRef} position={[0, -0.38, 0.705]} visible={false}>
+          <mesh geometry={geometries.mouthRing} material={materials.eye} scale={[1, 1.15, 0.4]} />
+        </group>
+        <group ref={tearRef} position={[-0.5, -0.18, 0.71]} visible={false}>
+          <mesh geometry={geometries.tear} material={materials.accent} scale={[0.65, 1.25, 0.35]} />
         </group>
       </group>
       <mesh
@@ -346,6 +404,14 @@ function MiniRobot({
   const rightFootRef = useRef<Group>(null);
   const leftEyeRef = useRef<Group>(null);
   const rightEyeRef = useRef<Group>(null);
+  const leftHeartRef = useRef<Group>(null);
+  const rightHeartRef = useRef<Group>(null);
+  const leftBrowRef = useRef<Group>(null);
+  const rightBrowRef = useRef<Group>(null);
+  const mouthLeftRef = useRef<Group>(null);
+  const mouthRightRef = useRef<Group>(null);
+  const mouthRingRef = useRef<Group>(null);
+  const tearRef = useRef<Group>(null);
   const startTimeRef = useRef<number | null>(null);
   const elapsedRef = useRef(0);
   const hoveredRef = useRef(false);
@@ -422,7 +488,8 @@ function MiniRobot({
         return;
       }
 
-      if (part === "face") expressionRef.current = (expressionRef.current + 1) % 4;
+      if (part === "face")
+        expressionRef.current = (expressionRef.current + 1) % FACE_EXPRESSION_COUNT;
       interactionRef.current =
         side === undefined ? { kind: part, startedAt: now } : { kind: part, startedAt: now, side };
       if (part === "hand") onGreeting();
@@ -575,29 +642,96 @@ function MiniRobot({
     const trackingAmount = reducedMotion ? 0 : smooth(clampProgress(elapsed, 4.28, 4.88));
     const eyeOffsetX = pointerRef.current.x * 0.1 * trackingAmount;
     const eyeOffsetY = pointerRef.current.y * 0.075 * trackingAmount;
-    const expression = expressionRef.current;
-    const expressionLeftY =
-      expression === 1 ? 0.48 : expression === 2 ? 1.12 : expression === 3 ? 0.18 : 1;
-    const expressionRightY =
-      expression === 1 ? 0.48 : expression === 2 ? 0.72 : expression === 3 ? 0.18 : 1;
-    const surpriseScale = 1 + headReaction * 0.34;
-    const leftEyeTargetY = 0.08 + eyeOffsetY + (expression === 2 ? 0.05 : 0);
-    const rightEyeTargetY = 0.08 + eyeOffsetY + (expression === 2 ? -0.03 : 0);
+    let expression = expressionRef.current;
+    if (!reducedMotion && elapsed >= 5.05 && elapsed < 7.3) expression = 1;
+    if (interaction.kind === "head" && interactionAge >= 0 && interactionAge < 1.15) expression = 3;
+    else if (interaction.kind === "hand" && interactionAge >= 0 && interactionAge < 1.85)
+      expression = 1;
+    else if (interaction.kind === "chest" && interactionAge >= 0 && interactionAge < 1.1)
+      expression = 2;
+    else if (interaction.kind === "feet" && interactionAge >= 0 && interactionAge < 0.9)
+      expression = 3;
+    else if (interaction.kind === "dance" && interactionAge >= 0 && interactionAge < 2.65)
+      expression = 1;
+
+    let leftEyeX = 1;
+    let rightEyeX = 1;
+    let leftEyeY = 1;
+    let rightEyeY = 1;
+    let leftEyeRotation = 0;
+    let rightEyeRotation = 0;
+    let leftEyeLift = 0;
+    let rightEyeLift = 0;
+
+    switch (expression) {
+      case 1:
+        leftEyeY = 0.38;
+        rightEyeY = 0.38;
+        leftEyeRotation = -0.14;
+        rightEyeRotation = 0.14;
+        break;
+      case 2:
+        leftEyeX = 1.18;
+        rightEyeX = 1.18;
+        leftEyeY = 1.18;
+        rightEyeY = 1.18;
+        break;
+      case 3:
+        leftEyeX = 1.22;
+        rightEyeX = 1.22;
+        leftEyeY = 1.34;
+        rightEyeY = 1.34;
+        break;
+      case 4:
+        leftEyeY = 0.62;
+        rightEyeY = 0.62;
+        leftEyeRotation = 0.18;
+        rightEyeRotation = -0.18;
+        break;
+      case 5:
+        leftEyeY = 0.55;
+        rightEyeY = 0.55;
+        leftEyeRotation = -0.24;
+        rightEyeRotation = 0.24;
+        break;
+      case 7:
+        leftEyeY = 0.12;
+        rightEyeY = 0.12;
+        break;
+      case 8:
+        leftEyeX = 1.1;
+        rightEyeX = 0.78;
+        leftEyeY = 1.04;
+        rightEyeY = 0.66;
+        leftEyeLift = 0.05;
+        rightEyeLift = -0.04;
+        break;
+      case 9:
+        leftEyeY = 0.06;
+        rightEyeY = 0.06;
+        break;
+    }
+
+    const heartExpression = expression === 6;
+    const surpriseScale = 1 + headReaction * 0.12;
+    const leftEyeTargetY = 0.08 + eyeOffsetY + leftEyeLift;
+    const rightEyeTargetY = 0.08 + eyeOffsetY + rightEyeLift;
 
     if (leftEyeRef.current) {
+      leftEyeRef.current.visible = !heartExpression;
       leftEyeRef.current.scale.x = MathUtils.lerp(
         leftEyeRef.current.scale.x,
-        surpriseScale * (expression === 2 ? 1.08 : 1),
+        leftEyeX * surpriseScale,
         0.18,
       );
       leftEyeRef.current.scale.y = MathUtils.lerp(
         leftEyeRef.current.scale.y,
-        blinkScale * expressionLeftY * surpriseScale,
+        blinkScale * leftEyeY * surpriseScale,
         0.22,
       );
       leftEyeRef.current.rotation.z = MathUtils.lerp(
         leftEyeRef.current.rotation.z,
-        expression === 1 ? -0.14 : 0,
+        leftEyeRotation,
         0.18,
       );
       leftEyeRef.current.position.x = MathUtils.lerp(
@@ -612,19 +746,20 @@ function MiniRobot({
       );
     }
     if (rightEyeRef.current) {
+      rightEyeRef.current.visible = !heartExpression;
       rightEyeRef.current.scale.x = MathUtils.lerp(
         rightEyeRef.current.scale.x,
-        surpriseScale * (expression === 2 ? 0.84 : 1),
+        rightEyeX * surpriseScale,
         0.18,
       );
       rightEyeRef.current.scale.y = MathUtils.lerp(
         rightEyeRef.current.scale.y,
-        blinkScale * expressionRightY * surpriseScale,
+        blinkScale * rightEyeY * surpriseScale,
         0.22,
       );
       rightEyeRef.current.rotation.z = MathUtils.lerp(
         rightEyeRef.current.rotation.z,
-        expression === 1 ? 0.14 : 0,
+        rightEyeRotation,
         0.18,
       );
       rightEyeRef.current.position.x = MathUtils.lerp(
@@ -637,6 +772,60 @@ function MiniRobot({
         rightEyeTargetY,
         0.16,
       );
+    }
+
+    const heartPulse = reducedMotion ? 1 : 1 + Math.sin(state.clock.elapsedTime * 5.2) * 0.06;
+    if (leftHeartRef.current) {
+      leftHeartRef.current.visible = heartExpression;
+      leftHeartRef.current.position.set(-0.52 + eyeOffsetX, 0.08 + eyeOffsetY, 0.705);
+      leftHeartRef.current.scale.setScalar(heartExpression ? heartPulse : 0.01);
+    }
+    if (rightHeartRef.current) {
+      rightHeartRef.current.visible = heartExpression;
+      rightHeartRef.current.position.set(0.52 + eyeOffsetX, 0.08 + eyeOffsetY, 0.705);
+      rightHeartRef.current.scale.setScalar(heartExpression ? heartPulse : 0.01);
+    }
+
+    const showBrows = expression === 4 || expression === 5 || expression === 8;
+    const angryBrows = expression === 5;
+    const sadBrows = expression === 4;
+    if (leftBrowRef.current) {
+      leftBrowRef.current.visible = showBrows;
+      leftBrowRef.current.position.y = expression === 8 ? 0.46 : 0.4;
+      leftBrowRef.current.rotation.z = angryBrows ? -0.34 : sadBrows ? 0.28 : -0.12;
+    }
+    if (rightBrowRef.current) {
+      rightBrowRef.current.visible = showBrows;
+      rightBrowRef.current.position.y = expression === 8 ? 0.34 : 0.4;
+      rightBrowRef.current.rotation.z = angryBrows ? 0.34 : sadBrows ? -0.28 : 0.12;
+    }
+
+    const showSmile = expression === 1 || expression === 2 || expression === 6;
+    const showFrown = expression === 4 || expression === 5;
+    const showFlatMouth = expression === 7 || expression === 8;
+    const showMouthLines = showSmile || showFrown || showFlatMouth;
+    const mouthAngle = showSmile ? 0.3 : showFrown ? -0.3 : 0;
+    if (mouthLeftRef.current) {
+      mouthLeftRef.current.visible = showMouthLines;
+      mouthLeftRef.current.rotation.z = -mouthAngle;
+      mouthLeftRef.current.position.y = showFlatMouth && expression === 8 ? -0.35 : -0.39;
+      mouthLeftRef.current.scale.setScalar(showMouthLines ? (expression === 2 ? 1.16 : 1) : 0.01);
+    }
+    if (mouthRightRef.current) {
+      mouthRightRef.current.visible = showMouthLines;
+      mouthRightRef.current.rotation.z = mouthAngle;
+      mouthRightRef.current.position.y = showFlatMouth && expression === 8 ? -0.43 : -0.39;
+      mouthRightRef.current.scale.setScalar(showMouthLines ? (expression === 2 ? 1.16 : 1) : 0.01);
+    }
+    if (mouthRingRef.current) {
+      mouthRingRef.current.visible = expression === 3;
+      const mouthPulse = reducedMotion ? 1 : 1 + Math.sin(state.clock.elapsedTime * 4.2) * 0.08;
+      mouthRingRef.current.scale.setScalar(expression === 3 ? mouthPulse : 0.01);
+    }
+    if (tearRef.current) {
+      tearRef.current.visible = expression === 4;
+      tearRef.current.position.y =
+        -0.17 - (reducedMotion ? 0 : (state.clock.elapsedTime * 0.17) % 0.16);
     }
 
     if (pulseRef.current) {
@@ -789,6 +978,14 @@ function MiniRobot({
         groupRef={headRef}
         leftEyeRef={leftEyeRef}
         rightEyeRef={rightEyeRef}
+        leftHeartRef={leftHeartRef}
+        rightHeartRef={rightHeartRef}
+        leftBrowRef={leftBrowRef}
+        rightBrowRef={rightBrowRef}
+        mouthLeftRef={mouthLeftRef}
+        mouthRightRef={mouthRightRef}
+        mouthRingRef={mouthRingRef}
+        tearRef={tearRef}
         geometries={geometries}
         materials={materials}
         onPartClick={handlePartClick}
