@@ -611,6 +611,7 @@ body::before {
   width: min(88%, 22rem);
   max-height: 92%;
   filter: drop-shadow(0 24px 34px color-mix(in oklab, var(--foreground) 22%, transparent));
+  transform: translateY(1.75rem);
 }
 
 .home-visual {

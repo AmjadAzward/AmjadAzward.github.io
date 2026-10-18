@@ -39,6 +39,7 @@ type RobotInteraction = {
 type PartClickHandler = (event: ThreeEvent<MouseEvent>, part: RobotPart, side?: -1 | 1) => void;
 
 const FINAL_POSE: PiecePose = { position: [0, 0, 0], rotation: [0, 0, 0] };
+const ROBOT_VERTICAL_OFFSET = -0.32;
 const BLUE = new Color(COLORS.eye);
 const DARK = new Color(COLORS.dark);
 
@@ -668,7 +669,7 @@ function MiniRobot({
         danceProgress >= 0
           ? Math.abs(Math.sin(danceProgress * Math.PI * 8)) * 0.18 * danceEnvelope * motionStrength
           : 0;
-      robotRef.current.position.y = bounce + float + jump + danceHop;
+      robotRef.current.position.y = ROBOT_VERTICAL_OFFSET + bounce + float + jump + danceHop;
       const activatedScale = MathUtils.lerp(1, 1.1, smooth(clampProgress(elapsed, 3.72, 4.28)));
       const scale =
         activatedScale +
