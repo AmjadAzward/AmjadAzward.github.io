@@ -20,7 +20,7 @@ const COLORS = {
   eye: "#42a5ff",
   cyan: "#38bdf8",
   face: "#101827",
-  faceLightMode: "#050c18",
+  faceLightMode: "#edf4ff",
   joint: "#64748b",
   jointLightMode: "#0a1930",
   dark: "#07101e",
@@ -453,8 +453,15 @@ function MiniRobot({ reducedMotion, darkMode }: { reducedMotion: boolean; darkMo
     const hoverAmount = hoveredRef.current && elapsed >= 4 ? 1 : 0;
     const breathing = reducedMotion ? 0 : (Math.sin(state.clock.elapsedTime * 2.2) + 1) * 0.5;
 
-    materials.eye.color.copy(DARK).lerp(BLUE, activation);
-    materials.eye.emissiveIntensity = activation * (0.95 + hoverAmount * 0.42 + clickAmount * 0.65);
+    if (darkMode) {
+      materials.eye.color.copy(DARK).lerp(BLUE, activation);
+      materials.eye.emissiveIntensity =
+        activation * (0.95 + hoverAmount * 0.42 + clickAmount * 0.65);
+    } else {
+      materials.eye.color.copy(DARK);
+      materials.eye.emissiveIntensity =
+        activation * (0.08 + hoverAmount * 0.04 + clickAmount * 0.06);
+    }
     materials.core.color.copy(DARK).lerp(BLUE, activation);
     materials.core.emissiveIntensity =
       activation * (0.92 + breathing * 0.34 * idle + hoverAmount * 0.38 + clickAmount * 0.75);

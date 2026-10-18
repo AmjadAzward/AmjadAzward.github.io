@@ -45,7 +45,10 @@ export function RobotStaticFallback({ darkMode }: { darkMode: boolean }) {
   const bodyMiddle = darkMode ? "#eaf2ff" : "#1f3b60";
   const bodyEnd = darkMode ? "#b9d3ee" : "#0b172a";
   const joint = darkMode ? "#64748b" : "#081426";
-  const innerBody = darkMode ? "#dce9f7" : "#183253";
+  const innerBody = darkMode ? "#dce9f7" : "#eaf2ff";
+  const facePanel = darkMode ? "#101827" : "#f3f7ff";
+  const eye = darkMode ? "#42a5ff" : "#07101e";
+  const eyeHighlight = darkMode ? "#d8f4ff" : "#294569";
 
   return (
     <div
@@ -93,20 +96,20 @@ export function RobotStaticFallback({ darkMode }: { darkMode: boolean }) {
 
           <rect x="144" y="181" width="32" height="36" rx="10" fill={joint} />
           <rect x="54" y="40" width="212" height="158" rx="52" fill="url(#robot-body)" />
-          <rect x="72" y="62" width="176" height="112" rx="39" fill="#101827" />
+          <rect x="72" y="62" width="176" height="112" rx="39" fill={facePanel} />
           <rect x="89" y="72" width="7" height="91" rx="4" fill="#38bdf8" opacity=".5" />
           <rect x="224" y="72" width="7" height="91" rx="4" fill="#38bdf8" opacity=".5" />
-          <ellipse cx="120" cy="115" rx="25" ry="16" fill="#42a5ff" />
-          <ellipse cx="200" cy="115" rx="25" ry="16" fill="#42a5ff" />
-          <ellipse cx="120" cy="115" rx="10" ry="7" fill="#d8f4ff" />
-          <ellipse cx="200" cy="115" rx="10" ry="7" fill="#d8f4ff" />
+          <ellipse cx="120" cy="115" rx="25" ry="16" fill={eye} />
+          <ellipse cx="200" cy="115" rx="25" ry="16" fill={eye} />
+          <ellipse cx="120" cy="115" rx="10" ry="7" fill={eyeHighlight} />
+          <ellipse cx="200" cy="115" rx="10" ry="7" fill={eyeHighlight} />
           <ellipse
             cx="120"
             cy="115"
             rx="34"
             ry="24"
             fill="#42a5ff"
-            opacity=".38"
+            opacity={darkMode ? ".38" : ".08"}
             filter="url(#soft-blue)"
           />
           <ellipse
@@ -115,7 +118,7 @@ export function RobotStaticFallback({ darkMode }: { darkMode: boolean }) {
             rx="34"
             ry="24"
             fill="#42a5ff"
-            opacity=".38"
+            opacity={darkMode ? ".38" : ".08"}
             filter="url(#soft-blue)"
           />
         </g>
