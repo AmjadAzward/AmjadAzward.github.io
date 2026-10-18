@@ -33,11 +33,10 @@ function supportsWebGL() {
 }
 
 function prefersLightweightScene() {
-  const isSmall = window.matchMedia("(max-width: 640px)").matches;
   const connection = (
     navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }
   ).connection;
-  return isSmall || connection?.saveData === true || connection?.effectiveType === "2g";
+  return connection?.saveData === true || connection?.effectiveType === "2g";
 }
 
 export function RobotStaticFallback({ darkMode }: { darkMode: boolean }) {

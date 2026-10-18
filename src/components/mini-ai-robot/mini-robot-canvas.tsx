@@ -1,5 +1,5 @@
 import { Canvas, type ThreeEvent, useFrame } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ACESFilmicToneMapping,
   Color,
@@ -30,6 +30,13 @@ type Vec3 = [number, number, number];
 type PiecePose = { position: Vec3; rotation: Vec3 };
 type RobotMaterials = ReturnType<typeof createMaterials>;
 type RobotGeometries = ReturnType<typeof createGeometries>;
+type RobotPart = "head" | "face" | "hand" | "chest" | "feet";
+type RobotInteraction = {
+  kind: RobotPart | "dance";
+  startedAt: number;
+  side?: -1 | 1;
+};
+type PartClickHandler = (event: ThreeEvent<MouseEvent>, part: RobotPart, side?: -1 | 1) => void;
 
 const FINAL_POSE: PiecePose = { position: [0, 0, 0], rotation: [0, 0, 0] };
 const BLUE = new Color(COLORS.eye);
@@ -155,22 +162,30 @@ function RobotHead({
   rightEyeRef,
   geometries,
   materials,
+  onPartClick,
 }: {
   groupRef: React.RefObject<Group | null>;
   leftEyeRef: React.RefObject<Group | null>;
   rightEyeRef: React.RefObject<Group | null>;
   geometries: RobotGeometries;
   materials: RobotMaterials;
+  onPartClick: PartClickHandler;
 }) {
   return (
     <group ref={groupRef}>
-      <mesh geometry={geometries.head} material={materials.body} />
-      <mesh geometry={geometries.face} material={materials.face} position={[0, 0, 0.55]} />
-      <group ref={leftEyeRef} position={[-0.52, 0.08, 0.69]}>
-        <mesh geometry={geometries.eye} material={materials.eye} scale={[1.08, 0.62, 0.22]} />
-      </group>
-      <group ref={rightEyeRef} position={[0.52, 0.08, 0.69]}>
-        <mesh geometry={geometries.eye} material={materials.eye} scale={[1.08, 0.62, 0.22]} />
+      <mesh
+        geometry={geometries.head}
+        material={materials.body}
+        onClick={(event) => onPartClick(event, "head")}
+      />
+      <group onClick={(event) => onPartClick(event, "face")}>
+        <mesh geometry={geometries.face} material={materials.face} position={[0, 0, 0.55]} />
+        <group ref={leftEyeRef} position={[-0.52, 0.08, 0.69]}>
+          <mesh geometry={geometries.eye} material={materials.eye} scale={[1.08, 0.62, 0.22]} />
+        </group>
+        <group ref={rightEyeRef} position={[0.52, 0.08, 0.69]}>
+          <mesh geometry={geometries.eye} material={materials.eye} scale={[1.08, 0.62, 0.22]} />
+        </group>
       </group>
       <mesh
         geometry={geometries.sideDetail}
@@ -194,21 +209,28 @@ function RobotBody({
   pulseRef,
   geometries,
   materials,
+  onPartClick,
 }: {
   torsoRef: React.RefObject<Group | null>;
   coreRef: React.RefObject<Group | null>;
   pulseRef: React.RefObject<Group | null>;
   geometries: RobotGeometries;
   materials: RobotMaterials;
+  onPartClick: PartClickHandler;
 }) {
   return (
     <>
       <group ref={torsoRef}>
-        <mesh geometry={geometries.torso} material={materials.body} />
+        <mesh
+          geometry={geometries.torso}
+          material={materials.body}
+          onClick={(event) => onPartClick(event, "chest")}
+        />
         <mesh
           geometry={geometries.chestPanel}
           material={materials.face}
           position={[0, 0.08, 0.45]}
+          onClick={(event) => onPartClick(event, "chest")}
         />
         <mesh
           geometry={geometries.sideDetail}
@@ -218,7 +240,7 @@ function RobotBody({
           scale={[0.7, 1, 0.7]}
         />
       </group>
-      <group ref={coreRef}>
+      <group ref={coreRef} onClick={(event) => onPartClick(event, "chest")}>
         <mesh geometry={geometries.coreRing} material={materials.joint} />
         <mesh geometry={geometries.core} material={materials.core} scale={[1, 1, 0.34]} />
         <group ref={pulseRef}>
@@ -235,12 +257,14 @@ function RobotArm({
   side,
   geometries,
   materials,
+  onPartClick,
 }: {
   groupRef: React.RefObject<Group | null>;
   handRef: React.RefObject<Group | null>;
   side: -1 | 1;
   geometries: RobotGeometries;
   materials: RobotMaterials;
+  onPartClick: PartClickHandler;
 }) {
   return (
     <>
@@ -254,7 +278,7 @@ function RobotArm({
           scale={[0.48, 0.48, 0.48]}
         />
       </group>
-      <group ref={handRef}>
+      <group ref={handRef} onClick={(event) => onPartClick(event, "hand", side)}>
         <mesh geometry={geometries.hand} material={materials.body} scale={[0.95, 1.05, 0.9]} />
       </group>
     </>
@@ -266,11 +290,15 @@ function RobotLeg({
   footRef,
   geometries,
   materials,
+  side,
+  onPartClick,
 }: {
   groupRef: React.RefObject<Group | null>;
   footRef: React.RefObject<Group | null>;
   geometries: RobotGeometries;
   materials: RobotMaterials;
+  side: -1 | 1;
+  onPartClick: PartClickHandler;
 }) {
   return (
     <>
@@ -278,7 +306,7 @@ function RobotLeg({
         <mesh geometry={geometries.joint} material={materials.joint} position={[0, 0.28, 0]} />
         <mesh geometry={geometries.leg} material={materials.body} />
       </group>
-      <group ref={footRef}>
+      <group ref={footRef} onClick={(event) => onPartClick(event, "feet", side)}>
         <mesh geometry={geometries.foot} material={materials.body} />
         <mesh
           geometry={geometries.sideDetail}
@@ -292,7 +320,15 @@ function RobotLeg({
   );
 }
 
-function MiniRobot({ reducedMotion, darkMode }: { reducedMotion: boolean; darkMode: boolean }) {
+function MiniRobot({
+  reducedMotion,
+  darkMode,
+  onGreeting,
+}: {
+  reducedMotion: boolean;
+  darkMode: boolean;
+  onGreeting: () => void;
+}) {
   const robotRef = useRef<Group>(null);
   const torsoRef = useRef<Group>(null);
   const headRef = useRef<Group>(null);
@@ -314,6 +350,10 @@ function MiniRobot({ reducedMotion, darkMode }: { reducedMotion: boolean; darkMo
   const hoveredRef = useRef(false);
   const clickTimeRef = useRef(-100);
   const pointerRef = useRef({ x: 0, y: 0 });
+  const interactionRef = useRef<RobotInteraction>({ kind: "face", startedAt: -100 });
+  const tapTimesRef = useRef<number[]>([]);
+  const expressionRef = useRef(0);
+  const headMotionRef = useRef({ x: 0, y: 0, z: 0 });
 
   const materials = useMemo(createMaterials, []);
   const geometries = useMemo(createGeometries, []);
@@ -362,6 +402,31 @@ function MiniRobot({ reducedMotion, darkMode }: { reducedMotion: boolean; darkMo
       disposeRecord(geometries as unknown as Record<string, BufferGeometry>);
     },
     [geometries, materials],
+  );
+
+  const handlePartClick = useCallback<PartClickHandler>(
+    (event, part, side) => {
+      event.stopPropagation();
+      if (elapsedRef.current < 4) return;
+
+      const now = performance.now() / 1000;
+      clickTimeRef.current = now;
+      const recentTaps = tapTimesRef.current.filter((tap) => now - tap < 1.8);
+      recentTaps.push(now);
+      tapTimesRef.current = recentTaps;
+
+      if (recentTaps.length >= 5) {
+        tapTimesRef.current = [];
+        interactionRef.current = { kind: "dance", startedAt: now };
+        return;
+      }
+
+      if (part === "face") expressionRef.current = (expressionRef.current + 1) % 4;
+      interactionRef.current =
+        side === undefined ? { kind: part, startedAt: now } : { kind: part, startedAt: now, side };
+      if (part === "hand") onGreeting();
+    },
+    [onGreeting],
   );
 
   useFrame((state) => {
@@ -448,6 +513,30 @@ function MiniRobot({ reducedMotion, darkMode }: { reducedMotion: boolean; darkMo
     const idle = smooth(clampProgress(elapsed, 5, 5.35));
     const now = performance.now() / 1000;
     const sinceClick = now - clickTimeRef.current;
+    const interaction = interactionRef.current;
+    const interactionAge = now - interaction.startedAt;
+    const motionStrength = reducedMotion ? 0.22 : 1;
+    const headReaction =
+      interaction.kind === "head" && interactionAge >= 0 && interactionAge < 1.15
+        ? Math.sin((interactionAge / 1.15) * Math.PI)
+        : 0;
+    const chestReaction =
+      interaction.kind === "chest" && interactionAge >= 0 && interactionAge < 1.1
+        ? Math.sin((interactionAge / 1.1) * Math.PI)
+        : 0;
+    const jumpProgress =
+      interaction.kind === "feet" && interactionAge >= 0 && interactionAge < 0.9
+        ? interactionAge / 0.9
+        : -1;
+    const danceProgress =
+      interaction.kind === "dance" && interactionAge >= 0 && interactionAge < 2.65
+        ? interactionAge / 2.65
+        : -1;
+    const danceEnvelope =
+      danceProgress >= 0
+        ? smooth(clampProgress(danceProgress, 0, 0.12)) *
+          (1 - smooth(clampProgress(danceProgress, 0.82, 1)))
+        : 0;
     const clickAmount =
       sinceClick >= 0 && sinceClick < 0.7 ? Math.sin((sinceClick / 0.7) * Math.PI) : 0;
     const hoverAmount = hoveredRef.current && elapsed >= 4 ? 1 : 0;
@@ -464,7 +553,12 @@ function MiniRobot({ reducedMotion, darkMode }: { reducedMotion: boolean; darkMo
     }
     materials.core.color.copy(DARK).lerp(BLUE, activation);
     materials.core.emissiveIntensity =
-      activation * (0.92 + breathing * 0.34 * idle + hoverAmount * 0.38 + clickAmount * 0.75);
+      activation *
+      (0.92 +
+        breathing * 0.34 * idle +
+        hoverAmount * 0.38 +
+        clickAmount * 0.32 +
+        chestReaction * 2.2);
     materials.accent.emissiveIntensity = 0.08 + activation * 0.55;
 
     const autoPhase = (((elapsed - 5.2) % 4.6) + 4.6) % 4.6;
@@ -480,9 +574,31 @@ function MiniRobot({ reducedMotion, darkMode }: { reducedMotion: boolean; darkMo
     const trackingAmount = reducedMotion ? 0 : smooth(clampProgress(elapsed, 4.28, 4.88));
     const eyeOffsetX = pointerRef.current.x * 0.1 * trackingAmount;
     const eyeOffsetY = pointerRef.current.y * 0.075 * trackingAmount;
+    const expression = expressionRef.current;
+    const expressionLeftY =
+      expression === 1 ? 0.48 : expression === 2 ? 1.12 : expression === 3 ? 0.18 : 1;
+    const expressionRightY =
+      expression === 1 ? 0.48 : expression === 2 ? 0.72 : expression === 3 ? 0.18 : 1;
+    const surpriseScale = 1 + headReaction * 0.34;
+    const leftEyeTargetY = 0.08 + eyeOffsetY + (expression === 2 ? 0.05 : 0);
+    const rightEyeTargetY = 0.08 + eyeOffsetY + (expression === 2 ? -0.03 : 0);
 
     if (leftEyeRef.current) {
-      leftEyeRef.current.scale.y = blinkScale;
+      leftEyeRef.current.scale.x = MathUtils.lerp(
+        leftEyeRef.current.scale.x,
+        surpriseScale * (expression === 2 ? 1.08 : 1),
+        0.18,
+      );
+      leftEyeRef.current.scale.y = MathUtils.lerp(
+        leftEyeRef.current.scale.y,
+        blinkScale * expressionLeftY * surpriseScale,
+        0.22,
+      );
+      leftEyeRef.current.rotation.z = MathUtils.lerp(
+        leftEyeRef.current.rotation.z,
+        expression === 1 ? -0.14 : 0,
+        0.18,
+      );
       leftEyeRef.current.position.x = MathUtils.lerp(
         leftEyeRef.current.position.x,
         -0.52 + eyeOffsetX,
@@ -490,12 +606,26 @@ function MiniRobot({ reducedMotion, darkMode }: { reducedMotion: boolean; darkMo
       );
       leftEyeRef.current.position.y = MathUtils.lerp(
         leftEyeRef.current.position.y,
-        0.08 + eyeOffsetY,
+        leftEyeTargetY,
         0.16,
       );
     }
     if (rightEyeRef.current) {
-      rightEyeRef.current.scale.y = blinkScale;
+      rightEyeRef.current.scale.x = MathUtils.lerp(
+        rightEyeRef.current.scale.x,
+        surpriseScale * (expression === 2 ? 0.84 : 1),
+        0.18,
+      );
+      rightEyeRef.current.scale.y = MathUtils.lerp(
+        rightEyeRef.current.scale.y,
+        blinkScale * expressionRightY * surpriseScale,
+        0.22,
+      );
+      rightEyeRef.current.rotation.z = MathUtils.lerp(
+        rightEyeRef.current.rotation.z,
+        expression === 1 ? 0.14 : 0,
+        0.18,
+      );
       rightEyeRef.current.position.x = MathUtils.lerp(
         rightEyeRef.current.position.x,
         0.52 + eyeOffsetX,
@@ -503,19 +633,29 @@ function MiniRobot({ reducedMotion, darkMode }: { reducedMotion: boolean; darkMo
       );
       rightEyeRef.current.position.y = MathUtils.lerp(
         rightEyeRef.current.position.y,
-        0.08 + eyeOffsetY,
+        rightEyeTargetY,
         0.16,
       );
     }
 
     if (pulseRef.current) {
       const activationPulse = clampProgress(elapsed, 4.08, 4.92);
-      const clickPulse = sinceClick >= 0 && sinceClick < 0.72 ? sinceClick / 0.72 : -1;
-      const pulseProgress = clickPulse >= 0 ? clickPulse : activationPulse;
+      const chestPulse =
+        interaction.kind === "chest" && interactionAge >= 0 && interactionAge < 1.1
+          ? interactionAge / 1.1
+          : -1;
+      const pulseProgress = chestPulse >= 0 ? chestPulse : activationPulse;
       const pulseOpacity =
-        pulseProgress > 0 && pulseProgress < 1 ? Math.sin(pulseProgress * Math.PI) * 0.42 : 0;
-      pulseRef.current.scale.setScalar(0.7 + pulseProgress * 2.2);
+        pulseProgress > 0 && pulseProgress < 1
+          ? Math.sin(pulseProgress * Math.PI) * (chestPulse >= 0 ? 0.78 : 0.42)
+          : 0;
+      pulseRef.current.scale.setScalar(0.7 + pulseProgress * (chestPulse >= 0 ? 3.3 : 2.2));
       materials.pulse.opacity = pulseOpacity;
+    }
+
+    if (torsoRef.current && elapsed >= 4) {
+      const torsoPulse = 1 + chestReaction * 0.045;
+      torsoRef.current.scale.setScalar(torsoPulse);
     }
 
     if (robotRef.current) {
@@ -523,60 +663,114 @@ function MiniRobot({ reducedMotion, darkMode }: { reducedMotion: boolean; darkMo
       const bounce = reducedMotion ? 0 : Math.sin(bounceProgress * Math.PI) * 0.14;
       const float =
         !reducedMotion && elapsed > 5 ? Math.sin(state.clock.elapsedTime * 1.45) * 0.055 : 0;
-      robotRef.current.position.y = bounce + float;
+      const jump = jumpProgress >= 0 ? Math.sin(jumpProgress * Math.PI) * 0.72 * motionStrength : 0;
+      const danceHop =
+        danceProgress >= 0
+          ? Math.abs(Math.sin(danceProgress * Math.PI * 8)) * 0.18 * danceEnvelope * motionStrength
+          : 0;
+      robotRef.current.position.y = bounce + float + jump + danceHop;
       const activatedScale = MathUtils.lerp(1, 1.1, smooth(clampProgress(elapsed, 3.72, 4.28)));
       const scale =
-        activatedScale + (!reducedMotion ? Math.sin(bounceProgress * Math.PI) * 0.035 : 0);
+        activatedScale +
+        (!reducedMotion ? Math.sin(bounceProgress * Math.PI) * 0.035 : 0) +
+        (jumpProgress >= 0 ? Math.sin(jumpProgress * Math.PI) * 0.04 * motionStrength : 0);
       robotRef.current.scale.setScalar(scale);
+      robotRef.current.rotation.x = 0;
+      robotRef.current.rotation.y =
+        danceProgress >= 0
+          ? Math.sin(danceProgress * Math.PI * 4) * 0.42 * danceEnvelope * motionStrength
+          : 0;
+      robotRef.current.rotation.z =
+        danceProgress >= 0
+          ? Math.sin(danceProgress * Math.PI * 8) * 0.13 * danceEnvelope * motionStrength
+          : 0;
     }
 
     const waveUp = smooth(clampProgress(elapsed, 5.05, 5.52));
     const waveDown = 1 - smooth(clampProgress(elapsed, 6.88, 7.3));
-    const waveAmount = reducedMotion ? 0 : waveUp * waveDown;
-    const waveOscillation =
-      waveAmount > 0 ? Math.sin((elapsed - 5.48) * Math.PI * 4.2) * waveAmount : 0;
-
-    if (rightArmRef.current && elapsed >= 5) {
-      rightArmRef.current.position.x = MathUtils.lerp(1.13, 1.35, waveAmount);
-      rightArmRef.current.position.y = MathUtils.lerp(-0.18, 0.48, waveAmount);
-      rightArmRef.current.rotation.set(
+    const automaticWave = reducedMotion ? 0 : waveUp * waveDown;
+    const tapWaveUp = smooth(clampProgress(interactionAge, 0, 0.28));
+    const tapWaveDown = 1 - smooth(clampProgress(interactionAge, 1.45, 1.85));
+    const tapWave =
+      interaction.kind === "hand" && interactionAge >= 0 && interactionAge < 1.85
+        ? tapWaveUp * tapWaveDown * motionStrength
+        : 0;
+    const updateArmWave = (
+      side: -1 | 1,
+      arm: Group | null,
+      hand: Group | null,
+      amount: number,
+      oscillation: number,
+    ) => {
+      if (!arm || !hand || elapsed < 5) return;
+      arm.position.x = MathUtils.lerp(1.13 * side, 1.35 * side, amount);
+      arm.position.y = MathUtils.lerp(-0.18, 0.48, amount);
+      arm.rotation.set(
         0,
         0,
-        MathUtils.lerp(-0.08, 2.08, waveAmount) + waveOscillation * 0.14,
+        MathUtils.lerp(-0.08 * side, 2.08 * side, amount) + oscillation * 0.14 * side,
       );
-    }
+      hand.position.x = MathUtils.lerp(1.17 * side, (1.64 + oscillation * 0.08) * side, amount);
+      hand.position.y = MathUtils.lerp(-0.86, 0.9 + Math.abs(oscillation) * 0.035, amount);
+      hand.position.z = MathUtils.lerp(0, 0.12, amount);
+      hand.rotation.z = oscillation * 0.28 * side;
+    };
+    const leftWave = interaction.side === -1 ? tapWave : 0;
+    const rightWave = Math.max(automaticWave, interaction.side === 1 ? tapWave : 0);
+    const leftWaveOscillation =
+      leftWave > 0 ? Math.sin((interactionAge - 0.24) * Math.PI * 4.8) * leftWave : 0;
+    const rightWaveOscillation =
+      rightWave > 0
+        ? Math.sin(
+            (interaction.side === 1 && tapWave > automaticWave ? interactionAge : elapsed - 5.48) *
+              Math.PI *
+              4.4,
+          ) * rightWave
+        : 0;
+    updateArmWave(-1, leftArmRef.current, leftHandRef.current, leftWave, leftWaveOscillation);
+    updateArmWave(1, rightArmRef.current, rightHandRef.current, rightWave, rightWaveOscillation);
 
-    if (rightHandRef.current && elapsed >= 5) {
-      rightHandRef.current.position.x = MathUtils.lerp(
-        1.17,
-        1.64 + waveOscillation * 0.08,
-        waveAmount,
-      );
-      rightHandRef.current.position.y = MathUtils.lerp(
-        -0.86,
-        0.9 + Math.abs(waveOscillation) * 0.035,
-        waveAmount,
-      );
-      rightHandRef.current.position.z = MathUtils.lerp(0, 0.12, waveAmount);
-      rightHandRef.current.rotation.z = waveOscillation * 0.28;
+    if (danceEnvelope > 0) {
+      const danceBeat = Math.sin(danceProgress * Math.PI * 8);
+      if (leftArmRef.current)
+        leftArmRef.current.rotation.z = MathUtils.lerp(
+          leftArmRef.current.rotation.z,
+          -1.25 + danceBeat * 0.35,
+          danceEnvelope * motionStrength,
+        );
+      if (rightArmRef.current)
+        rightArmRef.current.rotation.z = MathUtils.lerp(
+          rightArmRef.current.rotation.z,
+          1.25 + danceBeat * 0.35,
+          danceEnvelope * motionStrength,
+        );
+      if (leftLegRef.current)
+        leftLegRef.current.rotation.x = danceBeat * 0.16 * danceEnvelope * motionStrength;
+      if (rightLegRef.current)
+        rightLegRef.current.rotation.x = -danceBeat * 0.16 * danceEnvelope * motionStrength;
     }
 
     if (headRef.current && elapsed >= 4) {
       const activationTilt = -0.1 * smooth(clampProgress(elapsed, 4.12, 4.82)) * (1 - idle);
       const idleTilt = reducedMotion ? 0 : Math.sin(state.clock.elapsedTime * 0.72) * 0.035 * idle;
-      const targetX = activationTilt - pointerRef.current.y * 0.16 * trackingAmount;
+      const danceNod =
+        danceProgress >= 0
+          ? Math.sin(danceProgress * Math.PI * 8) * 0.12 * danceEnvelope * motionStrength
+          : 0;
+      const targetX =
+        activationTilt -
+        pointerRef.current.y * 0.16 * trackingAmount -
+        headReaction * 0.08 +
+        danceNod;
       const targetY = pointerRef.current.x * 0.28 * trackingAmount;
-      const targetZ = idleTilt + clickAmount * 0.16;
-      headRef.current.rotation.x = MathUtils.lerp(headRef.current.rotation.x, targetX, 0.08);
-      headRef.current.rotation.y = MathUtils.lerp(headRef.current.rotation.y, targetY, 0.08);
-      headRef.current.rotation.z = MathUtils.lerp(headRef.current.rotation.z, targetZ, 0.09);
+      const targetZ = idleTilt + headReaction * 0.24 * motionStrength;
+      const headMotion = headMotionRef.current;
+      headMotion.x = MathUtils.lerp(headMotion.x, targetX, 0.08);
+      headMotion.y = MathUtils.lerp(headMotion.y, targetY, 0.08);
+      headMotion.z = MathUtils.lerp(headMotion.z, targetZ, 0.09);
+      headRef.current.rotation.set(headMotion.x, headMotion.y, headMotion.z);
     }
   });
-
-  const handleClick = (event: ThreeEvent<MouseEvent>) => {
-    event.stopPropagation();
-    if (!reducedMotion && elapsedRef.current >= 4) clickTimeRef.current = performance.now() / 1000;
-  };
 
   const handlePointer = (hovered: boolean) => (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation();
@@ -586,10 +780,9 @@ function MiniRobot({ reducedMotion, darkMode }: { reducedMotion: boolean; darkMo
   return (
     <group
       ref={robotRef}
-      rotation={[0, -0.08, 0]}
+      rotation={[0, 0, 0]}
       onPointerOver={handlePointer(true)}
       onPointerOut={handlePointer(false)}
-      onClick={handleClick}
     >
       <RobotHead
         groupRef={headRef}
@@ -597,6 +790,7 @@ function MiniRobot({ reducedMotion, darkMode }: { reducedMotion: boolean; darkMo
         rightEyeRef={rightEyeRef}
         geometries={geometries}
         materials={materials}
+        onPartClick={handlePartClick}
       />
       <RobotBody
         torsoRef={torsoRef}
@@ -604,6 +798,7 @@ function MiniRobot({ reducedMotion, darkMode }: { reducedMotion: boolean; darkMo
         pulseRef={pulseRef}
         geometries={geometries}
         materials={materials}
+        onPartClick={handlePartClick}
       />
       <group ref={neckRef}>
         <mesh geometry={geometries.neck} material={materials.joint} />
@@ -619,6 +814,7 @@ function MiniRobot({ reducedMotion, darkMode }: { reducedMotion: boolean; darkMo
         side={-1}
         geometries={geometries}
         materials={materials}
+        onPartClick={handlePartClick}
       />
       <RobotArm
         groupRef={rightArmRef}
@@ -626,18 +822,23 @@ function MiniRobot({ reducedMotion, darkMode }: { reducedMotion: boolean; darkMo
         side={1}
         geometries={geometries}
         materials={materials}
+        onPartClick={handlePartClick}
       />
       <RobotLeg
         groupRef={leftLegRef}
         footRef={leftFootRef}
         geometries={geometries}
         materials={materials}
+        side={-1}
+        onPartClick={handlePartClick}
       />
       <RobotLeg
         groupRef={rightLegRef}
         footRef={rightFootRef}
         geometries={geometries}
         materials={materials}
+        side={1}
+        onPartClick={handlePartClick}
       />
     </group>
   );
@@ -652,16 +853,19 @@ export default function MiniRobotCanvas({
   inView: boolean;
   darkMode: boolean;
 }) {
+  const [greetingKey, setGreetingKey] = useState(0);
+  const showGreeting = useCallback(() => setGreetingKey((key) => key + 1), []);
+
   return (
     <div
       className="mini-robot-canvas"
       role="img"
-      aria-label="Interactive miniature AI companion assembling itself, waving hello, and following the pointer"
+      aria-label="Interactive miniature AI companion. Tap its head, face, hands, chest, or feet to see different reactions."
     >
       <Canvas
         dpr={[1, 1.5]}
         frameloop={inView ? "always" : "never"}
-        camera={{ position: [4.6, 2.7, 11.8], fov: 37, near: 0.1, far: 50 }}
+        camera={{ position: [0, 2.35, 12.8], fov: 37, near: 0.1, far: 50 }}
         gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
         onCreated={({ gl }) => {
           gl.outputColorSpace = SRGBColorSpace;
@@ -674,10 +878,14 @@ export default function MiniRobotCanvas({
         <directionalLight position={[4, 6, 7]} intensity={darkMode ? 2.15 : 1.65} color="#ffffff" />
         <directionalLight position={[-4, 1, 5]} intensity={0.72} color="#42a5ff" />
         <pointLight position={[0, 2, 4]} intensity={0.8} color="#38bdf8" distance={10} />
-        <MiniRobot reducedMotion={reducedMotion} darkMode={darkMode} />
+        <MiniRobot reducedMotion={reducedMotion} darkMode={darkMode} onGreeting={showGreeting} />
       </Canvas>
       {!reducedMotion && (
-        <span className="mini-robot-greeting" aria-hidden>
+        <span
+          key={greetingKey}
+          className={`mini-robot-greeting${greetingKey > 0 ? " mini-robot-greeting--tap" : ""}`}
+          aria-hidden
+        >
           HI
         </span>
       )}

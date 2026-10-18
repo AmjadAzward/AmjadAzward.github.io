@@ -536,6 +536,7 @@ body::before {
   display: block;
   outline: none;
   touch-action: pan-y;
+  cursor: pointer;
 }
 
 .mini-robot-greeting {
@@ -576,6 +577,11 @@ body::before {
   background: color-mix(in oklab, var(--background) 80%, transparent);
   content: "";
   transform: rotate(45deg);
+}
+
+.mini-robot-greeting--tap {
+  animation-delay: 0s;
+  animation-duration: 1.85s;
 }
 
 @keyframes mini-robot-greeting {
