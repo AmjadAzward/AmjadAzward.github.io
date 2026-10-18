@@ -289,13 +289,7 @@ function RobotLeg({
   );
 }
 
-function MiniRobot({
-  replayToken,
-  reducedMotion,
-}: {
-  replayToken: number;
-  reducedMotion: boolean;
-}) {
+function MiniRobot({ reducedMotion }: { reducedMotion: boolean }) {
   const robotRef = useRef<Group>(null);
   const torsoRef = useRef<Group>(null);
   const headRef = useRef<Group>(null);
@@ -323,7 +317,7 @@ function MiniRobot({
 
   useEffect(() => {
     startTimeRef.current = null;
-  }, [replayToken, reducedMotion]);
+  }, [reducedMotion]);
 
   useEffect(() => {
     const resetPointer = () => {
@@ -603,11 +597,9 @@ function MiniRobot({
 }
 
 export default function MiniRobotCanvas({
-  replayToken,
   reducedMotion,
   inView,
 }: {
-  replayToken: number;
   reducedMotion: boolean;
   inView: boolean;
 }) {
@@ -633,7 +625,7 @@ export default function MiniRobotCanvas({
         <directionalLight position={[4, 6, 7]} intensity={2.15} color="#ffffff" />
         <directionalLight position={[-4, 1, 5]} intensity={0.72} color="#42a5ff" />
         <pointLight position={[0, 2, 4]} intensity={0.8} color="#38bdf8" distance={10} />
-        <MiniRobot replayToken={replayToken} reducedMotion={reducedMotion} />
+        <MiniRobot reducedMotion={reducedMotion} />
       </Canvas>
     </div>
   );

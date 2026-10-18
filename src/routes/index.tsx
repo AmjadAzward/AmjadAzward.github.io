@@ -24,13 +24,7 @@ function HeroRobot({ reduce }: { reduce: boolean }) {
       transition={{ duration: 0.72, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
       className="home-visual-entry"
     >
-      <Suspense
-        fallback={
-          <div className="mini-robot-shell mini-robot-route-loading" aria-hidden>
-            <span>AI</span>
-          </div>
-        }
-      >
+      <Suspense fallback={<div className="mini-robot-shell" aria-hidden />}>
         <MiniAIRobotHero />
       </Suspense>
     </motion.div>

@@ -1,5 +1,4 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { RotateCcw } from "lucide-react";
 import { useReducedMotion } from "motion/react";
 
 const MiniRobotCanvas = lazy(() => import("./mini-robot-canvas"));
@@ -25,7 +24,7 @@ function prefersLightweightScene() {
   return isSmall || connection?.saveData === true || connection?.effectiveType === "2g";
 }
 
-export function RobotStaticFallback({ loading = false }: { loading?: boolean }) {
+export function RobotStaticFallback() {
   return (
     <div
       className="mini-robot-static"
@@ -51,7 +50,7 @@ export function RobotStaticFallback({ loading = false }: { loading?: boolean }) 
         <ellipse cx="160" cy="397" rx="76" ry="16" fill="#42a5ff" opacity=".12" />
         <circle cx="160" cy="206" r="132" fill="url(#robot-glow)" opacity=".25" />
 
-        <g className={loading ? "robot-static-loading" : undefined}>
+        <g>
           <rect x="103" y="211" width="114" height="118" rx="34" fill="url(#robot-body)" />
           <rect x="117" y="229" width="86" height="70" rx="23" fill="#dce9f7" />
           <circle cx="160" cy="264" r="24" fill="#101827" />
@@ -99,7 +98,6 @@ export function RobotStaticFallback({ loading = false }: { loading?: boolean }) 
           />
         </g>
       </svg>
-      {loading && <span className="mini-robot-loading-label">Initializing companion</span>}
     </div>
   );
 }
@@ -109,7 +107,6 @@ export default function MiniAIRobotHero() {
   const shellRef = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<DisplayMode>("checking");
   const [inView, setInView] = useState(true);
-  const [replayToken, setReplayToken] = useState(0);
 
   useEffect(() => {
     setMode(supportsWebGL() && !prefersLightweightScene() ? "3d" : "static");
@@ -134,34 +131,13 @@ export default function MiniAIRobotHero() {
       <div ref={shellRef} className="mini-robot-shell">
         <span className="mini-robot-halo" aria-hidden />
         {mode === "3d" ? (
-          <Suspense fallback={<RobotStaticFallback loading />}>
-            <MiniRobotCanvas
-              replayToken={replayToken}
-              reducedMotion={reducedMotion}
-              inView={inView}
-            />
+          <Suspense fallback={null}>
+            <MiniRobotCanvas reducedMotion={reducedMotion} inView={inView} />
           </Suspense>
-        ) : (
-          <RobotStaticFallback loading={mode === "checking"} />
-        )}
+        ) : mode === "static" ? (
+          <RobotStaticFallback />
+        ) : null}
       </div>
-
-      {mode === "3d" && (
-        <button
-          type="button"
-          className="mini-robot-replay"
-          onClick={() => setReplayToken((token) => token + 1)}
-          disabled={reducedMotion}
-          title={
-            reducedMotion
-              ? "Assembly animation is disabled by reduced-motion preferences"
-              : undefined
-          }
-        >
-          <RotateCcw aria-hidden />
-          {reducedMotion ? "Assembly paused" : "Replay assembly"}
-        </button>
-      )}
     </div>
   );
 }
