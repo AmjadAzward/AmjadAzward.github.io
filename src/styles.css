@@ -3677,7 +3677,15 @@ body::before {
   }
 
   .home-stage-inner {
-    gap: 2rem;
+    gap: 1.25rem;
+  }
+
+  .home-visual-entry {
+    order: -1;
+  }
+
+  .home-identity {
+    order: 1;
   }
 
   .home-visual {
