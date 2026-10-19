@@ -20,6 +20,66 @@ import { navItems, socials } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
 
 const cinematicEase = [0.16, 1, 0.3, 1] as const;
+
+function InitialLoader() {
+  const reduce = useReducedMotion();
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const startedAt = performance.now();
+    const minimumVisibleTime = reduce ? 0 : 720;
+    let hideTimer: number | undefined;
+
+    const hide = () => {
+      const remainingTime = Math.max(0, minimumVisibleTime - (performance.now() - startedAt));
+      hideTimer = window.setTimeout(() => setVisible(false), remainingTime);
+    };
+
+    if (document.readyState === "complete") {
+      hide();
+    } else {
+      window.addEventListener("load", hide, { once: true });
+    }
+
+    const safetyTimer = window.setTimeout(() => setVisible(false), 2200);
+
+    return () => {
+      window.removeEventListener("load", hide);
+      window.clearTimeout(hideTimer);
+      window.clearTimeout(safetyTimer);
+    };
+  }, [reduce]);
+
+  return (
+    <AnimatePresence>
+      {visible ? (
+        <motion.div
+          className="site-loader"
+          initial={false}
+          exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 1.015 }}
+          transition={{ duration: reduce ? 0.08 : 0.42, ease: cinematicEase }}
+          role="status"
+          aria-live="polite"
+          aria-label="Loading Amjad Azward's portfolio"
+        >
+          <div className="site-loader-content">
+            <div className="site-loader-orbit" aria-hidden>
+              <span className="site-loader-mark">
+                AA
+                <i />
+              </span>
+            </div>
+            <p>Loading portfolio</p>
+            <span className="site-loader-track" aria-hidden>
+              <i />
+            </span>
+          </div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
+  );
+}
+
 export function Reveal({
   children,
   className,
@@ -405,6 +465,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [location.pathname, reduce]);
   return (
     <>
+      <InitialLoader />
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
