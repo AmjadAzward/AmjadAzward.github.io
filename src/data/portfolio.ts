@@ -61,8 +61,10 @@ export const socials: Social[] = [
   { label: "X", href: "https://x.com/AmjadAzward" },
   { label: "Instagram", href: "https://www.instagram.com/amjadazward/" },
 ];
+export const totalProjectCount = 20;
+
 export const stats = [
-  { value: 30, suffix: "+", label: "Projects Built" },
+  { value: totalProjectCount, suffix: "+", label: "Projects Built" },
   { value: 160, suffix: "+", label: "Certifications" },
   { value: 3.87, suffix: "", label: "CGPA" },
   { value: 3, suffix: "", label: "Roles Held" },

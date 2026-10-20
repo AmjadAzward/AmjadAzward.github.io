@@ -3,7 +3,7 @@ import { Github, Layers3 } from "lucide-react";
 
 import { ExternalIcon, PageHeading, Reveal, Section } from "@/components/portfolio-ui";
 import { TiltSurface } from "@/components/tilt-surface";
-import { projects } from "@/data/portfolio";
+import { projects, totalProjectCount } from "@/data/portfolio";
 import { makeHead } from "@/lib/head";
 
 export const Route = createFileRoute("/portfolio")({
@@ -16,6 +16,7 @@ export const Route = createFileRoute("/portfolio")({
 });
 
 const projectGroups = ["All", "Products", "Intelligence", "Applications"] as const;
+const projectTotalLabel = `${totalProjectCount}+`;
 type ProjectGroup = (typeof projectGroups)[number];
 
 function projectGroup(tag: string): Exclude<ProjectGroup, "All"> {
@@ -51,7 +52,7 @@ function Portfolio() {
           <dl className="portfolio-metrics">
             <div>
               <dt>Projects</dt>
-              <dd>{String(projects.length).padStart(2, "0")}</dd>
+              <dd>{projectTotalLabel}</dd>
             </div>
             <div>
               <dt>Focus areas</dt>
@@ -71,7 +72,7 @@ function Portfolio() {
             <p className="eyebrow">PROJECT INDEX</p>
             <h2 id="portfolio-browser-title">Project collection</h2>
           </div>
-          <p>{String(projects.length).padStart(2, "0")} projects</p>
+          <p>{projectTotalLabel} projects</p>
         </header>
 
         {featuredProject && (
