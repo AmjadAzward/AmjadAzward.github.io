@@ -5,7 +5,9 @@ import { lazy, Suspense } from "react";
 import { ActionLink, ExternalIcon } from "@/components/portfolio-ui";
 import { makeHead } from "@/lib/head";
 
-const MiniAIRobotHero = lazy(() => import("@/components/mini-ai-robot/mini-ai-robot-hero"));
+const InteractiveStudioHero = lazy(
+  () => import("@/components/interactive-studio/interactive-studio-hero"),
+);
 
 export const Route = createFileRoute("/")({
   head: makeHead(
@@ -16,37 +18,23 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-function HeroRobot({ reduce }: { reduce: boolean }) {
-  return (
-    <motion.div
-      initial={reduce ? false : { opacity: 0, y: 24, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.72, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
-      className="home-visual-entry"
-    >
-      <Suspense fallback={<div className="mini-robot-shell" aria-hidden />}>
-        <MiniAIRobotHero />
-      </Suspense>
-    </motion.div>
-  );
-}
-
 function Home() {
   const reduce = useReducedMotion() ?? false;
 
   return (
-    <section className="home-stage">
-      <span className="home-orb home-orb-primary" aria-hidden />
-      <span className="home-orb home-orb-secondary" aria-hidden />
+    <section className="home-stage studio-home">
+      <div className="studio-home-shell">
+        <Suspense fallback={<div className="interactive-studio studio-loading" aria-hidden />}>
+          <InteractiveStudioHero />
+        </Suspense>
 
-      <div className="home-stage-inner">
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
-          className="home-identity"
+          className="home-identity studio-home-identity"
         >
-          <p className="home-kicker">Software engineering - Data science</p>
+          <p className="home-kicker">Software engineering - Data science / Interactive studio</p>
           <h1 className="home-name">
             <span>Building useful</span>
             <em>digital systems.</em>
@@ -66,8 +54,6 @@ function Home() {
             </ActionLink>
           </div>
         </motion.div>
-
-        <HeroRobot reduce={reduce} />
       </div>
     </section>
   );
