@@ -1084,11 +1084,12 @@ function StudioWorld({
     renderer.toneMappingExposure = darkMode ? 1.08 : 0.94;
   }, [darkMode, renderer]);
 
-  useFrame(({ camera }) => {
+  useFrame(({ camera, size }) => {
     const character = characterPositionRef.current;
-    desiredCamera.set(character.x * 0.24, 4.15, character.z + 7.6);
+    const panelOffset = size.width >= 860 ? 1.45 : 0;
+    desiredCamera.set(character.x - panelOffset * 0.28, 4.15, character.z + 7.6);
     camera.position.lerp(desiredCamera, reducedMotion ? 0.2 : 0.045);
-    cameraTarget.set(character.x * 0.32, 1.1, character.z - 1.45);
+    cameraTarget.set(character.x - panelOffset, 1.1, character.z - 1.45);
     camera.lookAt(cameraTarget);
 
     let nearest: StudioZoneId | null = null;

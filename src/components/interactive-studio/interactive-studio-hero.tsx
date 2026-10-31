@@ -186,6 +186,7 @@ export default function InteractiveStudioHero() {
   const [inView, setInView] = useState(true);
   const [activeZone, setActiveZone] = useState<StudioZoneId | null>(null);
   const [mapOpen, setMapOpen] = useState(false);
+  const [journeyStarted, setJourneyStarted] = useState(false);
 
   useEffect(() => {
     setMode(supportsWebGL() && !prefersLightweightScene() ? "3d" : "static");
@@ -208,6 +209,7 @@ export default function InteractiveStudioHero() {
     inputRef.current.target = destination.target;
     inputRef.current.x = 0;
     inputRef.current.z = 0;
+    setJourneyStarted(true);
   };
 
   const spawnAt = (id: StudioZoneId) => {
@@ -217,6 +219,7 @@ export default function InteractiveStudioHero() {
     inputRef.current.target = null;
     inputRef.current.x = 0;
     inputRef.current.z = 0;
+    setJourneyStarted(true);
     setMapOpen(false);
   };
 
@@ -229,6 +232,27 @@ export default function InteractiveStudioHero() {
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [mapOpen]);
+
+  useEffect(() => {
+    const startOnMovement = (event: KeyboardEvent) => {
+      if (
+        [
+          "KeyW",
+          "KeyA",
+          "KeyS",
+          "KeyD",
+          "ArrowUp",
+          "ArrowDown",
+          "ArrowLeft",
+          "ArrowRight",
+        ].includes(event.code)
+      ) {
+        setJourneyStarted(true);
+      }
+    };
+    window.addEventListener("keydown", startOnMovement);
+    return () => window.removeEventListener("keydown", startOnMovement);
+  }, []);
 
   useEffect(() => {
     const handlePathNavigation = (event: Event) => {
@@ -244,6 +268,7 @@ export default function InteractiveStudioHero() {
   }, []);
 
   const setDirection = (x: number, z: number) => {
+    setJourneyStarted(true);
     inputRef.current.x = x;
     inputRef.current.z = z;
     inputRef.current.target = null;
@@ -410,7 +435,7 @@ export default function InteractiveStudioHero() {
         </div>
       ) : null}
 
-      {!stop ? (
+      {!stop && !journeyStarted ? (
         <section className="path-intro-card" aria-labelledby="path-intro-title">
           <p>
             <Compass aria-hidden /> Interactive portfolio trail
