@@ -275,6 +275,13 @@ function ThemeToggle() {
 function Header() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const isHome = location.pathname === "/";
+
+  const walkToSection = (to: string) => {
+    const stop = to.replace(/^\//, "");
+    if (!stop) return;
+    window.dispatchEvent(new CustomEvent("aa:path-stop", { detail: stop }));
+  };
 
   useEffect(() => {
     setOpen(false);
@@ -309,6 +316,12 @@ function Header() {
               activeOptions={{ exact: item.to === "/" }}
               activeProps={{ "aria-current": "page" }}
               className="nav-link"
+              onClick={(event) => {
+                if (isHome && item.to !== "/") {
+                  event.preventDefault();
+                  walkToSection(item.to);
+                }
+              }}
             >
               {item.label}
             </Link>
@@ -359,7 +372,17 @@ function Header() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.04 }}
                 >
-                  <Link to={item.to} onClick={() => setOpen(false)} className="mobile-nav-link">
+                  <Link
+                    to={item.to}
+                    onClick={(event) => {
+                      if (isHome && item.to !== "/") {
+                        event.preventDefault();
+                        walkToSection(item.to);
+                      }
+                      setOpen(false);
+                    }}
+                    className="mobile-nav-link"
+                  >
                     <span>{String(index + 1).padStart(2, "0")}</span>
                     {item.label}
                   </Link>

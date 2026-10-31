@@ -1,10 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
+import { ArrowRight, Compass, Footprints, MapPin, Sparkles } from "lucide-react";
+
+import { certifications, projects, services, skillGroups } from "@/data/portfolio";
 
 const InteractiveStudioCanvas = lazy(() => import("./interactive-studio-canvas"));
 
-export type StudioZoneId = "about" | "skills" | "portfolio" | "certifications" | "contact";
+export type StudioZoneId =
+  "about" | "skills" | "certifications" | "services" | "portfolio" | "contact";
 
 export type StudioInput = {
   x: number;
@@ -14,40 +18,96 @@ export type StudioInput = {
 
 type DisplayMode = "checking" | "3d" | "static";
 
-const zoneDetails: Record<
-  StudioZoneId,
+const pathStops: Array<{
+  id: StudioZoneId;
+  number: string;
+  short: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  to: "/about" | "/skills" | "/certifications" | "/services" | "/portfolio" | "/contact";
+  target: { x: number; z: number };
+  facts: string[];
+}> = [
   {
-    label: string;
-    description: string;
-    to: "/about" | "/skills" | "/portfolio" | "/certifications" | "/contact";
-  }
-> = {
-  about: {
-    label: "Profile hologram",
-    description: "Meet the engineer behind the systems.",
+    id: "about",
+    number: "01",
+    short: "About",
+    eyebrow: "The starting point",
+    title: "Who I am",
+    description:
+      "A third-year Computer Science undergraduate building useful systems across software, data, cloud, and machine learning.",
     to: "/about",
+    target: { x: -1.35, z: -3.1 },
+    facts: ["Colombo, Sri Lanka", "Software + data", "Open to collaboration"],
   },
-  skills: {
-    label: "Skills workstation",
-    description: "Explore the technologies I build with.",
+  {
+    id: "skills",
+    number: "02",
+    short: "Skills",
+    eyebrow: "The engineering toolkit",
+    title: "Tools for building",
+    description:
+      "Languages, frameworks, cloud platforms, databases, and product skills used to turn ideas into maintainable software.",
     to: "/skills",
+    target: { x: 1.35, z: -8.2 },
+    facts: skillGroups.map((group) => group.title),
   },
-  portfolio: {
-    label: "Project wall",
-    description: "Open selected software and data work.",
-    to: "/portfolio",
-  },
-  certifications: {
-    label: "Credential archive",
-    description: "Browse certifications and continuous learning.",
+  {
+    id: "certifications",
+    number: "03",
+    short: "Credentials",
+    eyebrow: "The learning archive",
+    title: "Always learning",
+    description:
+      "Selected certifications across AI, software engineering, cloud, databases, networking, and modern infrastructure.",
     to: "/certifications",
+    target: { x: -1.35, z: -13.3 },
+    facts: certifications
+      .slice(0, 3)
+      .map((item) => item.issuer)
+      .filter((issuer): issuer is string => Boolean(issuer)),
   },
-  contact: {
-    label: "Communication terminal",
-    description: "Start a conversation about your next project.",
+  {
+    id: "services",
+    number: "04",
+    short: "Services",
+    eyebrow: "The build station",
+    title: "Ways I can help",
+    description:
+      "Focused engineering support for web, mobile, desktop, AI, connected systems, and data-led product experiences.",
+    to: "/services",
+    target: { x: 1.35, z: -18.4 },
+    facts: services.slice(0, 4).map((item) => item.title),
+  },
+  {
+    id: "portfolio",
+    number: "05",
+    short: "Projects",
+    eyebrow: "The project gallery",
+    title: "Ideas made tangible",
+    description:
+      "A growing collection of practical products, intelligent systems, mobile experiences, and data-driven applications.",
+    to: "/portfolio",
+    target: { x: -1.35, z: -23.5 },
+    facts: projects
+      .slice(0, 3)
+      .map((item) => item.title)
+      .filter((title): title is string => Boolean(title)),
+  },
+  {
+    id: "contact",
+    number: "06",
+    short: "Contact",
+    eyebrow: "The final waypoint",
+    title: "Let's build something",
+    description:
+      "Have a product, system, or idea worth exploring? The trail ends with an open line for a thoughtful conversation.",
     to: "/contact",
+    target: { x: 1.35, z: -28.6 },
+    facts: ["Project enquiries", "Freelance work", "Engineering opportunities"],
   },
-};
+];
 
 function useDarkMode() {
   const [darkMode, setDarkMode] = useState(true);
@@ -56,7 +116,6 @@ function useDarkMode() {
     const root = document.documentElement;
     const update = () => setDarkMode(root.classList.contains("dark"));
     const observer = new MutationObserver(update);
-
     update();
     observer.observe(root, { attributes: true, attributeFilter: ["class"] });
     return () => observer.disconnect();
@@ -86,12 +145,11 @@ function prefersLightweightScene() {
 function StudioStaticFallback({ darkMode }: { darkMode: boolean }) {
   return (
     <div
-      className={`studio-static-fallback ${darkMode ? "is-evening" : "is-morning"}`}
+      className={`studio-static-fallback path-static-fallback ${darkMode ? "is-evening" : "is-morning"}`}
       role="img"
-      aria-label="A modern digital studio with a software engineer and miniature AI robot"
+      aria-label="A futuristic walking path with an engineer and miniature AI robot"
     >
-      <span className="studio-static-window" aria-hidden />
-      <span className="studio-static-desk" aria-hidden />
+      <span className="path-static-trail" aria-hidden />
       <span className="studio-static-character" aria-hidden>
         <i className="studio-static-head" />
         <i className="studio-static-body" />
@@ -128,6 +186,27 @@ export default function InteractiveStudioHero() {
     return () => observer.disconnect();
   }, []);
 
+  const walkTo = (id: StudioZoneId) => {
+    const destination = pathStops.find((item) => item.id === id);
+    if (!destination) return;
+    inputRef.current.target = destination.target;
+    inputRef.current.x = 0;
+    inputRef.current.z = 0;
+  };
+
+  useEffect(() => {
+    const handlePathNavigation = (event: Event) => {
+      const id = (event as CustomEvent<string>).detail as StudioZoneId;
+      const destination = pathStops.find((item) => item.id === id);
+      if (!destination) return;
+      inputRef.current.target = destination.target;
+      inputRef.current.x = 0;
+      inputRef.current.z = 0;
+    };
+    window.addEventListener("aa:path-stop", handlePathNavigation);
+    return () => window.removeEventListener("aa:path-stop", handlePathNavigation);
+  }, []);
+
   const setDirection = (x: number, z: number) => {
     inputRef.current.x = x;
     inputRef.current.z = z;
@@ -139,10 +218,14 @@ export default function InteractiveStudioHero() {
     inputRef.current.z = 0;
   };
 
-  const zone = activeZone ? zoneDetails[activeZone] : null;
+  const stop = activeZone ? pathStops.find((item) => item.id === activeZone) : null;
 
   return (
-    <div ref={shellRef} className="interactive-studio" aria-label="Interactive AI engineer studio">
+    <div
+      ref={shellRef}
+      className="interactive-studio path-experience"
+      aria-label="Walkable portfolio path"
+    >
       <div className="studio-viewport">
         {mode === "3d" ? (
           <Suspense fallback={<StudioStaticFallback darkMode={darkMode} />}>
@@ -159,37 +242,89 @@ export default function InteractiveStudioHero() {
         )}
       </div>
 
-      <div className="studio-hud-top" aria-hidden>
-        <span className="studio-status-dot" />
-        <span>{darkMode ? "Evening studio" : "Morning studio"}</span>
-        <span>Interactive / 01</span>
+      <div className="path-topbar" aria-hidden>
+        <span>
+          <i /> {darkMode ? "Evening route" : "Morning route"}
+        </span>
+        <span>AMJAD / PORTFOLIO TRAIL</span>
+        <span>{stop ? `STOP ${stop.number} / 06` : "TRAILHEAD / 00"}</span>
       </div>
 
-      <div className="studio-section-index" aria-label="Studio destinations">
-        {(Object.keys(zoneDetails) as StudioZoneId[]).map((id, index) => (
-          <Link key={id} to={zoneDetails[id].to} title={zoneDetails[id].label}>
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            {zoneDetails[id].label.split(" ")[0]}
-          </Link>
+      {!stop ? (
+        <section className="path-intro-card" aria-labelledby="path-intro-title">
+          <p>
+            <Compass aria-hidden /> Interactive portfolio trail
+          </p>
+          <h1 id="path-intro-title">Walk through the work.</h1>
+          <span>
+            Guide the character along one continuous path. Each landmark reveals a different part of
+            my story, skills, credentials, services, and projects.
+          </span>
+          <div>
+            <button type="button" onClick={() => walkTo("about")}>
+              Begin the journey <Footprints aria-hidden />
+            </button>
+            <Link to="/portfolio">Open project index</Link>
+          </div>
+        </section>
+      ) : null}
+
+      <nav className="path-stop-index" aria-label="Portfolio trail destinations">
+        {pathStops.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className={item.id === activeZone ? "is-active" : undefined}
+            onClick={() => walkTo(item.id)}
+            aria-label={`Walk to ${item.short}`}
+          >
+            <span>{item.number}</span>
+            <i />
+            <strong>{item.short}</strong>
+          </button>
         ))}
-      </div>
+      </nav>
 
-      {zone ? (
-        <aside className="studio-proximity-card" aria-live="polite">
-          <span>NEARBY</span>
-          <strong>{zone.label}</strong>
-          <p>{zone.description}</p>
-          <Link to={zone.to}>Open section</Link>
+      {stop ? (
+        <aside className="path-destination-card" aria-live="polite">
+          <p className="path-card-eyebrow">
+            <MapPin aria-hidden /> {stop.number} / {stop.eyebrow}
+          </p>
+          <h2>{stop.title}</h2>
+          <p>{stop.description}</p>
+          <div className="path-fact-list">
+            {stop.facts.map((fact) => (
+              <span key={fact}>{fact}</span>
+            ))}
+          </div>
+          {stop.id === "portfolio" && projects[0] ? (
+            <img src={projects[0].image} alt={`Preview of ${projects[0].title}`} />
+          ) : null}
+          <Link to={stop.to}>
+            Explore {stop.short.toLowerCase()} <ArrowRight aria-hidden />
+          </Link>
         </aside>
       ) : null}
 
-      <div className="studio-controls-hint" aria-hidden>
-        <span>WASD / ARROWS</span>
+      <div className="path-controls-hint" aria-hidden>
+        <Footprints />
+        <span>
+          <strong>WASD / ARROWS</strong> to walk
+        </span>
         <i />
-        <span>CLICK FLOOR TO WALK</span>
+        <span>
+          <strong>CLICK</strong> the path
+        </span>
+        <i />
+        <span>
+          <Sparkles /> robot companion online
+        </span>
       </div>
 
-      <div className="studio-mobile-controls" aria-label="Character movement controls">
+      <div
+        className="studio-mobile-controls path-mobile-controls"
+        aria-label="Character movement controls"
+      >
         <button
           type="button"
           aria-label="Move forward"

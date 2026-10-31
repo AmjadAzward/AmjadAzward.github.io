@@ -28,14 +28,15 @@ type Zone = {
 };
 
 const ZONES: Zone[] = [
-  { id: "about", position: [-3.7, 0.03, -2.5], color: "#49a8ff" },
-  { id: "skills", position: [-1.8, 0.03, -3.05], color: "#38bdf8" },
-  { id: "portfolio", position: [2.45, 0.03, -2.65], color: "#278cff" },
-  { id: "certifications", position: [3.65, 0.03, 1.35], color: "#6aaeff" },
-  { id: "contact", position: [-3.7, 0.03, 1.45], color: "#30a7e8" },
+  { id: "about", position: [-1.35, 0.03, -3.1], color: "#49a8ff" },
+  { id: "skills", position: [1.35, 0.03, -8.2], color: "#38bdf8" },
+  { id: "certifications", position: [-1.35, 0.03, -13.3], color: "#6aaeff" },
+  { id: "services", position: [1.35, 0.03, -18.4], color: "#278cff" },
+  { id: "portfolio", position: [-1.35, 0.03, -23.5], color: "#57b8ff" },
+  { id: "contact", position: [1.35, 0.03, -28.6], color: "#30a7e8" },
 ];
 
-const START_POSITION = new Vector3(1.72, 0, 0.72);
+const START_POSITION = new Vector3(0, 0, 1.2);
 
 function useKeyboard() {
   const keys = useRef<Record<string, boolean>>({});
@@ -131,8 +132,8 @@ function DigitalEngineer({
       const sprinting = keyState["ShiftLeft"] || keyState["ShiftRight"];
       const speed = sprinting ? 3.05 : 1.9;
       root.position.addScaledVector(direction, speed * delta);
-      root.position.x = MathUtils.clamp(root.position.x, -4.35, 4.35);
-      root.position.z = MathUtils.clamp(root.position.z, -3.2, 2.15);
+      root.position.x = MathUtils.clamp(root.position.x, -2.55, 2.55);
+      root.position.z = MathUtils.clamp(root.position.z, -29.2, 1.6);
 
       const targetRotation = Math.atan2(direction.x, direction.z);
       root.rotation.y = MathUtils.lerp(root.rotation.y, targetRotation, 0.13);
@@ -372,6 +373,180 @@ function RobotCompanion({
   );
 }
 
+function PathEnvironment({
+  darkMode,
+  inputRef,
+}: {
+  darkMode: boolean;
+  inputRef: RefObject<StudioInput>;
+}) {
+  const ground = darkMode ? "#071321" : "#b9d6e8";
+  const path = darkMode ? "#132a40" : "#e8f1f6";
+  const pathEdge = darkMode ? "#265a82" : "#6f9fbe";
+  const structure = darkMode ? "#173654" : "#d4e4ef";
+  const accent = darkMode ? "#42a5ff" : "#0878ee";
+  const foliage = darkMode ? "#0d2941" : "#7ca8a3";
+  const stations = useMemo(
+    () =>
+      ZONES.map((zone, index) => ({
+        ...zone,
+        side: index % 2 === 0 ? -1 : 1,
+        height: 1.15 + (index % 3) * 0.22,
+      })),
+    [],
+  );
+
+  const walkTo = (event: ThreeEvent<PointerEvent>) => {
+    event.stopPropagation();
+    const input = inputRef.current;
+    if (!input) return;
+    input.target = {
+      x: MathUtils.clamp(event.point.x, -2.55, 2.55),
+      z: MathUtils.clamp(event.point.z, -29.2, 1.6),
+    };
+  };
+
+  return (
+    <group>
+      <mesh position={[0, -0.05, -14]} rotation={[-Math.PI / 2, 0, 0]} onPointerDown={walkTo}>
+        <planeGeometry args={[20, 42]} />
+        <meshStandardMaterial color={ground} roughness={0.92} />
+      </mesh>
+
+      <mesh position={[0, 0, -14]} rotation={[-Math.PI / 2, 0, 0]} onPointerDown={walkTo}>
+        <planeGeometry args={[4.3, 34]} />
+        <meshStandardMaterial color={path} roughness={0.66} metalness={darkMode ? 0.18 : 0.03} />
+      </mesh>
+      {[-2.18, 2.18].map((x) => (
+        <mesh key={x} position={[x, 0.035, -14]}>
+          <boxGeometry args={[0.075, 0.07, 34]} />
+          <meshStandardMaterial
+            color={pathEdge}
+            emissive={accent}
+            emissiveIntensity={darkMode ? 0.38 : 0.04}
+          />
+        </mesh>
+      ))}
+      {Array.from({ length: 17 }, (_, index) => (
+        <mesh key={`dash-${index}`} position={[0, 0.042, 1 - index * 2]}>
+          <boxGeometry args={[0.055, 0.018, 0.72]} />
+          <meshStandardMaterial
+            color={accent}
+            emissive={accent}
+            emissiveIntensity={darkMode ? 0.6 : 0.08}
+          />
+        </mesh>
+      ))}
+
+      {stations.map((station, index) => (
+        <group key={station.id} position={[station.side * 3.35, 0, station.position[2]]}>
+          <mesh position={[0, station.height / 2, 0]}>
+            <boxGeometry args={[1.75, station.height, 0.22]} />
+            <meshStandardMaterial color={structure} roughness={0.42} metalness={0.2} />
+          </mesh>
+          <mesh position={[-station.side * 0.88, 0.72, 0]} rotation={[0, 0, station.side * -0.08]}>
+            <boxGeometry args={[0.08, 1.5, 0.08]} />
+            <meshStandardMaterial
+              color={accent}
+              emissive={accent}
+              emissiveIntensity={darkMode ? 1.1 : 0.2}
+            />
+          </mesh>
+          <mesh position={[0, station.height + 0.13, 0]}>
+            <boxGeometry args={[1.15, 0.08, 0.3]} />
+            <meshStandardMaterial
+              color={station.color}
+              emissive={station.color}
+              emissiveIntensity={darkMode ? 0.75 : 0.12}
+            />
+          </mesh>
+          {index === 4 ? (
+            <group position={[0, 0.72, station.side * -0.18]}>
+              {[-0.5, 0, 0.5].map((x, cardIndex) => (
+                <mesh
+                  key={x}
+                  position={[x, cardIndex === 1 ? 0.12 : 0, 0]}
+                  rotation={[0, 0, (cardIndex - 1) * 0.08]}
+                >
+                  <boxGeometry args={[0.42, 0.6, 0.05]} />
+                  <meshStandardMaterial
+                    color={cardIndex === 1 ? accent : pathEdge}
+                    emissive={cardIndex === 1 ? accent : "#000000"}
+                    emissiveIntensity={darkMode ? 0.45 : 0.06}
+                  />
+                </mesh>
+              ))}
+            </group>
+          ) : null}
+        </group>
+      ))}
+
+      {Array.from({ length: 12 }, (_, index) => {
+        const side = index % 2 === 0 ? -1 : 1;
+        const z = -0.5 - Math.floor(index / 2) * 5.1;
+        return (
+          <group key={`lamp-${index}`} position={[side * 2.75, 0, z]}>
+            <mesh position={[0, 0.75, 0]}>
+              <cylinderGeometry args={[0.035, 0.055, 1.5, 10]} />
+              <meshStandardMaterial color={structure} metalness={0.55} roughness={0.28} />
+            </mesh>
+            <mesh position={[0, 1.55, 0]}>
+              <sphereGeometry args={[0.11, 12, 8]} />
+              <meshStandardMaterial
+                color={accent}
+                emissive={accent}
+                emissiveIntensity={darkMode ? 2.1 : 0.32}
+              />
+            </mesh>
+            {index % 3 === 0 ? (
+              <pointLight
+                position={[0, 1.5, 0]}
+                color={accent}
+                intensity={darkMode ? 1.8 : 0.15}
+                distance={4.2}
+              />
+            ) : null}
+          </group>
+        );
+      })}
+
+      {Array.from({ length: 20 }, (_, index) => {
+        const side = index % 2 === 0 ? -1 : 1;
+        const z = 1 - Math.floor(index / 2) * 3.5;
+        return (
+          <group key={`tree-${index}`} position={[side * (5.2 + (index % 3) * 0.55), 0, z]}>
+            <mesh position={[0, 0.55, 0]}>
+              <cylinderGeometry args={[0.1, 0.16, 1.1, 8]} />
+              <meshStandardMaterial color={darkMode ? "#172638" : "#786a5a"} roughness={0.9} />
+            </mesh>
+            <mesh position={[0, 1.45, 0]}>
+              <icosahedronGeometry args={[0.72, 1]} />
+              <meshStandardMaterial color={foliage} roughness={0.82} />
+            </mesh>
+          </group>
+        );
+      })}
+
+      <mesh position={[0, 0.06, 2.05]}>
+        <boxGeometry args={[5.2, 0.12, 0.34]} />
+        <meshStandardMaterial
+          color={accent}
+          emissive={accent}
+          emissiveIntensity={darkMode ? 0.8 : 0.12}
+        />
+      </mesh>
+      <mesh position={[0, 0.06, -30.15]}>
+        <boxGeometry args={[5.2, 0.12, 0.34]} />
+        <meshStandardMaterial
+          color={accent}
+          emissive={accent}
+          emissiveIntensity={darkMode ? 0.8 : 0.12}
+        />
+      </mesh>
+    </group>
+  );
+}
+
 function StudioEnvironment({
   darkMode,
   inputRef,
@@ -388,6 +563,7 @@ function StudioEnvironment({
       })),
     [],
   );
+  if (ZONES.length > 0) return <PathEnvironment darkMode={darkMode} inputRef={inputRef} />;
   const floor = darkMode ? "#0b192a" : "#dce9f8";
   const wall = darkMode ? "#13253b" : "#edf4fc";
   const frame = darkMode ? "#245177" : "#aac5e2";
@@ -594,13 +770,13 @@ function StudioWorld({
 
   useFrame(({ camera }) => {
     const character = characterPositionRef.current;
-    desiredCamera.set(character.x * 0.18, 4.35, character.z + 8.35);
+    desiredCamera.set(character.x * 0.24, 4.15, character.z + 7.6);
     camera.position.lerp(desiredCamera, reducedMotion ? 0.2 : 0.045);
-    cameraTarget.set(character.x * 0.28, 1.25, character.z - 0.72);
+    cameraTarget.set(character.x * 0.32, 1.1, character.z - 1.45);
     camera.lookAt(cameraTarget);
 
     let nearest: StudioZoneId | null = null;
-    let nearestDistance = 1.05;
+    let nearestDistance = 1.18;
     for (const zone of ZONES) {
       const distance = Math.hypot(character.x - zone.position[0], character.z - zone.position[2]);
       if (distance < nearestDistance) {
@@ -617,7 +793,7 @@ function StudioWorld({
   return (
     <>
       <color attach="background" args={[background]} />
-      <fog attach="fog" args={[fog, 8.5, 22]} />
+      <fog attach="fog" args={[fog, 12, 34]} />
       <hemisphereLight
         intensity={darkMode ? 1.05 : 1.55}
         color={darkMode ? "#8fbdff" : "#fff3d9"}
@@ -630,13 +806,13 @@ function StudioWorld({
         color={darkMode ? "#7fb5ff" : "#fff0c9"}
       />
       <pointLight
-        position={[3.2, 2.5, -2.4]}
+        position={[2.8, 3.2, -9]}
         intensity={darkMode ? 5 : 1.2}
         distance={7}
         color="#42a5ff"
       />
       <pointLight
-        position={[-3.8, 2.6, -2.2]}
+        position={[-2.8, 3.2, -21]}
         intensity={darkMode ? 3.2 : 0.8}
         distance={6}
         color="#38bdf8"
@@ -663,7 +839,7 @@ export default function InteractiveStudioCanvas(props: StudioCanvasProps) {
   return (
     <Canvas
       className="interactive-studio-canvas"
-      camera={{ position: [0, 4.35, 9], fov: 43, near: 0.1, far: 45 }}
+      camera={{ position: [0, 4.15, 8.8], fov: 45, near: 0.1, far: 60 }}
       dpr={[1, 1.5]}
       frameloop={props.inView ? "always" : "never"}
       gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
