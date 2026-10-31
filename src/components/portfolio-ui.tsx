@@ -496,15 +496,17 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="site-atmosphere" aria-hidden>
         <span className="atmosphere-contours" />
       </div>
-      <Header />
-      <motion.div
-        key={`progress-${location.pathname}`}
-        className="route-progress"
-        initial={reduce ? false : { scaleX: 0, opacity: 1 }}
-        animate={reduce ? { opacity: 0 } : { scaleX: 1, opacity: 0 }}
-        transition={{ duration: 0.48, ease: cinematicEase }}
-        aria-hidden
-      />
+      {!isHome ? <Header /> : null}
+      {!isHome ? (
+        <motion.div
+          key={`progress-${location.pathname}`}
+          className="route-progress"
+          initial={reduce ? false : { scaleX: 0, opacity: 1 }}
+          animate={reduce ? { opacity: 0 } : { scaleX: 1, opacity: 0 }}
+          transition={{ duration: 0.48, ease: cinematicEase }}
+          aria-hidden
+        />
+      ) : null}
       <AnimatePresence mode="wait" initial={false}>
         <motion.main
           id="main-content"
@@ -513,13 +515,13 @@ export function AppShell({ children }: { children: ReactNode }) {
           animate={{ opacity: 1, y: 0 }}
           exit={reduce ? { opacity: 0 } : { opacity: 0, y: -8 }}
           transition={{ duration: reduce ? 0.08 : 0.34, ease: cinematicEase }}
-          className={cn("relative z-[1] min-h-screen pt-16", isHome && "home-main")}
+          className={cn("relative z-[1] min-h-screen pt-16", isHome && "home-main path-world-main")}
         >
           {children}
         </motion.main>
       </AnimatePresence>
-      <Footer />
-      <ScrollToTop />
+      {!isHome ? <Footer /> : null}
+      {!isHome ? <ScrollToTop /> : null}
     </>
   );
 }
