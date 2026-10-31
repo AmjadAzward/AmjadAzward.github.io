@@ -2,6 +2,7 @@ import { Canvas, type ThreeEvent, useFrame, useThree } from "@react-three/fiber"
 import { useEffect, useMemo, useRef, type RefObject } from "react";
 import {
   ACESFilmicToneMapping,
+  CatmullRomCurve3,
   Color,
   Group,
   MathUtils,
@@ -37,6 +38,42 @@ const ZONES: Zone[] = [
 ];
 
 const START_POSITION = new Vector3(0, 0, 1.2);
+
+type TrailSegment = {
+  key: string;
+  position: [number, number, number];
+  rotation: number;
+  length: number;
+};
+
+function createTrailSegments(
+  points: Array<[number, number]>,
+  samples: number,
+  keyPrefix: string,
+): TrailSegment[] {
+  const curve = new CatmullRomCurve3(
+    points.map(([x, z]) => new Vector3(x, 0, z)),
+    false,
+    "catmullrom",
+    0.34,
+  );
+  const sampled = curve.getPoints(samples);
+
+  return sampled.slice(1).map((point, index) => {
+    const previous = sampled[index];
+    if (!previous) {
+      return { key: `${keyPrefix}-${index}`, position: [0, 0, 0], rotation: 0, length: 0 };
+    }
+    const dx = point.x - previous.x;
+    const dz = point.z - previous.z;
+    return {
+      key: `${keyPrefix}-${index}`,
+      position: [(point.x + previous.x) / 2, 0.025, (point.z + previous.z) / 2],
+      rotation: Math.atan2(dx, dz),
+      length: Math.hypot(dx, dz) + 0.18,
+    };
+  });
+}
 
 function useKeyboard() {
   const keys = useRef<Record<string, boolean>>({});
@@ -132,7 +169,7 @@ function DigitalEngineer({
       const sprinting = keyState["ShiftLeft"] || keyState["ShiftRight"];
       const speed = sprinting ? 3.05 : 1.9;
       root.position.addScaledVector(direction, speed * delta);
-      root.position.x = MathUtils.clamp(root.position.x, -2.55, 2.55);
+      root.position.x = MathUtils.clamp(root.position.x, -4.45, 4.45);
       root.position.z = MathUtils.clamp(root.position.z, -29.2, 1.6);
 
       const targetRotation = Math.atan2(direction.x, direction.z);
@@ -376,16 +413,22 @@ function RobotCompanion({
 function PathEnvironment({
   darkMode,
   inputRef,
+  reducedMotion,
 }: {
   darkMode: boolean;
   inputRef: RefObject<StudioInput>;
+  reducedMotion: boolean;
 }) {
-  const ground = darkMode ? "#071321" : "#b9d6e8";
-  const path = darkMode ? "#132a40" : "#e8f1f6";
-  const pathEdge = darkMode ? "#265a82" : "#6f9fbe";
+  const waterRef = useRef<Group>(null);
+  const ground = darkMode ? "#071923" : "#8eada8";
+  const path = darkMode ? "#263747" : "#d9d1be";
+  const pathEdge = darkMode ? "#386683" : "#7899a5";
   const structure = darkMode ? "#173654" : "#d4e4ef";
   const accent = darkMode ? "#42a5ff" : "#0878ee";
-  const foliage = darkMode ? "#0d2941" : "#7ca8a3";
+  const foliage = darkMode ? "#0d3442" : "#4f7f82";
+  const foliageLight = darkMode ? "#185169" : "#729b94";
+  const water = darkMode ? "#062c4a" : "#3a9bc1";
+  const sand = darkMode ? "#243b40" : "#cbbf9f";
   const stations = useMemo(
     () =>
       ZONES.map((zone, index) => ({
@@ -395,48 +438,206 @@ function PathEnvironment({
       })),
     [],
   );
+  const mainTrail = useMemo(
+    () =>
+      createTrailSegments(
+        [
+          [0, 1.8],
+          [-0.55, -0.6],
+          [-1.35, -3.1],
+          [-0.3, -5.5],
+          [1.35, -8.2],
+          [0.25, -10.7],
+          [-1.35, -13.3],
+          [-0.45, -15.8],
+          [1.35, -18.4],
+          [0.25, -20.9],
+          [-1.35, -23.5],
+          [-0.25, -26.1],
+          [1.35, -28.6],
+        ],
+        52,
+        "main",
+      ),
+    [],
+  );
+  const forestBranch = useMemo(
+    () =>
+      createTrailSegments(
+        [
+          [0.75, -7.1],
+          [-2.5, -7.4],
+          [-3.7, -9.1],
+          [-2.6, -11.2],
+          [-0.25, -11.4],
+        ],
+        18,
+        "forest",
+      ),
+    [],
+  );
+  const coastBranch = useMemo(
+    () =>
+      createTrailSegments(
+        [
+          [1.05, -17.4],
+          [2.8, -18.1],
+          [4.15, -19.8],
+          [3.2, -21.4],
+          [0.35, -22.1],
+        ],
+        18,
+        "coast",
+      ),
+    [],
+  );
+  const forest = useMemo(
+    () =>
+      Array.from({ length: 34 }, (_, index) => {
+        const rightSide = index % 4 === 0;
+        const row = Math.floor(index / 2);
+        return {
+          x: rightSide ? 3.35 + (index % 3) * 0.42 : -3.1 - (index % 5) * 0.58,
+          z: 1.5 - row * 1.95 + ((index * 7) % 5) * 0.21,
+          scale: 0.72 + ((index * 11) % 7) * 0.07,
+          light: index % 3 === 0,
+        };
+      }),
+    [],
+  );
+  const shorelineRocks = useMemo(
+    () =>
+      Array.from({ length: 22 }, (_, index) => ({
+        x: 4.65 + ((index * 7) % 5) * 0.22,
+        z: 1.4 - index * 1.52,
+        scale: 0.18 + (index % 4) * 0.07,
+      })),
+    [],
+  );
+
+  useFrame((state) => {
+    if (!waterRef.current || reducedMotion) return;
+    waterRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.7) * 0.025;
+    waterRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.22) * 0.0015;
+  });
 
   const walkTo = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation();
     const input = inputRef.current;
     if (!input) return;
     input.target = {
-      x: MathUtils.clamp(event.point.x, -2.55, 2.55),
+      x: MathUtils.clamp(event.point.x, -4.45, 4.45),
       z: MathUtils.clamp(event.point.z, -29.2, 1.6),
     };
   };
 
   return (
     <group>
-      <mesh position={[0, -0.05, -14]} rotation={[-Math.PI / 2, 0, 0]} onPointerDown={walkTo}>
-        <planeGeometry args={[20, 42]} />
+      <mesh position={[-2.1, -0.08, -14]} rotation={[-Math.PI / 2, 0, 0]} onPointerDown={walkTo}>
+        <planeGeometry args={[15, 42]} />
         <meshStandardMaterial color={ground} roughness={0.92} />
       </mesh>
 
-      <mesh position={[0, 0, -14]} rotation={[-Math.PI / 2, 0, 0]} onPointerDown={walkTo}>
-        <planeGeometry args={[4.3, 34]} />
-        <meshStandardMaterial color={path} roughness={0.66} metalness={darkMode ? 0.18 : 0.03} />
+      <mesh position={[4.4, -0.055, -14]} rotation={[-Math.PI / 2, 0, 0]} onPointerDown={walkTo}>
+        <planeGeometry args={[2.15, 42]} />
+        <meshStandardMaterial color={sand} roughness={0.96} />
       </mesh>
-      {[-2.18, 2.18].map((x) => (
-        <mesh key={x} position={[x, 0.035, -14]}>
-          <boxGeometry args={[0.075, 0.07, 34]} />
+
+      <group ref={waterRef}>
+        <mesh position={[8.3, -0.11, -14]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[7.8, 42, 1, 28]} />
           <meshStandardMaterial
-            color={pathEdge}
-            emissive={accent}
-            emissiveIntensity={darkMode ? 0.38 : 0.04}
+            color={water}
+            emissive={darkMode ? "#03223a" : "#176d98"}
+            emissiveIntensity={darkMode ? 0.42 : 0.08}
+            metalness={0.12}
+            roughness={0.24}
+            transparent
+            opacity={0.88}
           />
         </mesh>
-      ))}
-      {Array.from({ length: 17 }, (_, index) => (
-        <mesh key={`dash-${index}`} position={[0, 0.042, 1 - index * 2]}>
-          <boxGeometry args={[0.055, 0.018, 0.72]} />
-          <meshStandardMaterial
-            color={accent}
-            emissive={accent}
-            emissiveIntensity={darkMode ? 0.6 : 0.08}
+        {Array.from({ length: 7 }, (_, index) => (
+          <mesh
+            key={`wave-${index}`}
+            position={[5.35 + index * 0.62, -0.045 + (index % 2) * 0.012, -14]}
+            rotation={[-Math.PI / 2, 0, 0]}
+          >
+            <planeGeometry args={[0.035, 38]} />
+            <meshBasicMaterial
+              color={darkMode ? "#2a87b5" : "#a9e7f2"}
+              transparent
+              opacity={0.38}
+            />
+          </mesh>
+        ))}
+      </group>
+
+      {[...mainTrail, ...forestBranch, ...coastBranch].map((segment) => (
+        <mesh
+          key={segment.key}
+          position={segment.position}
+          rotation={[0, segment.rotation, 0]}
+          onPointerDown={walkTo}
+        >
+          <boxGeometry
+            args={[segment.key.startsWith("main") ? 2.05 : 1.25, 0.07, segment.length]}
           />
+          <meshStandardMaterial color={path} roughness={0.82} metalness={0.02} />
         </mesh>
       ))}
+
+      {mainTrail
+        .filter((_, index) => index % 3 === 0)
+        .map((segment, index) => (
+          <mesh
+            key={`trail-stone-${segment.key}`}
+            position={[segment.position[0], 0.073, segment.position[2]]}
+            rotation={[-Math.PI / 2, 0, index * 0.37]}
+          >
+            <circleGeometry args={[0.08 + (index % 3) * 0.02, 10]} />
+            <meshStandardMaterial
+              color={pathEdge}
+              emissive={darkMode ? accent : "#000000"}
+              emissiveIntensity={darkMode ? 0.16 : 0}
+              roughness={0.78}
+            />
+          </mesh>
+        ))}
+
+      <mesh position={[-0.45, -0.035, -15.65]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[11.5, 1.05]} />
+        <meshStandardMaterial
+          color={water}
+          emissive={darkMode ? "#03223a" : "#176d98"}
+          emissiveIntensity={darkMode ? 0.38 : 0.06}
+          roughness={0.2}
+        />
+      </mesh>
+      {Array.from({ length: 8 }, (_, index) => (
+        <mesh key={`bridge-plank-${index}`} position={[0.15, 0.09, -16.12 + index * 0.14]}>
+          <boxGeometry args={[2.1, 0.09, 0.115]} />
+          <meshStandardMaterial color={darkMode ? "#3d5260" : "#9b8063"} roughness={0.82} />
+        </mesh>
+      ))}
+      {[-0.94, 1.24].map((x) => (
+        <mesh key={`bridge-rail-${x}`} position={[x, 0.22, -15.63]}>
+          <boxGeometry args={[0.055, 0.38, 1.35]} />
+          <meshStandardMaterial color={pathEdge} roughness={0.62} />
+        </mesh>
+      ))}
+
+      <group position={[4.12, 0.04, -19.8]}>
+        <mesh>
+          <cylinderGeometry args={[1.05, 1.05, 0.1, 8]} />
+          <meshStandardMaterial color={darkMode ? "#294353" : "#a88d6c"} roughness={0.78} />
+        </mesh>
+        {[-0.72, 0.72].map((x) => (
+          <mesh key={x} position={[x, 0.4, 0]}>
+            <cylinderGeometry args={[0.035, 0.045, 0.8, 8]} />
+            <meshStandardMaterial color={pathEdge} roughness={0.58} />
+          </mesh>
+        ))}
+      </group>
 
       {stations.map((station, index) => (
         <group key={station.id} position={[station.side * 3.35, 0, station.position[2]]}>
@@ -510,22 +711,69 @@ function PathEnvironment({
         );
       })}
 
-      {Array.from({ length: 20 }, (_, index) => {
-        const side = index % 2 === 0 ? -1 : 1;
-        const z = 1 - Math.floor(index / 2) * 3.5;
-        return (
-          <group key={`tree-${index}`} position={[side * (5.2 + (index % 3) * 0.55), 0, z]}>
-            <mesh position={[0, 0.55, 0]}>
-              <cylinderGeometry args={[0.1, 0.16, 1.1, 8]} />
-              <meshStandardMaterial color={darkMode ? "#172638" : "#786a5a"} roughness={0.9} />
+      {forest.map((tree, index) => (
+        <group key={`tree-${index}`} position={[tree.x, 0, tree.z]} scale={tree.scale}>
+          <mesh position={[0, 0.62, 0]}>
+            <cylinderGeometry args={[0.1, 0.17, 1.25, 8]} />
+            <meshStandardMaterial color={darkMode ? "#172d38" : "#756657"} roughness={0.94} />
+          </mesh>
+          <mesh position={[0, 1.48, 0]} scale={[0.82, 1.18, 0.82]}>
+            <icosahedronGeometry args={[0.72, 1]} />
+            <meshStandardMaterial color={tree.light ? foliageLight : foliage} roughness={0.86} />
+          </mesh>
+          <mesh position={[0.18, 1.82, -0.05]} scale={[0.5, 0.64, 0.5]}>
+            <icosahedronGeometry args={[0.48, 1]} />
+            <meshStandardMaterial color={tree.light ? foliage : foliageLight} roughness={0.88} />
+          </mesh>
+        </group>
+      ))}
+
+      {shorelineRocks.map((rock, index) => (
+        <mesh
+          key={`shore-rock-${index}`}
+          position={[rock.x, rock.scale * 0.35 - 0.05, rock.z]}
+          rotation={[index * 0.21, index * 0.47, index * 0.16]}
+          scale={[rock.scale * 1.3, rock.scale * 0.7, rock.scale]}
+        >
+          <dodecahedronGeometry args={[1, 0]} />
+          <meshStandardMaterial color={darkMode ? "#234354" : "#78939a"} roughness={0.93} />
+        </mesh>
+      ))}
+
+      {(
+        [
+          [-6.1, -4.2, 1.25],
+          [-5.6, -14.5, 1.65],
+          [-6.3, -24.6, 1.4],
+          [3.9, -5.3, 0.88],
+          [3.7, -26.1, 1.05],
+        ] as Array<[number, number, number]>
+      ).map(([x, z, scale], index) => (
+        <mesh
+          key={`hill-${index}`}
+          position={[x, scale * 0.22 - 0.12, z]}
+          scale={[scale, scale * 0.42, scale]}
+        >
+          <icosahedronGeometry args={[1, 2]} />
+          <meshStandardMaterial color={index % 2 === 0 ? foliage : foliageLight} roughness={0.98} />
+        </mesh>
+      ))}
+
+      {darkMode
+        ? Array.from({ length: 18 }, (_, index) => (
+            <mesh
+              key={`firefly-${index}`}
+              position={[
+                -4.4 + ((index * 13) % 9) * 0.82,
+                0.75 + (index % 4) * 0.31,
+                0.2 - index * 1.72,
+              ]}
+            >
+              <sphereGeometry args={[0.025, 8, 6]} />
+              <meshBasicMaterial color={index % 2 === 0 ? "#7bd7ff" : "#bcecff"} />
             </mesh>
-            <mesh position={[0, 1.45, 0]}>
-              <icosahedronGeometry args={[0.72, 1]} />
-              <meshStandardMaterial color={foliage} roughness={0.82} />
-            </mesh>
-          </group>
-        );
-      })}
+          ))
+        : null}
 
       <mesh position={[0, 0.06, 2.05]}>
         <boxGeometry args={[5.2, 0.12, 0.34]} />
@@ -550,9 +798,11 @@ function PathEnvironment({
 function StudioEnvironment({
   darkMode,
   inputRef,
+  reducedMotion,
 }: {
   darkMode: boolean;
   inputRef: RefObject<StudioInput>;
+  reducedMotion: boolean;
 }) {
   const city = useMemo(
     () =>
@@ -563,7 +813,10 @@ function StudioEnvironment({
       })),
     [],
   );
-  if (ZONES.length > 0) return <PathEnvironment darkMode={darkMode} inputRef={inputRef} />;
+  if (ZONES.length > 0)
+    return (
+      <PathEnvironment darkMode={darkMode} inputRef={inputRef} reducedMotion={reducedMotion} />
+    );
   const floor = darkMode ? "#0b192a" : "#dce9f8";
   const wall = darkMode ? "#13253b" : "#edf4fc";
   const frame = darkMode ? "#245177" : "#aac5e2";
@@ -818,7 +1071,7 @@ function StudioWorld({
         color="#38bdf8"
       />
 
-      <StudioEnvironment darkMode={darkMode} inputRef={inputRef} />
+      <StudioEnvironment darkMode={darkMode} inputRef={inputRef} reducedMotion={reducedMotion} />
       <ZoneBeacons inputRef={inputRef} darkMode={darkMode} />
       <DigitalEngineer
         inputRef={inputRef}

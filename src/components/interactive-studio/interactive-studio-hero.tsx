@@ -257,8 +257,9 @@ export default function InteractiveStudioHero() {
           </p>
           <h1 id="path-intro-title">Walk through the work.</h1>
           <span>
-            Guide the character along one continuous path. Each landmark reveals a different part of
-            my story, skills, credentials, services, and projects.
+            Follow a winding nature trail through forest, water, and coastal viewpoints. Each
+            landmark reveals a different part of my story, skills, credentials, services, and
+            projects.
           </span>
           <div>
             <button type="button" onClick={() => walkTo("about")}>
