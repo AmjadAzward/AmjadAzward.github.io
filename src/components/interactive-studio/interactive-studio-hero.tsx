@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
-import { ArrowRight, Compass, Footprints, Map as MapIcon, MapPin, Sparkles, X } from "lucide-react";
+import { ArrowRight, Compass, Footprints, Map as MapIcon, MapPin, X } from "lucide-react";
 
 import { certifications, projects, services, skillGroups } from "@/data/portfolio";
 
@@ -278,14 +278,6 @@ export default function InteractiveStudioHero() {
         )}
       </div>
 
-      <div className="path-topbar" aria-hidden>
-        <span>
-          <i /> {darkMode ? "Evening route" : "Morning route"}
-        </span>
-        <span>AMJAD / PORTFOLIO TRAIL</span>
-        <span>{stop ? `STOP ${stop.number} / 06` : "TRAILHEAD / 00"}</span>
-      </div>
-
       <button
         type="button"
         className="path-map-trigger"
@@ -438,22 +430,6 @@ export default function InteractiveStudioHero() {
         </section>
       ) : null}
 
-      <nav className="path-stop-index" aria-label="Portfolio trail destinations">
-        {pathStops.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className={item.id === activeZone ? "is-active" : undefined}
-            onClick={() => walkTo(item.id)}
-            aria-label={`Walk to ${item.short}`}
-          >
-            <span>{item.number}</span>
-            <i />
-            <strong>{item.short}</strong>
-          </button>
-        ))}
-      </nav>
-
       {stop ? (
         <aside className="path-destination-card" aria-live="polite">
           <p className="path-card-eyebrow">
@@ -474,21 +450,6 @@ export default function InteractiveStudioHero() {
           </Link>
         </aside>
       ) : null}
-
-      <div className="path-controls-hint" aria-hidden>
-        <Footprints />
-        <span>
-          <strong>WASD / ARROWS</strong> to walk
-        </span>
-        <i />
-        <span>
-          <strong>CLICK</strong> the path
-        </span>
-        <i />
-        <span>
-          <Sparkles /> robot companion online
-        </span>
-      </div>
 
       <div
         className="studio-mobile-controls path-mobile-controls"
