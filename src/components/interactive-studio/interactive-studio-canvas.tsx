@@ -142,17 +142,26 @@ function DigitalEngineer({
     const input = inputRef.current;
     if (!root || !input) return;
 
-    const keyState = keys.current;
-    let x =
-      (keyState["KeyD"] || keyState["ArrowRight"] ? 1 : 0) -
-      (keyState["KeyA"] || keyState["ArrowLeft"] ? 1 : 0) +
-      input.x;
-    let z =
-      (keyState["KeyS"] || keyState["ArrowDown"] ? 1 : 0) -
-      (keyState["KeyW"] || keyState["ArrowUp"] ? 1 : 0) +
-      input.z;
+    if (input.spawn) {
+      root.position.set(input.spawn.x, 0, input.spawn.z);
+      root.rotation.y = 0;
+      positionRef.current?.copy(root.position);
+      input.spawn = null;
+    }
 
-    if (Math.abs(x) < 0.01 && Math.abs(z) < 0.01 && input.target) {
+    const keyState = keys.current;
+    let x = input.locked
+      ? 0
+      : (keyState["KeyD"] || keyState["ArrowRight"] ? 1 : 0) -
+        (keyState["KeyA"] || keyState["ArrowLeft"] ? 1 : 0) +
+        input.x;
+    let z = input.locked
+      ? 0
+      : (keyState["KeyS"] || keyState["ArrowDown"] ? 1 : 0) -
+        (keyState["KeyW"] || keyState["ArrowUp"] ? 1 : 0) +
+        input.z;
+
+    if (!input.locked && Math.abs(x) < 0.01 && Math.abs(z) < 0.01 && input.target) {
       x = input.target.x - root.position.x;
       z = input.target.z - root.position.z;
       if (Math.hypot(x, z) < 0.16) {
@@ -420,15 +429,15 @@ function PathEnvironment({
   reducedMotion: boolean;
 }) {
   const waterRef = useRef<Group>(null);
-  const ground = darkMode ? "#071923" : "#8eada8";
-  const path = darkMode ? "#263747" : "#d9d1be";
-  const pathEdge = darkMode ? "#386683" : "#7899a5";
+  const ground = darkMode ? "#0b2719" : "#6f9f62";
+  const path = darkMode ? "#493c2e" : "#d6c39a";
+  const pathEdge = darkMode ? "#766247" : "#9a835c";
   const structure = darkMode ? "#173654" : "#d4e4ef";
   const accent = darkMode ? "#42a5ff" : "#0878ee";
-  const foliage = darkMode ? "#0d3442" : "#4f7f82";
-  const foliageLight = darkMode ? "#185169" : "#729b94";
-  const water = darkMode ? "#062c4a" : "#3a9bc1";
-  const sand = darkMode ? "#243b40" : "#cbbf9f";
+  const foliage = darkMode ? "#123d25" : "#2f773b";
+  const foliageLight = darkMode ? "#245b32" : "#4f9849";
+  const water = darkMode ? "#063356" : "#319ac5";
+  const sand = darkMode ? "#5b513b" : "#d2bd83";
   const stations = useMemo(
     () =>
       ZONES.map((zone, index) => ({
@@ -715,7 +724,7 @@ function PathEnvironment({
         <group key={`tree-${index}`} position={[tree.x, 0, tree.z]} scale={tree.scale}>
           <mesh position={[0, 0.62, 0]}>
             <cylinderGeometry args={[0.1, 0.17, 1.25, 8]} />
-            <meshStandardMaterial color={darkMode ? "#172d38" : "#756657"} roughness={0.94} />
+            <meshStandardMaterial color={darkMode ? "#4d321f" : "#704626"} roughness={0.94} />
           </mesh>
           <mesh position={[0, 1.48, 0]} scale={[0.82, 1.18, 0.82]}>
             <icosahedronGeometry args={[0.72, 1]} />

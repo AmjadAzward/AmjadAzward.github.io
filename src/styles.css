@@ -862,6 +862,296 @@ body::before {
   border-left: 1px solid var(--border);
 }
 
+.path-map-trigger {
+  position: absolute;
+  z-index: 9;
+  top: 1rem;
+  right: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.45rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid color-mix(in oklab, var(--primary) 34%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--background) 74%, transparent);
+  color: var(--foreground);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  box-shadow: 0 12px 36px rgb(0 18 35 / 18%);
+  backdrop-filter: blur(18px) saturate(135%);
+}
+
+.path-map-trigger svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--primary);
+}
+
+.path-map-overlay {
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  background: rgb(2 12 22 / 72%);
+  backdrop-filter: blur(12px) saturate(90%);
+  animation: path-map-fade 0.28s ease both;
+}
+
+@keyframes path-map-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.path-map-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(58rem, 96vw);
+  max-height: min(52rem, 94svh);
+  padding: clamp(0.8rem, 1.8vw, 1.2rem);
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--primary) 38%, var(--border));
+  border-radius: 1.5rem;
+  background: color-mix(in oklab, var(--background) 92%, #0a2130);
+  box-shadow: 0 36px 120px rgb(0 8 20 / 52%);
+  animation: path-map-panel-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes path-map-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.2rem) scale(0.96);
+  }
+}
+
+.path-map-panel > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.25rem 0.25rem 0.85rem;
+}
+
+.path-map-panel > header p {
+  margin: 0;
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.13em;
+}
+
+.path-map-panel > header h2 {
+  margin: 0.28rem 0 0;
+  color: var(--foreground);
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 3vw, 2.8rem);
+  font-weight: 650;
+  letter-spacing: -0.055em;
+  line-height: 1;
+}
+
+.path-map-panel > header button {
+  display: grid;
+  width: 2.45rem;
+  height: 2.45rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--background) 84%, transparent);
+  color: var(--foreground);
+}
+
+.path-map-panel > header button svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.path-map-canvas {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid rgb(150 210 245 / 26%);
+  border-radius: 1.15rem;
+  background: #09618d;
+  box-shadow: inset 0 0 42px rgb(2 30 55 / 42%);
+  aspect-ratio: 16 / 10;
+}
+
+.path-map-canvas > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.path-map-canvas > button {
+  position: absolute;
+  display: grid;
+  width: 2.15rem;
+  height: 2.15rem;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #07111e;
+  transform: translate(-50%, -50%);
+}
+
+.path-map-canvas > button span {
+  display: grid;
+  width: 1.7rem;
+  height: 1.7rem;
+  place-items: center;
+  border: 0.2rem solid #f5f8ff;
+  background: #101c2b;
+  color: #f5f8ff;
+  font-family: var(--font-mono);
+  font-size: 0.48rem;
+  font-weight: 700;
+  box-shadow: 0 4px 18px rgb(0 10 25 / 55%);
+  transform: rotate(45deg);
+  transition: 0.22s ease;
+}
+
+.path-map-canvas > button span i {
+  font-style: normal;
+  transform: rotate(-45deg);
+}
+
+.path-map-canvas > button strong {
+  position: absolute;
+  top: calc(100% + 0.22rem);
+  left: 50%;
+  padding: 0.26rem 0.42rem;
+  border-radius: 999px;
+  background: rgb(5 16 28 / 82%);
+  color: white;
+  font-size: 0.52rem;
+  line-height: 1;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  backdrop-filter: blur(8px);
+}
+
+.path-map-canvas > button:hover span,
+.path-map-canvas > button:focus-visible span,
+.path-map-canvas > button.is-current span {
+  border-color: #8edcff;
+  background: #0878ee;
+  box-shadow:
+    0 0 0 0.28rem rgb(66 165 255 / 24%),
+    0 6px 24px rgb(0 16 42 / 56%);
+  transform: rotate(45deg) scale(1.13);
+}
+
+.path-map-panel > footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem 1.2rem;
+  padding: 0.8rem 0.2rem 0.1rem;
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.path-map-panel > footer span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+}
+
+.path-map-panel > footer i {
+  display: inline-block;
+  width: 0.58rem;
+  height: 0.58rem;
+}
+
+.map-legend-pin {
+  border: 2px solid var(--foreground);
+  background: var(--primary);
+  transform: rotate(45deg);
+}
+
+.map-legend-route {
+  height: 0.2rem !important;
+  border-radius: 999px;
+  background: #d8c99f;
+}
+
+.map-legend-water {
+  border-radius: 50%;
+  background: #2196c3;
+}
+
+@media (max-width: 680px) {
+  .path-map-trigger {
+    top: 0.7rem;
+    right: 0.7rem;
+    width: 2.45rem;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .path-map-trigger span {
+    display: none;
+  }
+
+  .path-map-overlay {
+    padding: 0.55rem;
+  }
+
+  .path-map-panel {
+    width: 100%;
+    max-height: calc(100svh - 1.1rem);
+    padding: 0.65rem;
+    border-radius: 1.15rem;
+  }
+
+  .path-map-panel > header {
+    padding-bottom: 0.6rem;
+  }
+
+  .path-map-panel > header h2 {
+    font-size: 1.65rem;
+  }
+
+  .path-map-canvas {
+    aspect-ratio: 4 / 5;
+  }
+
+  .path-map-canvas > svg {
+    object-fit: fill;
+  }
+
+  .path-map-canvas > button {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+
+  .path-map-canvas > button span {
+    width: 1.42rem;
+    height: 1.42rem;
+    font-size: 0.42rem;
+  }
+
+  .path-map-canvas > button strong {
+    font-size: 0.46rem;
+  }
+
+  .path-map-panel > footer {
+    gap: 0.45rem 0.75rem;
+    padding-top: 0.6rem;
+    font-size: 0.44rem;
+  }
+}
+
 /* Interactive AI studio homepage */
 .studio-home {
   display: block;
