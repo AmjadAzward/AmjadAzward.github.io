@@ -41,7 +41,7 @@ const pathStops: Array<{
     description:
       "A third-year Computer Science undergraduate building useful systems across software, data, cloud, and machine learning.",
     to: "/about",
-    target: { x: -1.35, z: -3.1 },
+    target: { x: -4.8, z: 0.8 },
     mapPosition: { left: 31, top: 19 },
     facts: ["Colombo, Sri Lanka", "Software + data", "Open to collaboration"],
   },
@@ -54,7 +54,7 @@ const pathStops: Array<{
     description:
       "Languages, frameworks, cloud platforms, databases, and product skills used to turn ideas into maintainable software.",
     to: "/skills",
-    target: { x: 1.35, z: -8.2 },
+    target: { x: 4.6, z: -3.6 },
     mapPosition: { left: 68, top: 29 },
     facts: skillGroups.map((group) => group.title),
   },
@@ -67,7 +67,7 @@ const pathStops: Array<{
     description:
       "Selected certifications across AI, software engineering, cloud, databases, networking, and modern infrastructure.",
     to: "/certifications",
-    target: { x: -1.35, z: -13.3 },
+    target: { x: -4.6, z: -8.9 },
     mapPosition: { left: 30, top: 43 },
     facts: certifications
       .slice(0, 3)
@@ -83,7 +83,7 @@ const pathStops: Array<{
     description:
       "Focused engineering support for web, mobile, desktop, AI, connected systems, and data-led product experiences.",
     to: "/services",
-    target: { x: 1.35, z: -18.4 },
+    target: { x: 4.9, z: -13.4 },
     mapPosition: { left: 67, top: 55 },
     facts: services.slice(0, 4).map((item) => item.title),
   },
@@ -96,7 +96,7 @@ const pathStops: Array<{
     description:
       "A growing collection of practical products, intelligent systems, mobile experiences, and data-driven applications.",
     to: "/portfolio",
-    target: { x: -1.35, z: -23.5 },
+    target: { x: -3.8, z: -18.8 },
     mapPosition: { left: 32, top: 71 },
     facts: projects
       .slice(0, 3)
@@ -112,7 +112,7 @@ const pathStops: Array<{
     description:
       "Have a product, system, or idea worth exploring? The trail ends with an open line for a thoughtful conversation.",
     to: "/contact",
-    target: { x: 1.35, z: -28.6 },
+    target: { x: 3.8, z: -24 },
     mapPosition: { left: 67, top: 84 },
     facts: ["Project enquiries", "Freelance work", "Engineering opportunities"],
   },
@@ -425,9 +425,9 @@ export default function InteractiveStudioHero() {
           </p>
           <h1 id="path-intro-title">Walk through the work.</h1>
           <span>
-            Follow a winding nature trail through forest, water, and coastal viewpoints. Each
-            landmark reveals a different part of my story, skills, credentials, services, and
-            projects.
+            Choose your own route across a wide island of forest paths, bridges, water, and coastal
+            viewpoints. Each landmark reveals a different part of my story, skills, credentials,
+            services, and projects.
           </span>
           <div>
             <button type="button" onClick={() => walkTo("about")}>

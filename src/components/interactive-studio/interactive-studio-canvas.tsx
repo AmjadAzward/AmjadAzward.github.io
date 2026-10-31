@@ -29,15 +29,15 @@ type Zone = {
 };
 
 const ZONES: Zone[] = [
-  { id: "about", position: [-1.35, 0.03, -3.1], color: "#49a8ff" },
-  { id: "skills", position: [1.35, 0.03, -8.2], color: "#38bdf8" },
-  { id: "certifications", position: [-1.35, 0.03, -13.3], color: "#6aaeff" },
-  { id: "services", position: [1.35, 0.03, -18.4], color: "#278cff" },
-  { id: "portfolio", position: [-1.35, 0.03, -23.5], color: "#57b8ff" },
-  { id: "contact", position: [1.35, 0.03, -28.6], color: "#30a7e8" },
+  { id: "about", position: [-4.8, 0.03, 0.8], color: "#49a8ff" },
+  { id: "skills", position: [4.6, 0.03, -3.6], color: "#38bdf8" },
+  { id: "certifications", position: [-4.6, 0.03, -8.9], color: "#6aaeff" },
+  { id: "services", position: [4.9, 0.03, -13.4], color: "#278cff" },
+  { id: "portfolio", position: [-3.8, 0.03, -18.8], color: "#57b8ff" },
+  { id: "contact", position: [3.8, 0.03, -24], color: "#30a7e8" },
 ];
 
-const START_POSITION = new Vector3(0, 0, 1.2);
+const START_POSITION = new Vector3(0, 0, 5);
 
 type TrailSegment = {
   key: string;
@@ -178,8 +178,8 @@ function DigitalEngineer({
       const sprinting = keyState["ShiftLeft"] || keyState["ShiftRight"];
       const speed = sprinting ? 3.05 : 1.9;
       root.position.addScaledVector(direction, speed * delta);
-      root.position.x = MathUtils.clamp(root.position.x, -4.45, 4.45);
-      root.position.z = MathUtils.clamp(root.position.z, -29.2, 1.6);
+      root.position.x = MathUtils.clamp(root.position.x, -8.1, 8.1);
+      root.position.z = MathUtils.clamp(root.position.z, -25.4, 5.8);
 
       const targetRotation = Math.atan2(direction.x, direction.z);
       root.rotation.y = MathUtils.lerp(root.rotation.y, targetRotation, 0.13);
@@ -451,21 +451,23 @@ function PathEnvironment({
     () =>
       createTrailSegments(
         [
-          [0, 1.8],
-          [-0.55, -0.6],
-          [-1.35, -3.1],
-          [-0.3, -5.5],
-          [1.35, -8.2],
-          [0.25, -10.7],
-          [-1.35, -13.3],
-          [-0.45, -15.8],
-          [1.35, -18.4],
-          [0.25, -20.9],
-          [-1.35, -23.5],
-          [-0.25, -26.1],
-          [1.35, -28.6],
+          [0, 5],
+          [-3.1, 3.6],
+          [-4.8, 0.8],
+          [-5.6, -4.2],
+          [-4.6, -8.9],
+          [-5.2, -14.2],
+          [-3.8, -18.8],
+          [-1.2, -23.6],
+          [3.8, -24],
+          [5.8, -18.4],
+          [4.9, -13.4],
+          [5.6, -8.1],
+          [4.6, -3.6],
+          [3.2, 1.8],
+          [0, 5],
         ],
-        52,
+        72,
         "main",
       ),
     [],
@@ -474,13 +476,13 @@ function PathEnvironment({
     () =>
       createTrailSegments(
         [
-          [0.75, -7.1],
-          [-2.5, -7.4],
-          [-3.7, -9.1],
-          [-2.6, -11.2],
-          [-0.25, -11.4],
+          [-4.8, 0.8],
+          [-7.2, -1.8],
+          [-7.4, -7.2],
+          [-6.4, -12.5],
+          [-4.6, -8.9],
         ],
-        18,
+        24,
         "forest",
       ),
     [],
@@ -489,25 +491,73 @@ function PathEnvironment({
     () =>
       createTrailSegments(
         [
-          [1.05, -17.4],
-          [2.8, -18.1],
-          [4.15, -19.8],
-          [3.2, -21.4],
-          [0.35, -22.1],
+          [4.6, -3.6],
+          [7.1, -6.2],
+          [7.3, -11.5],
+          [7.1, -17.8],
+          [5.9, -21.9],
+          [3.8, -24],
         ],
-        18,
+        28,
         "coast",
       ),
     [],
   );
+  const crossTrails = useMemo(
+    () => [
+      ...createTrailSegments(
+        [
+          [-4.8, 0.8],
+          [-1.7, -0.9],
+          [1.5, -1.4],
+          [4.6, -3.6],
+        ],
+        16,
+        "cross-north",
+      ),
+      ...createTrailSegments(
+        [
+          [-4.6, -8.9],
+          [-1.8, -10.4],
+          [1.9, -10.8],
+          [4.9, -13.4],
+        ],
+        16,
+        "cross-center",
+      ),
+      ...createTrailSegments(
+        [
+          [-3.8, -18.8],
+          [-0.8, -17.2],
+          [2.1, -18.6],
+          [3.8, -24],
+        ],
+        16,
+        "cross-south",
+      ),
+      ...createTrailSegments(
+        [
+          [0, 5],
+          [0.4, 1.2],
+          [-0.2, -4.3],
+          [0.5, -9.8],
+          [0, -15.3],
+          [-0.8, -17.2],
+        ],
+        26,
+        "central",
+      ),
+    ],
+    [],
+  );
   const forest = useMemo(
     () =>
-      Array.from({ length: 34 }, (_, index) => {
+      Array.from({ length: 48 }, (_, index) => {
         const rightSide = index % 4 === 0;
         const row = Math.floor(index / 2);
         return {
-          x: rightSide ? 3.35 + (index % 3) * 0.42 : -3.1 - (index % 5) * 0.58,
-          z: 1.5 - row * 1.95 + ((index * 7) % 5) * 0.21,
+          x: rightSide ? 2.2 + (index % 4) * 1.12 : -2.1 - (index % 6) * 0.96,
+          z: 4.6 - row * 1.36 + ((index * 7) % 5) * 0.24,
           scale: 0.72 + ((index * 11) % 7) * 0.07,
           light: index % 3 === 0,
         };
@@ -517,8 +567,8 @@ function PathEnvironment({
   const shorelineRocks = useMemo(
     () =>
       Array.from({ length: 22 }, (_, index) => ({
-        x: 4.65 + ((index * 7) % 5) * 0.22,
-        z: 1.4 - index * 1.52,
+        x: 8.45 + ((index * 7) % 5) * 0.24,
+        z: 4.3 - index * 1.42,
         scale: 0.18 + (index % 4) * 0.07,
       })),
     [],
@@ -535,26 +585,26 @@ function PathEnvironment({
     const input = inputRef.current;
     if (!input) return;
     input.target = {
-      x: MathUtils.clamp(event.point.x, -4.45, 4.45),
-      z: MathUtils.clamp(event.point.z, -29.2, 1.6),
+      x: MathUtils.clamp(event.point.x, -8.1, 8.1),
+      z: MathUtils.clamp(event.point.z, -25.4, 5.8),
     };
   };
 
   return (
     <group>
-      <mesh position={[-2.1, -0.08, -14]} rotation={[-Math.PI / 2, 0, 0]} onPointerDown={walkTo}>
-        <planeGeometry args={[15, 42]} />
+      <mesh position={[0, -0.08, -10]} rotation={[-Math.PI / 2, 0, 0]} onPointerDown={walkTo}>
+        <planeGeometry args={[18.5, 36]} />
         <meshStandardMaterial color={ground} roughness={0.92} />
       </mesh>
 
-      <mesh position={[4.4, -0.055, -14]} rotation={[-Math.PI / 2, 0, 0]} onPointerDown={walkTo}>
-        <planeGeometry args={[2.15, 42]} />
+      <mesh position={[8.8, -0.055, -10]} rotation={[-Math.PI / 2, 0, 0]} onPointerDown={walkTo}>
+        <planeGeometry args={[2.1, 36]} />
         <meshStandardMaterial color={sand} roughness={0.96} />
       </mesh>
 
       <group ref={waterRef}>
-        <mesh position={[8.3, -0.11, -14]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[7.8, 42, 1, 28]} />
+        <mesh position={[12.9, -0.11, -10]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[6.4, 36, 1, 28]} />
           <meshStandardMaterial
             color={water}
             emissive={darkMode ? "#03223a" : "#176d98"}
@@ -568,10 +618,10 @@ function PathEnvironment({
         {Array.from({ length: 7 }, (_, index) => (
           <mesh
             key={`wave-${index}`}
-            position={[5.35 + index * 0.62, -0.045 + (index % 2) * 0.012, -14]}
+            position={[9.75 + index * 0.52, -0.045 + (index % 2) * 0.012, -10]}
             rotation={[-Math.PI / 2, 0, 0]}
           >
-            <planeGeometry args={[0.035, 38]} />
+            <planeGeometry args={[0.035, 33]} />
             <meshBasicMaterial
               color={darkMode ? "#2a87b5" : "#a9e7f2"}
               transparent
@@ -581,7 +631,7 @@ function PathEnvironment({
         ))}
       </group>
 
-      {[...mainTrail, ...forestBranch, ...coastBranch].map((segment) => (
+      {[...mainTrail, ...forestBranch, ...coastBranch, ...crossTrails].map((segment) => (
         <mesh
           key={segment.key}
           position={segment.position}
@@ -589,7 +639,7 @@ function PathEnvironment({
           onPointerDown={walkTo}
         >
           <boxGeometry
-            args={[segment.key.startsWith("main") ? 2.05 : 1.25, 0.07, segment.length]}
+            args={[segment.key.startsWith("main") ? 1.85 : 1.18, 0.07, segment.length]}
           />
           <meshStandardMaterial color={path} roughness={0.82} metalness={0.02} />
         </mesh>
@@ -613,8 +663,8 @@ function PathEnvironment({
           </mesh>
         ))}
 
-      <mesh position={[-0.45, -0.035, -15.65]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[11.5, 1.05]} />
+      <mesh position={[0, -0.035, -15.65]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[18, 1.05]} />
         <meshStandardMaterial
           color={water}
           emissive={darkMode ? "#03223a" : "#176d98"}
@@ -635,7 +685,7 @@ function PathEnvironment({
         </mesh>
       ))}
 
-      <group position={[4.12, 0.04, -19.8]}>
+      <group position={[7.15, 0.04, -17.8]}>
         <mesh>
           <cylinderGeometry args={[1.05, 1.05, 0.1, 8]} />
           <meshStandardMaterial color={darkMode ? "#294353" : "#a88d6c"} roughness={0.78} />
@@ -649,7 +699,10 @@ function PathEnvironment({
       </group>
 
       {stations.map((station, index) => (
-        <group key={station.id} position={[station.side * 3.35, 0, station.position[2]]}>
+        <group
+          key={station.id}
+          position={[station.position[0] + station.side * 1.9, 0, station.position[2]]}
+        >
           <mesh position={[0, station.height / 2, 0]}>
             <boxGeometry args={[1.75, station.height, 0.22]} />
             <meshStandardMaterial color={structure} roughness={0.42} metalness={0.2} />
@@ -751,11 +804,12 @@ function PathEnvironment({
 
       {(
         [
-          [-6.1, -4.2, 1.25],
-          [-5.6, -14.5, 1.65],
-          [-6.3, -24.6, 1.4],
-          [3.9, -5.3, 0.88],
-          [3.7, -26.1, 1.05],
+          [-7.6, 2.4, 1.25],
+          [-7.3, -13.8, 1.65],
+          [-6.8, -22.7, 1.4],
+          [6.7, 1.2, 0.88],
+          [6.8, -9.4, 1.05],
+          [7.1, -21.4, 0.92],
         ] as Array<[number, number, number]>
       ).map(([x, z, scale], index) => (
         <mesh
@@ -775,7 +829,7 @@ function PathEnvironment({
               position={[
                 -4.4 + ((index * 13) % 9) * 0.82,
                 0.75 + (index % 4) * 0.31,
-                0.2 - index * 1.72,
+                4.5 - index * 1.55,
               ]}
             >
               <sphereGeometry args={[0.025, 8, 6]} />
@@ -784,16 +838,16 @@ function PathEnvironment({
           ))
         : null}
 
-      <mesh position={[0, 0.06, 2.05]}>
-        <boxGeometry args={[5.2, 0.12, 0.34]} />
+      <mesh position={[0, 0.06, 5.85]}>
+        <boxGeometry args={[7.5, 0.12, 0.34]} />
         <meshStandardMaterial
           color={accent}
           emissive={accent}
           emissiveIntensity={darkMode ? 0.8 : 0.12}
         />
       </mesh>
-      <mesh position={[0, 0.06, -30.15]}>
-        <boxGeometry args={[5.2, 0.12, 0.34]} />
+      <mesh position={[0, 0.06, -25.55]}>
+        <boxGeometry args={[7.5, 0.12, 0.34]} />
         <meshStandardMaterial
           color={accent}
           emissive={accent}
