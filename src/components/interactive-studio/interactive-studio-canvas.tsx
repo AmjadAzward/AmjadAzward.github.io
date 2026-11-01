@@ -208,8 +208,8 @@ function DigitalEngineer({
   const direction = useMemo(() => new Vector3(), []);
   const skin = darkMode ? "#c88968" : "#b97556";
   const skinShadow = darkMode ? "#a96850" : "#94563f";
-  const jacket = darkMode ? "#101d31" : "#18385e";
-  const jacketEdge = darkMode ? "#1e4774" : "#275d94";
+  const shirt = darkMode ? "#dcecff" : "#eef6ff";
+  const shirtShadow = darkMode ? "#a9c7e5" : "#c1d7eb";
   const trousers = darkMode ? "#08111f" : "#122742";
   const hair = darkMode ? "#090c13" : "#101722";
   const shoes = darkMode ? "#070c14" : "#101a29";
@@ -357,57 +357,53 @@ function DigitalEngineer({
 
         <mesh position={[0, 1.43, 0]} scale={[1.34, 1, 0.8]}>
           <capsuleGeometry args={[0.32, 0.54, 8, 16]} />
-          <meshStandardMaterial color={jacket} roughness={0.4} metalness={0.06} />
+          <meshStandardMaterial color={shirt} roughness={0.62} />
         </mesh>
-        <mesh position={[0, 1.51, 0.285]} scale={[0.2, 0.61, 0.045]}>
+        <mesh position={[0, 1.45, 0.321]} scale={[0.018, 0.52, 0.018]}>
           <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color="#eef5ff" roughness={0.5} />
+          <meshStandardMaterial color={shirtShadow} roughness={0.65} />
         </mesh>
-        <mesh
-          position={[0, 1.62, 0.345]}
-          scale={[0.068, 0.075, 0.035]}
-          rotation={[0, 0, Math.PI / 4]}
-        >
+        <mesh position={[-0.085, 1.79, 0.326]} rotation={[0, 0, -0.48]} scale={[0.1, 0.18, 0.022]}>
           <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color="#42a5ff" roughness={0.3} metalness={0.12} />
+          <meshStandardMaterial color={shirtShadow} roughness={0.62} />
         </mesh>
-        <mesh position={[0, 1.39, 0.347]} scale={[0.047, 0.36, 0.03]}>
+        <mesh position={[0.085, 1.79, 0.326]} rotation={[0, 0, 0.48]} scale={[0.1, 0.18, 0.022]}>
           <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color="#238fe8" roughness={0.3} metalness={0.12} />
+          <meshStandardMaterial color={shirtShadow} roughness={0.62} />
         </mesh>
-        <mesh position={[-0.17, 1.66, 0.33]} rotation={[0, 0, -0.42]} scale={[0.17, 0.46, 0.04]}>
-          <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color={jacketEdge} roughness={0.42} />
-        </mesh>
-        <mesh position={[0.17, 1.66, 0.33]} rotation={[0, 0, 0.42]} scale={[0.17, 0.46, 0.04]}>
-          <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color={jacketEdge} roughness={0.42} />
-        </mesh>
-        <mesh position={[-0.055, 1.19, 0.347]}>
+        <mesh position={[0, 1.59, 0.342]}>
           <sphereGeometry args={[0.018, 8, 6]} />
-          <meshStandardMaterial color="#08101d" roughness={0.42} />
+          <meshStandardMaterial color="#23456a" roughness={0.48} />
         </mesh>
-        <mesh position={[0.055, 1.19, 0.347]}>
+        <mesh position={[0, 1.4, 0.342]}>
           <sphereGeometry args={[0.018, 8, 6]} />
-          <meshStandardMaterial color="#08101d" roughness={0.42} />
+          <meshStandardMaterial color="#23456a" roughness={0.48} />
+        </mesh>
+        <mesh position={[0, 1.21, 0.342]}>
+          <sphereGeometry args={[0.018, 8, 6]} />
+          <meshStandardMaterial color="#23456a" roughness={0.48} />
         </mesh>
 
         <group ref={leftArmRef} position={[-0.49, 1.78, 0]}>
           <mesh position={[0, -0.06, 0]} scale={[1, 0.92, 0.94]}>
             <sphereGeometry args={[0.15, 14, 10]} />
-            <meshStandardMaterial color={jacket} roughness={0.42} />
+            <meshStandardMaterial color={shirt} roughness={0.62} />
           </mesh>
           <mesh position={[0, -0.3, 0]}>
             <capsuleGeometry args={[0.115, 0.26, 6, 12]} />
-            <meshStandardMaterial color={jacket} roughness={0.44} />
+            <meshStandardMaterial color={shirt} roughness={0.62} />
           </mesh>
           <mesh position={[0, -0.55, 0]} scale={[1, 0.88, 0.96]}>
             <sphereGeometry args={[0.105, 12, 8]} />
-            <meshStandardMaterial color={jacketEdge} roughness={0.46} />
+            <meshStandardMaterial color={shirtShadow} roughness={0.64} />
           </mesh>
           <mesh position={[0, -0.72, 0]}>
             <capsuleGeometry args={[0.105, 0.18, 6, 12]} />
-            <meshStandardMaterial color={jacket} roughness={0.44} />
+            <meshStandardMaterial color={shirt} roughness={0.62} />
+          </mesh>
+          <mesh position={[0, -0.85, 0]} scale={[1.05, 0.56, 1.02]}>
+            <cylinderGeometry args={[0.11, 0.11, 0.12, 12]} />
+            <meshStandardMaterial color={shirtShadow} roughness={0.62} />
           </mesh>
           <mesh position={[0, -0.93, 0.015]} scale={[0.88, 1.18, 0.72]}>
             <sphereGeometry args={[0.13, 14, 10]} />
@@ -425,19 +421,23 @@ function DigitalEngineer({
         <group ref={rightArmRef} position={[0.49, 1.78, 0]}>
           <mesh position={[0, -0.06, 0]} scale={[1, 0.92, 0.94]}>
             <sphereGeometry args={[0.15, 14, 10]} />
-            <meshStandardMaterial color={jacket} roughness={0.42} />
+            <meshStandardMaterial color={shirt} roughness={0.62} />
           </mesh>
           <mesh position={[0, -0.3, 0]}>
             <capsuleGeometry args={[0.115, 0.26, 6, 12]} />
-            <meshStandardMaterial color={jacket} roughness={0.44} />
+            <meshStandardMaterial color={shirt} roughness={0.62} />
           </mesh>
           <mesh position={[0, -0.55, 0]} scale={[1, 0.88, 0.96]}>
             <sphereGeometry args={[0.105, 12, 8]} />
-            <meshStandardMaterial color={jacketEdge} roughness={0.46} />
+            <meshStandardMaterial color={shirtShadow} roughness={0.64} />
           </mesh>
           <mesh position={[0, -0.72, 0]}>
             <capsuleGeometry args={[0.105, 0.18, 6, 12]} />
-            <meshStandardMaterial color={jacket} roughness={0.44} />
+            <meshStandardMaterial color={shirt} roughness={0.62} />
+          </mesh>
+          <mesh position={[0, -0.85, 0]} scale={[1.05, 0.56, 1.02]}>
+            <cylinderGeometry args={[0.11, 0.11, 0.12, 12]} />
+            <meshStandardMaterial color={shirtShadow} roughness={0.62} />
           </mesh>
           <mesh position={[0, -0.93, 0.015]} scale={[0.88, 1.18, 0.72]}>
             <sphereGeometry args={[0.13, 14, 10]} />
