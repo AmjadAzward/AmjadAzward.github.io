@@ -74,8 +74,8 @@ const LAMP_OBJECTS = Array.from({ length: 12 }, (_, index) => ({
 
 const SOCIAL_OBJECTS = socials.map((social, index) => ({
   ...social,
-  x: 2.24 + index * 0.78,
-  z: -25.08,
+  x: 0.45 + index * 0.78,
+  z: -25.55,
   color: ["#0a66c2", "#24292f", "#1877f2", "#111827", "#833ab4"][index] ?? "#0878ee",
 }));
 
@@ -1371,7 +1371,8 @@ function StudioWorld({
     const character = characterPositionRef.current;
     const compactViewport = size.width < 680;
     const tabletViewport = size.width < 1024;
-    const panelOffset = size.width >= 860 ? 1.45 : 0;
+    const contactOffset = activeZoneRef.current === "contact" ? (compactViewport ? 1.2 : 0.75) : 0;
+    const panelOffset = size.width >= 860 ? 1.45 : contactOffset;
     const cameraHeight = compactViewport ? 4.75 : tabletViewport ? 4.4 : 4.15;
     const cameraDistance = compactViewport ? 9.1 : tabletViewport ? 8.25 : 7.6;
     desiredCamera.set(character.x - panelOffset * 0.28, cameraHeight, character.z + cameraDistance);
