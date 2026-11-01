@@ -1,14 +1,28 @@
 import { Link } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
-import { ArrowRight, Compass, Footprints, Map as MapIcon, MapPin, X } from "lucide-react";
+import {
+  ArrowRight,
+  Compass,
+  Facebook,
+  Footprints,
+  Github,
+  Instagram,
+  Linkedin,
+  LocateFixed,
+  Map as MapIcon,
+  MapPin,
+  X,
+} from "lucide-react";
 
-import { certifications, projects, services, skillGroups } from "@/data/portfolio";
+import { certifications, projects, services, skillGroups, socials } from "@/data/portfolio";
 
 const InteractiveStudioCanvas = lazy(() => import("./interactive-studio-canvas"));
 
 export type StudioZoneId =
   "about" | "skills" | "certifications" | "services" | "portfolio" | "contact";
+
+export type StudioPosition = { x: number; z: number };
 
 export type StudioInput = {
   x: number;
@@ -29,7 +43,6 @@ const pathStops: Array<{
   description: string;
   to: "/about" | "/skills" | "/certifications" | "/services" | "/portfolio" | "/contact";
   target: { x: number; z: number };
-  mapPosition: { left: number; top: number };
   facts: string[];
 }> = [
   {
@@ -42,7 +55,6 @@ const pathStops: Array<{
       "A third-year Computer Science undergraduate building useful systems across software, data, cloud, and machine learning.",
     to: "/about",
     target: { x: -4.8, z: 0.8 },
-    mapPosition: { left: 31, top: 19 },
     facts: ["Colombo, Sri Lanka", "Software + data", "Open to collaboration"],
   },
   {
@@ -55,7 +67,6 @@ const pathStops: Array<{
       "Languages, frameworks, cloud platforms, databases, and product skills used to turn ideas into maintainable software.",
     to: "/skills",
     target: { x: 4.6, z: -3.6 },
-    mapPosition: { left: 68, top: 29 },
     facts: skillGroups.map((group) => group.title),
   },
   {
@@ -68,7 +79,6 @@ const pathStops: Array<{
       "Selected certifications across AI, software engineering, cloud, databases, networking, and modern infrastructure.",
     to: "/certifications",
     target: { x: -4.6, z: -8.9 },
-    mapPosition: { left: 30, top: 43 },
     facts: certifications
       .slice(0, 3)
       .map((item) => item.issuer)
@@ -84,7 +94,6 @@ const pathStops: Array<{
       "Focused engineering support for web, mobile, desktop, AI, connected systems, and data-led product experiences.",
     to: "/services",
     target: { x: 4.9, z: -13.4 },
-    mapPosition: { left: 67, top: 55 },
     facts: services.slice(0, 4).map((item) => item.title),
   },
   {
@@ -97,7 +106,6 @@ const pathStops: Array<{
       "A growing collection of practical products, intelligent systems, mobile experiences, and data-driven applications.",
     to: "/portfolio",
     target: { x: -3.8, z: -18.8 },
-    mapPosition: { left: 32, top: 71 },
     facts: projects
       .slice(0, 3)
       .map((item) => item.title)
@@ -113,10 +121,148 @@ const pathStops: Array<{
       "Have a product, system, or idea worth exploring? The trail ends with an open line for a thoughtful conversation.",
     to: "/contact",
     target: { x: 3.8, z: -24 },
-    mapPosition: { left: 67, top: 84 },
     facts: ["Project enquiries", "Freelance work", "Engineering opportunities"],
   },
 ];
+
+const WORLD_BOUNDS = { minX: -8.1, maxX: 8.1, northZ: 5.8, southZ: -25.8 };
+
+function worldToMapPosition(position: StudioPosition) {
+  return {
+    left: 8 + ((position.x - WORLD_BOUNDS.minX) / (WORLD_BOUNDS.maxX - WORLD_BOUNDS.minX)) * 84,
+    top:
+      7 + ((WORLD_BOUNDS.northZ - position.z) / (WORLD_BOUNDS.northZ - WORLD_BOUNDS.southZ)) * 85,
+  };
+}
+
+function mapTrailPoints(points: StudioPosition[]) {
+  return points
+    .map((point) => {
+      const mapped = worldToMapPosition(point);
+      return `${mapped.left.toFixed(2)},${mapped.top.toFixed(2)}`;
+    })
+    .join(" ");
+}
+
+const VILLAGE_TRAILS: Array<{ id: string; kind: "main" | "branch"; points: StudioPosition[] }> = [
+  {
+    id: "main",
+    kind: "main",
+    points: [
+      { x: 0, z: 5 },
+      { x: -3.1, z: 3.6 },
+      { x: -4.8, z: 0.8 },
+      { x: -5.6, z: -4.2 },
+      { x: -4.6, z: -8.9 },
+      { x: -5.2, z: -14.2 },
+      { x: -3.8, z: -18.8 },
+      { x: -1.2, z: -23.6 },
+      { x: 3.8, z: -24 },
+      { x: 5.8, z: -18.4 },
+      { x: 4.9, z: -13.4 },
+      { x: 5.6, z: -8.1 },
+      { x: 4.6, z: -3.6 },
+      { x: 3.2, z: 1.8 },
+      { x: 0, z: 5 },
+    ],
+  },
+  {
+    id: "forest",
+    kind: "branch",
+    points: [
+      { x: -4.8, z: 0.8 },
+      { x: -7.2, z: -1.8 },
+      { x: -7.4, z: -7.2 },
+      { x: -6.4, z: -12.5 },
+      { x: -4.6, z: -8.9 },
+    ],
+  },
+  {
+    id: "coast",
+    kind: "branch",
+    points: [
+      { x: 4.6, z: -3.6 },
+      { x: 7.1, z: -6.2 },
+      { x: 7.3, z: -11.5 },
+      { x: 7.1, z: -17.8 },
+      { x: 5.9, z: -21.9 },
+      { x: 3.8, z: -24 },
+    ],
+  },
+  {
+    id: "cross-north",
+    kind: "branch",
+    points: [
+      { x: -4.8, z: 0.8 },
+      { x: -1.7, z: -0.9 },
+      { x: 1.5, z: -1.4 },
+      { x: 4.6, z: -3.6 },
+    ],
+  },
+  {
+    id: "cross-center",
+    kind: "branch",
+    points: [
+      { x: -4.6, z: -8.9 },
+      { x: -1.8, z: -10.4 },
+      { x: 1.9, z: -10.8 },
+      { x: 4.9, z: -13.4 },
+    ],
+  },
+  {
+    id: "cross-south",
+    kind: "branch",
+    points: [
+      { x: -3.8, z: -18.8 },
+      { x: -0.8, z: -17.2 },
+      { x: 2.1, z: -18.6 },
+      { x: 3.8, z: -24 },
+    ],
+  },
+  {
+    id: "central",
+    kind: "branch",
+    points: [
+      { x: 0, z: 5 },
+      { x: 0.4, z: 1.2 },
+      { x: -0.2, z: -4.3 },
+      { x: 0.5, z: -9.8 },
+      { x: 0, z: -15.3 },
+      { x: -0.8, z: -17.2 },
+    ],
+  },
+];
+
+const MAP_TREES = Array.from({ length: 48 }, (_, index) => {
+  const rightSide = index % 4 === 0;
+  const row = Math.floor(index / 2);
+  return {
+    index,
+    ...worldToMapPosition({
+      x: rightSide ? 2.2 + (index % 4) * 1.12 : -2.1 - (index % 6) * 0.96,
+      z: 4.6 - row * 1.36 + ((index * 7) % 5) * 0.24,
+    }),
+  };
+}).filter((tree) => tree.index % 2 === 0);
+
+const MAP_HILLS = [
+  { x: -7.6, z: 2.4 },
+  { x: -7.3, z: -13.8 },
+  { x: -6.8, z: -22.7 },
+  { x: 6.7, z: 1.2 },
+  { x: 6.8, z: -9.4 },
+  { x: 7.1, z: -21.4 },
+].map(worldToMapPosition);
+
+const SOCIAL_MAP_POSITION = worldToMapPosition({ x: 2.01, z: -25.55 });
+
+const mapSocialIcons: Record<string, typeof Github> = {
+  LinkedIn: Linkedin,
+  GitHub: Github,
+  Facebook,
+  X,
+  Instagram,
+};
 
 function useDarkMode() {
   const [darkMode, setDarkMode] = useState(true);
@@ -182,6 +328,7 @@ export default function InteractiveStudioHero() {
     spawn: null,
     locked: false,
   });
+  const explorerPositionRef = useRef<StudioPosition>({ x: 0, z: 5 });
   const [mode, setMode] = useState<DisplayMode>("checking");
   const [inView, setInView] = useState(true);
   const [activeZone, setActiveZone] = useState<StudioZoneId | null>(null);
@@ -280,6 +427,9 @@ export default function InteractiveStudioHero() {
   };
 
   const stop = activeZone ? pathStops.find((item) => item.id === activeZone) : null;
+  const explorerMapPosition = worldToMapPosition(explorerPositionRef.current);
+  const streamMapY = worldToMapPosition({ x: 0, z: -15.65 }).top;
+  const overlookMapPosition = worldToMapPosition({ x: 7.15, z: -17.8 });
 
   return (
     <div
@@ -295,6 +445,7 @@ export default function InteractiveStudioHero() {
               reducedMotion={reducedMotion}
               inView={inView}
               inputRef={inputRef}
+              explorerPositionRef={explorerPositionRef}
               onZoneChange={setActiveZone}
             />
           </Suspense>
@@ -328,7 +479,12 @@ export default function InteractiveStudioHero() {
           >
             <header>
               <div>
-                <p>EXPEDITION MAP / FAST TRAVEL</p>
+                <div className="path-map-kicker-row">
+                  <p>VILLAGE MAP / LIVE POSITION</p>
+                  <span className="path-map-village-state">
+                    <i aria-hidden /> {darkMode ? "Evening village" : "Morning village"}
+                  </span>
+                </div>
                 <h2 id="trail-map-title">Choose your next stop.</h2>
               </div>
               <button type="button" onClick={() => setMapOpen(false)} aria-label="Close trail map">
@@ -336,71 +492,105 @@ export default function InteractiveStudioHero() {
               </button>
             </header>
 
-            <div className="path-map-canvas">
+            <div className={`path-map-canvas ${darkMode ? "is-evening" : "is-morning"}`}>
               <svg viewBox="0 0 100 100" aria-hidden>
                 <defs>
                   <linearGradient id="map-sea" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0" stopColor="#1785b8" />
-                    <stop offset="1" stopColor="#07527f" />
+                    <stop offset="0" stopColor={darkMode ? "#0a527c" : "#1d91bf"} />
+                    <stop offset="1" stopColor={darkMode ? "#052c4d" : "#08618d"} />
                   </linearGradient>
                   <linearGradient id="map-land" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0" stopColor="#397d45" />
-                    <stop offset="1" stopColor="#205f39" />
+                    <stop offset="0" stopColor={darkMode ? "#1e5a35" : "#4d914f"} />
+                    <stop offset="1" stopColor={darkMode ? "#123f2a" : "#286b3c"} />
                   </linearGradient>
+                  <linearGradient id="map-river" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stopColor={darkMode ? "#0a4c73" : "#218db9"} />
+                    <stop offset="0.5" stopColor={darkMode ? "#1477a4" : "#55b8d5"} />
+                    <stop offset="1" stopColor={darkMode ? "#0a4c73" : "#218db9"} />
+                  </linearGradient>
+                  <filter id="map-marker-glow" x="-100%" y="-100%" width="300%" height="300%">
+                    <feGaussianBlur stdDeviation="1.6" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
                 </defs>
                 <rect width="100" height="100" rx="8" fill="url(#map-sea)" />
                 <path
-                  d="M12 7 C28 2 48 6 62 5 C81 4 92 14 91 29 C90 43 96 54 89 67 C82 80 90 91 72 96 C55 101 39 94 24 96 C8 98 5 84 9 70 C13 57 5 45 9 31 C12 22 5 13 12 7Z"
+                  d="M10 8 C24 3 42 5 56 4 C76 3 88 8 91 22 C94 37 91 52 93 66 C95 80 87 92 72 95 C53 98 40 93 23 95 C10 96 5 87 8 73 C11 59 6 49 8 35 C10 23 5 14 10 8Z"
                   fill="url(#map-land)"
-                  stroke="#74b46c"
-                  strokeWidth="1.6"
+                  stroke={darkMode ? "#4c8b55" : "#83bc72"}
+                  strokeWidth="1.4"
                 />
                 <path
-                  d="M50 5 C48 14 34 15 31 20 C27 27 42 33 55 31 C70 30 73 38 66 45 C59 52 36 49 30 57 C24 65 40 73 53 70 C68 67 73 74 67 84 C63 90 57 94 52 98"
+                  d={`M8 ${streamMapY.toFixed(2)} C27 ${(streamMapY - 2).toFixed(2)} 35 ${(streamMapY + 2).toFixed(2)} 50 ${streamMapY.toFixed(2)} C65 ${(streamMapY - 2).toFixed(2)} 74 ${(streamMapY + 2).toFixed(2)} 93 ${streamMapY.toFixed(2)}`}
                   fill="none"
-                  stroke="#d8c99f"
+                  stroke="url(#map-river)"
                   strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="8"
+                  strokeWidth="4.2"
                 />
-                <path
-                  d="M50 5 C48 14 34 15 31 20 C27 27 42 33 55 31 C70 30 73 38 66 45 C59 52 36 49 30 57 C24 65 40 73 53 70 C68 67 73 74 67 84 C63 90 57 94 52 98"
-                  fill="none"
-                  stroke="#9b885d"
-                  strokeDasharray="1 4"
-                  strokeLinecap="round"
-                  strokeWidth="1.3"
-                />
-                <path
-                  d="M39 35 C25 35 18 43 24 52 C30 59 39 53 43 48"
-                  fill="none"
-                  stroke="#d8c99f"
-                  strokeLinecap="round"
-                  strokeWidth="5"
-                />
-                <path
-                  d="M61 62 C77 60 84 68 78 77 C73 84 65 79 59 76"
-                  fill="none"
-                  stroke="#d8c99f"
-                  strokeLinecap="round"
-                  strokeWidth="5"
-                />
-                <ellipse cx="20" cy="27" rx="8" ry="6" fill="#1288b9" />
-                <ellipse cx="78" cy="42" rx="10" ry="6" fill="#0e78a9" />
-                <ellipse cx="18" cy="75" rx="7" ry="10" fill="#0d74a5" />
-                <ellipse cx="82" cy="86" rx="6" ry="5" fill="#168bb9" />
-                {Array.from({ length: 26 }, (_, index) => (
+                {VILLAGE_TRAILS.map((trail) => (
+                  <polyline
+                    key={trail.id}
+                    className={`map-village-trail map-village-trail-${trail.kind}`}
+                    points={mapTrailPoints(trail.points)}
+                  />
+                ))}
+
+                <g className="map-village-bridge" transform={`translate(50 ${streamMapY})`}>
+                  <rect x="-5" y="-2.6" width="10" height="5.2" rx="0.8" />
+                  {[-3.6, -1.8, 0, 1.8, 3.6].map((x) => (
+                    <line key={x} x1={x} y1="-2.3" x2={x} y2="2.3" />
+                  ))}
+                </g>
+
+                {MAP_HILLS.map((hill, index) => (
                   <g
-                    key={`map-tree-${index}`}
-                    transform={`translate(${14 + ((index * 19) % 73)} ${12 + ((index * 31) % 78)})`}
+                    key={`map-hill-${index}`}
+                    className="map-village-hill"
+                    transform={`translate(${hill.left} ${hill.top})`}
                   >
-                    <rect x="-0.35" y="0.6" width="0.7" height="1.5" rx="0.2" fill="#714528" />
-                    <circle
-                      r={1.4 + (index % 3) * 0.18}
-                      fill={index % 2 === 0 ? "#2e7d3d" : "#4c9848"}
-                    />
+                    <path d="M-2.6 1.8 L0 -2.4 L2.6 1.8 Z" />
+                    <path d="M-1.1 1.8 L1 -1.1 L3 1.8 Z" />
                   </g>
                 ))}
+
+                {MAP_TREES.map((tree) => (
+                  <g
+                    key={`map-tree-${tree.index}`}
+                    className="map-village-tree"
+                    transform={`translate(${tree.left} ${tree.top})`}
+                  >
+                    <rect x="-0.24" y="0.4" width="0.48" height="1" rx="0.14" />
+                    <circle r={0.9 + (tree.index % 3) * 0.12} />
+                  </g>
+                ))}
+
+                {pathStops.map((item, index) => {
+                  const building = worldToMapPosition({
+                    x: item.target.x + (index % 2 === 0 ? -1 : 1) * 1.9,
+                    z: item.target.z,
+                  });
+                  return (
+                    <g
+                      key={`map-building-${item.id}`}
+                      className="map-village-building"
+                      transform={`translate(${building.left} ${building.top})`}
+                    >
+                      <rect x="-1.4" y="-1" width="2.8" height="2.2" rx="0.3" />
+                      <path d="M-1.7 -1 L0 -2.1 L1.7 -1 Z" />
+                    </g>
+                  );
+                })}
+
+                <g
+                  className="map-village-overlook"
+                  transform={`translate(${overlookMapPosition.left} ${overlookMapPosition.top})`}
+                >
+                  <circle r="2.1" />
+                  <path d="M-1.4 0 H1.4 M0 -1.4 V1.4" />
+                </g>
               </svg>
 
               {pathStops.map((item) => (
@@ -408,7 +598,10 @@ export default function InteractiveStudioHero() {
                   key={`map-${item.id}`}
                   type="button"
                   className={item.id === activeZone ? "is-current" : undefined}
-                  style={{ left: `${item.mapPosition.left}%`, top: `${item.mapPosition.top}%` }}
+                  style={{
+                    left: `${worldToMapPosition(item.target).left}%`,
+                    top: `${worldToMapPosition(item.target).top}%`,
+                  }}
                   onClick={() => spawnAt(item.id)}
                   aria-label={`Fast travel to ${item.short}`}
                 >
@@ -418,6 +611,40 @@ export default function InteractiveStudioHero() {
                   <strong>{item.short}</strong>
                 </button>
               ))}
+
+              <span
+                className="path-map-you"
+                style={{
+                  left: `${explorerMapPosition.left}%`,
+                  top: `${explorerMapPosition.top}%`,
+                }}
+                role="img"
+                aria-label="Your current position"
+              >
+                <i>
+                  <LocateFixed aria-hidden />
+                </i>
+                <strong>You are here</strong>
+              </span>
+
+              <div
+                className="path-map-social-stop"
+                style={{ left: `${SOCIAL_MAP_POSITION.left}%`, top: `${SOCIAL_MAP_POSITION.top}%` }}
+                role="img"
+                aria-label="Social icon plaza at the end of the trail"
+              >
+                <div>
+                  {socials.map((social) => {
+                    const Icon = mapSocialIcons[social.label] ?? MapPin;
+                    return (
+                      <span key={`map-social-${social.label}`} title={social.label}>
+                        <Icon aria-hidden />
+                      </span>
+                    );
+                  })}
+                </div>
+                <strong>Social plaza</strong>
+              </div>
             </div>
 
             <footer>
@@ -429,6 +656,12 @@ export default function InteractiveStudioHero() {
               </span>
               <span>
                 <i className="map-legend-water" /> Coast and water
+              </span>
+              <span>
+                <i className="map-legend-you" /> You are here
+              </span>
+              <span>
+                <i className="map-legend-social" /> Social plaza
               </span>
             </footer>
           </section>

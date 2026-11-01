@@ -15,13 +15,14 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
 
 import { socials } from "@/data/portfolio";
 
-import type { StudioInput, StudioZoneId } from "./interactive-studio-hero";
+import type { StudioInput, StudioPosition, StudioZoneId } from "./interactive-studio-hero";
 
 type StudioCanvasProps = {
   darkMode: boolean;
   reducedMotion: boolean;
   inView: boolean;
   inputRef: RefObject<StudioInput>;
+  explorerPositionRef: RefObject<StudioPosition>;
   onZoneChange: (zone: StudioZoneId | null) => void;
 };
 
@@ -187,11 +188,13 @@ function useKeyboard() {
 function DigitalEngineer({
   inputRef,
   positionRef,
+  mapPositionRef,
   reducedMotion,
   darkMode,
 }: {
   inputRef: RefObject<StudioInput>;
   positionRef: RefObject<Vector3>;
+  mapPositionRef: RefObject<StudioPosition>;
   reducedMotion: boolean;
   darkMode: boolean;
 }) {
@@ -212,7 +215,11 @@ function DigitalEngineer({
     if (!rootRef.current) return;
     rootRef.current.position.copy(START_POSITION);
     positionRef.current?.copy(START_POSITION);
-  }, [positionRef]);
+    if (mapPositionRef.current) {
+      mapPositionRef.current.x = START_POSITION.x;
+      mapPositionRef.current.z = START_POSITION.z;
+    }
+  }, [mapPositionRef, positionRef]);
 
   useFrame((state, frameDelta) => {
     const root = rootRef.current;
@@ -268,6 +275,10 @@ function DigitalEngineer({
     }
 
     positionRef.current?.copy(root.position);
+    if (mapPositionRef.current) {
+      mapPositionRef.current.x = root.position.x;
+      mapPositionRef.current.z = root.position.z;
+    }
 
     const time = state.clock.elapsedTime;
     const stride = moving && !reducedMotion ? Math.sin(time * 9.5) : 0;
@@ -1353,6 +1364,7 @@ function StudioWorld({
   darkMode,
   reducedMotion,
   inputRef,
+  explorerPositionRef,
   onZoneChange,
 }: Omit<StudioCanvasProps, "inView">) {
   const characterPositionRef = useRef(new Vector3().copy(START_POSITION));
@@ -1436,6 +1448,7 @@ function StudioWorld({
       <DigitalEngineer
         inputRef={inputRef}
         positionRef={characterPositionRef}
+        mapPositionRef={explorerPositionRef}
         reducedMotion={reducedMotion}
         darkMode={darkMode}
       />
@@ -1465,6 +1478,7 @@ export default function InteractiveStudioCanvas(props: StudioCanvasProps) {
         darkMode={props.darkMode}
         reducedMotion={props.reducedMotion}
         inputRef={props.inputRef}
+        explorerPositionRef={props.explorerPositionRef}
         onZoneChange={props.onZoneChange}
       />
     </Canvas>
