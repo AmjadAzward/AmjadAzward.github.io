@@ -39,6 +39,72 @@ const ZONES: Zone[] = [
 
 const START_POSITION = new Vector3(0, 0, 5);
 
+const FOREST_OBJECTS = Array.from({ length: 48 }, (_, index) => {
+  const rightSide = index % 4 === 0;
+  const row = Math.floor(index / 2);
+  return {
+    x: rightSide ? 2.2 + (index % 4) * 1.12 : -2.1 - (index % 6) * 0.96,
+    z: 4.6 - row * 1.36 + ((index * 7) % 5) * 0.24,
+    scale: 0.72 + ((index * 11) % 7) * 0.07,
+    light: index % 3 === 0,
+  };
+});
+
+const HILL_OBJECTS: Array<[number, number, number]> = [
+  [-7.6, 2.4, 1.25],
+  [-7.3, -13.8, 1.65],
+  [-6.8, -22.7, 1.4],
+  [6.7, 1.2, 0.88],
+  [6.8, -9.4, 1.05],
+  [7.1, -21.4, 0.92],
+];
+
+const STATION_OBJECTS = ZONES.map((zone, index) => ({
+  x: zone.position[0] + (index % 2 === 0 ? -1 : 1) * 1.9,
+  z: zone.position[2],
+}));
+
+const LAMP_OBJECTS = Array.from({ length: 12 }, (_, index) => ({
+  x: (index % 2 === 0 ? -1 : 1) * 2.75,
+  z: -0.5 - Math.floor(index / 2) * 5.1,
+}));
+
+const WORLD_CIRCLE_COLLIDERS = [
+  ...FOREST_OBJECTS.map((tree) => ({
+    x: tree.x,
+    z: tree.z,
+    radius: 0.28 + tree.scale * 0.16,
+  })),
+  ...HILL_OBJECTS.map(([x, z, scale]) => ({ x, z, radius: scale * 0.82 + 0.2 })),
+  ...LAMP_OBJECTS.map(({ x, z }) => ({ x, z, radius: 0.34 })),
+  { x: 7.15, z: -17.8, radius: 1.22 },
+];
+
+const WORLD_BOX_COLLIDERS = STATION_OBJECTS.map(({ x, z }) => ({
+  x,
+  z,
+  halfWidth: 1.12,
+  halfDepth: 0.36,
+}));
+
+function isWorldBlocked(x: number, z: number) {
+  const hitsCircle = WORLD_CIRCLE_COLLIDERS.some(
+    (collider) => Math.hypot(x - collider.x, z - collider.z) < collider.radius,
+  );
+  if (hitsCircle) return true;
+
+  const hitsStructure = WORLD_BOX_COLLIDERS.some(
+    (collider) =>
+      Math.abs(x - collider.x) < collider.halfWidth &&
+      Math.abs(z - collider.z) < collider.halfDepth,
+  );
+  if (hitsStructure) return true;
+
+  const insideStream = z > -16.18 && z < -15.12;
+  const onBridge = x > -0.68 && x < 0.98;
+  return insideStream && !onBridge;
+}
+
 type TrailSegment = {
   key: string;
   position: [number, number, number];
@@ -177,9 +243,14 @@ function DigitalEngineer({
       direction.set(x, 0, z).normalize();
       const sprinting = keyState["ShiftLeft"] || keyState["ShiftRight"];
       const speed = sprinting ? 3.05 : 1.9;
-      root.position.addScaledVector(direction, speed * delta);
-      root.position.x = MathUtils.clamp(root.position.x, -8.1, 8.1);
-      root.position.z = MathUtils.clamp(root.position.z, -25.4, 5.8);
+      const stepX = direction.x * speed * delta;
+      const stepZ = direction.z * speed * delta;
+      const nextX = MathUtils.clamp(root.position.x + stepX, -8.1, 8.1);
+      const nextZ = MathUtils.clamp(root.position.z + stepZ, -25.4, 5.8);
+
+      // Resolve each axis independently so the explorer naturally slides along obstacles.
+      if (!isWorldBlocked(nextX, root.position.z)) root.position.x = nextX;
+      if (!isWorldBlocked(root.position.x, nextZ)) root.position.z = nextZ;
 
       const targetRotation = Math.atan2(direction.x, direction.z);
       root.rotation.y = MathUtils.lerp(root.rotation.y, targetRotation, 0.13);
@@ -550,20 +621,7 @@ function PathEnvironment({
     ],
     [],
   );
-  const forest = useMemo(
-    () =>
-      Array.from({ length: 48 }, (_, index) => {
-        const rightSide = index % 4 === 0;
-        const row = Math.floor(index / 2);
-        return {
-          x: rightSide ? 2.2 + (index % 4) * 1.12 : -2.1 - (index % 6) * 0.96,
-          z: 4.6 - row * 1.36 + ((index * 7) % 5) * 0.24,
-          scale: 0.72 + ((index * 11) % 7) * 0.07,
-          light: index % 3 === 0,
-        };
-      }),
-    [],
-  );
+  const forest = FOREST_OBJECTS;
   const shorelineRocks = useMemo(
     () =>
       Array.from({ length: 22 }, (_, index) => ({
@@ -584,10 +642,10 @@ function PathEnvironment({
     event.stopPropagation();
     const input = inputRef.current;
     if (!input) return;
-    input.target = {
-      x: MathUtils.clamp(event.point.x, -8.1, 8.1),
-      z: MathUtils.clamp(event.point.z, -25.4, 5.8),
-    };
+    const x = MathUtils.clamp(event.point.x, -8.1, 8.1);
+    const z = MathUtils.clamp(event.point.z, -25.4, 5.8);
+    if (isWorldBlocked(x, z)) return;
+    input.target = { x, z };
   };
 
   return (
@@ -802,16 +860,7 @@ function PathEnvironment({
         </mesh>
       ))}
 
-      {(
-        [
-          [-7.6, 2.4, 1.25],
-          [-7.3, -13.8, 1.65],
-          [-6.8, -22.7, 1.4],
-          [6.7, 1.2, 0.88],
-          [6.8, -9.4, 1.05],
-          [7.1, -21.4, 0.92],
-        ] as Array<[number, number, number]>
-      ).map(([x, z, scale], index) => (
+      {HILL_OBJECTS.map(([x, z, scale], index) => (
         <mesh
           key={`hill-${index}`}
           position={[x, scale * 0.22 - 0.12, z]}
@@ -837,23 +886,6 @@ function PathEnvironment({
             </mesh>
           ))
         : null}
-
-      <mesh position={[0, 0.06, 5.85]}>
-        <boxGeometry args={[7.5, 0.12, 0.34]} />
-        <meshStandardMaterial
-          color={accent}
-          emissive={accent}
-          emissiveIntensity={darkMode ? 0.8 : 0.12}
-        />
-      </mesh>
-      <mesh position={[0, 0.06, -25.55]}>
-        <boxGeometry args={[7.5, 0.12, 0.34]} />
-        <meshStandardMaterial
-          color={accent}
-          emissive={accent}
-          emissiveIntensity={darkMode ? 0.8 : 0.12}
-        />
-      </mesh>
     </group>
   );
 }
