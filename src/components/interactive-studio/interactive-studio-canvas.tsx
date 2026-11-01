@@ -12,6 +12,8 @@ import {
 } from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 
+import { socials } from "@/data/portfolio";
+
 import type { StudioInput, StudioZoneId } from "./interactive-studio-hero";
 
 type StudioCanvasProps = {
@@ -69,6 +71,13 @@ const LAMP_OBJECTS = Array.from({ length: 12 }, (_, index) => ({
   z: -0.5 - Math.floor(index / 2) * 5.1,
 }));
 
+const SOCIAL_OBJECTS = socials.map((social, index) => ({
+  ...social,
+  x: 2.24 + index * 0.78,
+  z: -25.08,
+  color: ["#0a66c2", "#24292f", "#1877f2", "#111827", "#833ab4"][index] ?? "#0878ee",
+}));
+
 const WORLD_CIRCLE_COLLIDERS = [
   ...FOREST_OBJECTS.map((tree) => ({
     x: tree.x,
@@ -77,6 +86,7 @@ const WORLD_CIRCLE_COLLIDERS = [
   })),
   ...HILL_OBJECTS.map(([x, z, scale]) => ({ x, z, radius: scale * 0.82 + 0.2 })),
   ...LAMP_OBJECTS.map(({ x, z }) => ({ x, z, radius: 0.34 })),
+  ...SOCIAL_OBJECTS.map(({ x, z }) => ({ x, z, radius: 0.43 })),
   { x: 7.15, z: -17.8, radius: 1.22 },
 ];
 
@@ -490,6 +500,240 @@ function RobotCompanion({
   );
 }
 
+function SocialIconMark({ label }: { label: string }) {
+  const markMaterial = (
+    <meshStandardMaterial
+      color="#eef7ff"
+      emissive="#d9efff"
+      emissiveIntensity={0.24}
+      roughness={0.28}
+      metalness={0.08}
+    />
+  );
+
+  if (label === "LinkedIn") {
+    return (
+      <group position={[0, 0, 0.095]}>
+        <mesh position={[-0.18, -0.07, 0]} scale={[0.065, 0.25, 0.055]}>
+          <boxGeometry args={[1, 1, 1]} />
+          {markMaterial}
+        </mesh>
+        <mesh position={[-0.18, 0.17, 0]}>
+          <sphereGeometry args={[0.045, 12, 8]} />
+          {markMaterial}
+        </mesh>
+        <mesh position={[-0.005, -0.07, 0]} scale={[0.065, 0.25, 0.055]}>
+          <boxGeometry args={[1, 1, 1]} />
+          {markMaterial}
+        </mesh>
+        <mesh position={[0.17, -0.07, 0]} scale={[0.065, 0.25, 0.055]}>
+          <boxGeometry args={[1, 1, 1]} />
+          {markMaterial}
+        </mesh>
+        <mesh position={[0.082, 0.05, 0]} scale={[0.24, 0.065, 0.055]}>
+          <boxGeometry args={[1, 1, 1]} />
+          {markMaterial}
+        </mesh>
+      </group>
+    );
+  }
+
+  if (label === "GitHub") {
+    return (
+      <group position={[0, -0.015, 0.1]}>
+        <mesh scale={[1, 0.9, 0.25]}>
+          <sphereGeometry args={[0.2, 20, 14]} />
+          {markMaterial}
+        </mesh>
+        {[-1, 1].map((side) => (
+          <mesh key={side} position={[side * 0.125, 0.17, 0]} rotation={[0, 0, side * 0.12]}>
+            <coneGeometry args={[0.085, 0.16, 3]} />
+            {markMaterial}
+          </mesh>
+        ))}
+        <mesh position={[0, -0.2, 0]} scale={[0.23, 0.16, 0.055]}>
+          <sphereGeometry args={[1, 16, 10]} />
+          {markMaterial}
+        </mesh>
+      </group>
+    );
+  }
+
+  if (label === "Facebook") {
+    return (
+      <group position={[0.02, 0, 0.095]}>
+        <mesh position={[-0.035, -0.02, 0]} scale={[0.085, 0.47, 0.055]}>
+          <boxGeometry args={[1, 1, 1]} />
+          {markMaterial}
+        </mesh>
+        <mesh position={[0.075, 0.19, 0]} scale={[0.3, 0.085, 0.055]}>
+          <boxGeometry args={[1, 1, 1]} />
+          {markMaterial}
+        </mesh>
+        <mesh position={[0.045, 0.035, 0]} scale={[0.24, 0.075, 0.055]}>
+          <boxGeometry args={[1, 1, 1]} />
+          {markMaterial}
+        </mesh>
+      </group>
+    );
+  }
+
+  if (label === "X") {
+    return (
+      <group position={[0, 0, 0.095]}>
+        {[-1, 1].map((direction) => (
+          <mesh key={direction} rotation={[0, 0, direction * 0.66]} scale={[0.075, 0.5, 0.055]}>
+            <boxGeometry args={[1, 1, 1]} />
+            {markMaterial}
+          </mesh>
+        ))}
+      </group>
+    );
+  }
+
+  return (
+    <group position={[0, 0, 0.095]}>
+      <mesh position={[0, 0.215, 0]} scale={[0.48, 0.065, 0.055]}>
+        <boxGeometry args={[1, 1, 1]} />
+        {markMaterial}
+      </mesh>
+      <mesh position={[0, -0.215, 0]} scale={[0.48, 0.065, 0.055]}>
+        <boxGeometry args={[1, 1, 1]} />
+        {markMaterial}
+      </mesh>
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[side * 0.215, 0, 0]} scale={[0.065, 0.48, 0.055]}>
+          <boxGeometry args={[1, 1, 1]} />
+          {markMaterial}
+        </mesh>
+      ))}
+      <mesh>
+        <torusGeometry args={[0.105, 0.035, 8, 20]} />
+        {markMaterial}
+      </mesh>
+      <mesh position={[0.13, 0.13, 0]}>
+        <sphereGeometry args={[0.035, 10, 8]} />
+        {markMaterial}
+      </mesh>
+    </group>
+  );
+}
+
+function SocialIconSculpture({
+  item,
+  index,
+  plateGeometry,
+  darkMode,
+  reducedMotion,
+}: {
+  item: (typeof SOCIAL_OBJECTS)[number];
+  index: number;
+  plateGeometry: RoundedBoxGeometry;
+  darkMode: boolean;
+  reducedMotion: boolean;
+}) {
+  const rootRef = useRef<Group>(null);
+  const hoveredRef = useRef(false);
+
+  useEffect(
+    () => () => {
+      document.body.style.cursor = "";
+    },
+    [],
+  );
+
+  useFrame((state) => {
+    const root = rootRef.current;
+    if (!root) return;
+    const float = reducedMotion ? 0 : Math.sin(state.clock.elapsedTime * 1.8 + index * 0.7) * 0.025;
+    root.position.y = MathUtils.lerp(root.position.y, 0.86 + float, 0.08);
+    const scale = hoveredRef.current ? 1.1 : 1;
+    const nextScale = MathUtils.lerp(root.scale.x, scale, 0.12);
+    root.scale.setScalar(nextScale);
+  });
+
+  return (
+    <group
+      ref={rootRef}
+      position={[item.x, 0.86, item.z]}
+      onPointerDown={(event) => event.stopPropagation()}
+      onClick={(event) => {
+        event.stopPropagation();
+        window.open(item.href, "_blank", "noopener,noreferrer");
+      }}
+      onPointerOver={(event) => {
+        event.stopPropagation();
+        hoveredRef.current = true;
+        document.body.style.cursor = "pointer";
+      }}
+      onPointerOut={() => {
+        hoveredRef.current = false;
+        document.body.style.cursor = "";
+      }}
+    >
+      <mesh geometry={plateGeometry}>
+        <meshStandardMaterial
+          color={item.color}
+          emissive={item.color}
+          emissiveIntensity={darkMode ? 0.2 : 0.04}
+          roughness={0.24}
+          metalness={0.24}
+        />
+      </mesh>
+      <SocialIconMark label={item.label} />
+      <mesh position={[0, -0.48, 0]}>
+        <cylinderGeometry args={[0.045, 0.06, 0.28, 10]} />
+        <meshStandardMaterial
+          color={darkMode ? "#60758d" : "#405d78"}
+          roughness={0.3}
+          metalness={0.62}
+        />
+      </mesh>
+      <mesh position={[0, -0.65, 0.02]} scale={[0.45, 0.075, 0.28]}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial
+          color={darkMode ? "#14253a" : "#d7e8f5"}
+          roughness={0.38}
+          metalness={0.3}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+function SocialLandmarks({
+  darkMode,
+  reducedMotion,
+}: {
+  darkMode: boolean;
+  reducedMotion: boolean;
+}) {
+  const plateGeometry = useMemo(() => new RoundedBoxGeometry(0.64, 0.66, 0.16, 3, 0.12), []);
+
+  useEffect(() => () => plateGeometry.dispose(), [plateGeometry]);
+
+  return (
+    <group name="social-landmarks">
+      {SOCIAL_OBJECTS.map((item, index) => (
+        <SocialIconSculpture
+          key={item.label}
+          item={item}
+          index={index}
+          plateGeometry={plateGeometry}
+          darkMode={darkMode}
+          reducedMotion={reducedMotion}
+        />
+      ))}
+      <pointLight
+        position={[3.8, 1.35, -24.65]}
+        color="#42a5ff"
+        intensity={darkMode ? 2.2 : 0.35}
+        distance={4.2}
+      />
+    </group>
+  );
+}
+
 function PathEnvironment({
   darkMode,
   inputRef,
@@ -870,6 +1114,8 @@ function PathEnvironment({
           <meshStandardMaterial color={index % 2 === 0 ? foliage : foliageLight} roughness={0.98} />
         </mesh>
       ))}
+
+      <SocialLandmarks darkMode={darkMode} reducedMotion={reducedMotion} />
 
       {darkMode
         ? Array.from({ length: 18 }, (_, index) => (

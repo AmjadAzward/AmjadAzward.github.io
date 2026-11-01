@@ -1,30 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
-import {
-  ArrowRight,
-  Compass,
-  Facebook,
-  Footprints,
-  Github,
-  Instagram,
-  Linkedin,
-  Map as MapIcon,
-  MapPin,
-  X,
-} from "lucide-react";
+import { ArrowRight, Compass, Footprints, Map as MapIcon, MapPin, X } from "lucide-react";
 
-import { certifications, projects, services, skillGroups, socials } from "@/data/portfolio";
+import { certifications, projects, services, skillGroups } from "@/data/portfolio";
 
 const InteractiveStudioCanvas = lazy(() => import("./interactive-studio-canvas"));
-
-const socialIcons: Record<string, typeof Github> = {
-  LinkedIn: Linkedin,
-  GitHub: Github,
-  Facebook,
-  X,
-  Instagram,
-};
 
 export type StudioZoneId =
   "about" | "skills" | "certifications" | "services" | "portfolio" | "contact";
@@ -492,32 +473,6 @@ export default function InteractiveStudioHero() {
           <Link to={stop.to}>
             Explore {stop.short.toLowerCase()} <ArrowRight aria-hidden />
           </Link>
-        </aside>
-      ) : null}
-
-      {activeZone === "contact" ? (
-        <aside className="path-social-dock" aria-label="Social profiles">
-          <div>
-            <span>Continue the conversation</span>
-            <strong>Find me online</strong>
-          </div>
-          <nav aria-label="Amjad Azward on social media">
-            {socials.map((social) => {
-              const Icon = socialIcons[social.label] ?? ArrowRight;
-              return (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  aria-label={social.label}
-                  title={social.label}
-                >
-                  <Icon aria-hidden />
-                </a>
-              );
-            })}
-          </nav>
         </aside>
       ) : null}
 
