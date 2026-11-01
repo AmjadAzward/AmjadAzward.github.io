@@ -207,9 +207,12 @@ function DigitalEngineer({
   const keys = useKeyboard();
   const direction = useMemo(() => new Vector3(), []);
   const skin = darkMode ? "#c88968" : "#b97556";
+  const skinShadow = darkMode ? "#a96850" : "#94563f";
   const jacket = darkMode ? "#101d31" : "#18385e";
   const jacketEdge = darkMode ? "#1e4774" : "#275d94";
   const trousers = darkMode ? "#08111f" : "#122742";
+  const hair = darkMode ? "#090c13" : "#101722";
+  const shoes = darkMode ? "#070c14" : "#101a29";
 
   useEffect(() => {
     if (!rootRef.current) return;
@@ -307,100 +310,240 @@ function DigitalEngineer({
       </mesh>
 
       <group ref={bodyRef}>
-        <group ref={leftLegRef} position={[-0.2, 0.75, 0]}>
-          <mesh position={[0, -0.31, 0]}>
-            <capsuleGeometry args={[0.14, 0.48, 6, 10]} />
-            <meshStandardMaterial color={trousers} roughness={0.58} />
+        <group ref={leftLegRef} position={[-0.18, 0.91, 0]}>
+          <mesh position={[0, -0.18, 0]}>
+            <capsuleGeometry args={[0.125, 0.3, 6, 12]} />
+            <meshStandardMaterial color={trousers} roughness={0.56} />
           </mesh>
-          <mesh position={[0, -0.69, 0.12]} scale={[0.34, 0.18, 0.55]}>
+          <mesh position={[0, -0.48, 0]} scale={[1, 0.88, 0.96]}>
+            <sphereGeometry args={[0.12, 14, 10]} />
+            <meshStandardMaterial color={trousers} roughness={0.56} />
+          </mesh>
+          <mesh position={[0, -0.65, 0]}>
+            <capsuleGeometry args={[0.112, 0.2, 6, 12]} />
+            <meshStandardMaterial color={trousers} roughness={0.55} />
+          </mesh>
+          <mesh position={[0, -0.86, 0.1]} scale={[0.18, 0.11, 0.32]}>
+            <sphereGeometry args={[1, 18, 12]} />
+            <meshStandardMaterial color={shoes} roughness={0.3} metalness={0.08} />
+          </mesh>
+          <mesh position={[0, -0.945, 0.105]} scale={[0.19, 0.025, 0.33]}>
             <boxGeometry args={[1, 1, 1]} />
-            <meshStandardMaterial color="#e9f2ff" roughness={0.38} />
+            <meshStandardMaterial color="#020711" roughness={0.48} />
           </mesh>
         </group>
-        <group ref={rightLegRef} position={[0.2, 0.75, 0]}>
-          <mesh position={[0, -0.31, 0]}>
-            <capsuleGeometry args={[0.14, 0.48, 6, 10]} />
-            <meshStandardMaterial color={trousers} roughness={0.58} />
+        <group ref={rightLegRef} position={[0.18, 0.91, 0]}>
+          <mesh position={[0, -0.18, 0]}>
+            <capsuleGeometry args={[0.125, 0.3, 6, 12]} />
+            <meshStandardMaterial color={trousers} roughness={0.56} />
           </mesh>
-          <mesh position={[0, -0.69, 0.12]} scale={[0.34, 0.18, 0.55]}>
+          <mesh position={[0, -0.48, 0]} scale={[1, 0.88, 0.96]}>
+            <sphereGeometry args={[0.12, 14, 10]} />
+            <meshStandardMaterial color={trousers} roughness={0.56} />
+          </mesh>
+          <mesh position={[0, -0.65, 0]}>
+            <capsuleGeometry args={[0.112, 0.2, 6, 12]} />
+            <meshStandardMaterial color={trousers} roughness={0.55} />
+          </mesh>
+          <mesh position={[0, -0.86, 0.1]} scale={[0.18, 0.11, 0.32]}>
+            <sphereGeometry args={[1, 18, 12]} />
+            <meshStandardMaterial color={shoes} roughness={0.3} metalness={0.08} />
+          </mesh>
+          <mesh position={[0, -0.945, 0.105]} scale={[0.19, 0.025, 0.33]}>
             <boxGeometry args={[1, 1, 1]} />
-            <meshStandardMaterial color="#e9f2ff" roughness={0.38} />
+            <meshStandardMaterial color="#020711" roughness={0.48} />
           </mesh>
         </group>
 
-        <mesh position={[0, 1.46, 0]} scale={[0.78, 1, 0.55]}>
-          <capsuleGeometry args={[0.42, 0.65, 8, 14]} />
-          <meshStandardMaterial color={jacket} roughness={0.42} metalness={0.08} />
+        <mesh position={[0, 1.43, 0]} scale={[1.34, 1, 0.8]}>
+          <capsuleGeometry args={[0.32, 0.54, 8, 16]} />
+          <meshStandardMaterial color={jacket} roughness={0.4} metalness={0.06} />
         </mesh>
-        <mesh position={[0, 1.55, 0.33]} scale={[0.23, 0.62, 0.08]}>
+        <mesh position={[0, 1.51, 0.285]} scale={[0.2, 0.61, 0.045]}>
           <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color="#f2f7ff" roughness={0.45} />
+          <meshStandardMaterial color="#eef5ff" roughness={0.5} />
         </mesh>
-        <mesh position={[0, 1.51, 0.39]} scale={[0.055, 0.48, 0.035]}>
+        <mesh
+          position={[0, 1.62, 0.345]}
+          scale={[0.068, 0.075, 0.035]}
+          rotation={[0, 0, Math.PI / 4]}
+        >
           <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color="#168cff" roughness={0.28} metalness={0.18} />
+          <meshStandardMaterial color="#42a5ff" roughness={0.3} metalness={0.12} />
         </mesh>
-        <mesh position={[-0.19, 1.65, 0.385]} rotation={[0, 0, -0.46]} scale={[0.2, 0.52, 0.04]}>
+        <mesh position={[0, 1.39, 0.347]} scale={[0.047, 0.36, 0.03]}>
+          <boxGeometry args={[1, 1, 1]} />
+          <meshStandardMaterial color="#238fe8" roughness={0.3} metalness={0.12} />
+        </mesh>
+        <mesh position={[-0.17, 1.66, 0.33]} rotation={[0, 0, -0.42]} scale={[0.17, 0.46, 0.04]}>
           <boxGeometry args={[1, 1, 1]} />
           <meshStandardMaterial color={jacketEdge} roughness={0.42} />
         </mesh>
-        <mesh position={[0.19, 1.65, 0.385]} rotation={[0, 0, 0.46]} scale={[0.2, 0.52, 0.04]}>
+        <mesh position={[0.17, 1.66, 0.33]} rotation={[0, 0, 0.42]} scale={[0.17, 0.46, 0.04]}>
           <boxGeometry args={[1, 1, 1]} />
           <meshStandardMaterial color={jacketEdge} roughness={0.42} />
+        </mesh>
+        <mesh position={[-0.055, 1.19, 0.347]}>
+          <sphereGeometry args={[0.018, 8, 6]} />
+          <meshStandardMaterial color="#08101d" roughness={0.42} />
+        </mesh>
+        <mesh position={[0.055, 1.19, 0.347]}>
+          <sphereGeometry args={[0.018, 8, 6]} />
+          <meshStandardMaterial color="#08101d" roughness={0.42} />
         </mesh>
 
-        <group ref={leftArmRef} position={[-0.55, 1.82, 0]}>
-          <mesh position={[0, -0.38, 0]}>
-            <capsuleGeometry args={[0.14, 0.5, 6, 10]} />
+        <group ref={leftArmRef} position={[-0.49, 1.78, 0]}>
+          <mesh position={[0, -0.06, 0]} scale={[1, 0.92, 0.94]}>
+            <sphereGeometry args={[0.15, 14, 10]} />
+            <meshStandardMaterial color={jacket} roughness={0.42} />
+          </mesh>
+          <mesh position={[0, -0.3, 0]}>
+            <capsuleGeometry args={[0.115, 0.26, 6, 12]} />
             <meshStandardMaterial color={jacket} roughness={0.44} />
           </mesh>
-          <mesh position={[0, -0.78, 0]}>
-            <sphereGeometry args={[0.16, 14, 10]} />
+          <mesh position={[0, -0.55, 0]} scale={[1, 0.88, 0.96]}>
+            <sphereGeometry args={[0.105, 12, 8]} />
+            <meshStandardMaterial color={jacketEdge} roughness={0.46} />
+          </mesh>
+          <mesh position={[0, -0.72, 0]}>
+            <capsuleGeometry args={[0.105, 0.18, 6, 12]} />
+            <meshStandardMaterial color={jacket} roughness={0.44} />
+          </mesh>
+          <mesh position={[0, -0.93, 0.015]} scale={[0.88, 1.18, 0.72]}>
+            <sphereGeometry args={[0.13, 14, 10]} />
             <meshStandardMaterial color={skin} roughness={0.58} />
+          </mesh>
+          <mesh
+            position={[-0.095, -0.91, 0.025]}
+            scale={[0.48, 0.9, 0.55]}
+            rotation={[0, 0, -0.25]}
+          >
+            <sphereGeometry args={[0.075, 10, 8]} />
+            <meshStandardMaterial color={skinShadow} roughness={0.58} />
           </mesh>
         </group>
-        <group ref={rightArmRef} position={[0.55, 1.82, 0]}>
-          <mesh position={[0, -0.38, 0]}>
-            <capsuleGeometry args={[0.14, 0.5, 6, 10]} />
+        <group ref={rightArmRef} position={[0.49, 1.78, 0]}>
+          <mesh position={[0, -0.06, 0]} scale={[1, 0.92, 0.94]}>
+            <sphereGeometry args={[0.15, 14, 10]} />
+            <meshStandardMaterial color={jacket} roughness={0.42} />
+          </mesh>
+          <mesh position={[0, -0.3, 0]}>
+            <capsuleGeometry args={[0.115, 0.26, 6, 12]} />
             <meshStandardMaterial color={jacket} roughness={0.44} />
           </mesh>
-          <mesh position={[0, -0.78, 0]}>
-            <sphereGeometry args={[0.16, 14, 10]} />
+          <mesh position={[0, -0.55, 0]} scale={[1, 0.88, 0.96]}>
+            <sphereGeometry args={[0.105, 12, 8]} />
+            <meshStandardMaterial color={jacketEdge} roughness={0.46} />
+          </mesh>
+          <mesh position={[0, -0.72, 0]}>
+            <capsuleGeometry args={[0.105, 0.18, 6, 12]} />
+            <meshStandardMaterial color={jacket} roughness={0.44} />
+          </mesh>
+          <mesh position={[0, -0.93, 0.015]} scale={[0.88, 1.18, 0.72]}>
+            <sphereGeometry args={[0.13, 14, 10]} />
             <meshStandardMaterial color={skin} roughness={0.58} />
+          </mesh>
+          <mesh position={[0.095, -0.91, 0.025]} scale={[0.48, 0.9, 0.55]} rotation={[0, 0, 0.25]}>
+            <sphereGeometry args={[0.075, 10, 8]} />
+            <meshStandardMaterial color={skinShadow} roughness={0.58} />
           </mesh>
         </group>
 
         <mesh position={[0, 2.05, 0]}>
-          <cylinderGeometry args={[0.12, 0.14, 0.22, 12]} />
+          <cylinderGeometry args={[0.105, 0.125, 0.25, 16]} />
           <meshStandardMaterial color={skin} roughness={0.56} />
         </mesh>
-        <mesh position={[0, 2.36, 0]} scale={[0.88, 1.03, 0.82]}>
-          <sphereGeometry args={[0.33, 22, 16]} />
-          <meshStandardMaterial color={skin} roughness={0.58} />
+        <mesh position={[-0.255, 2.39, 0]} scale={[0.5, 0.82, 0.34]}>
+          <sphereGeometry args={[0.1, 14, 10]} />
+          <meshStandardMaterial color={skinShadow} roughness={0.58} />
         </mesh>
-        <mesh position={[0, 2.59, -0.03]} scale={[0.96, 0.48, 0.9]}>
-          <sphereGeometry args={[0.34, 20, 14]} />
-          <meshStandardMaterial color="#11131a" roughness={0.72} />
+        <mesh position={[0.255, 2.39, 0]} scale={[0.5, 0.82, 0.34]}>
+          <sphereGeometry args={[0.1, 14, 10]} />
+          <meshStandardMaterial color={skinShadow} roughness={0.58} />
         </mesh>
-        <mesh position={[-0.245, 2.45, -0.02]} scale={[0.28, 0.5, 0.66]}>
-          <sphereGeometry args={[0.28, 16, 12]} />
-          <meshStandardMaterial color="#11131a" roughness={0.72} />
+        <mesh position={[0, 2.39, 0]} scale={[0.78, 1.04, 0.75]}>
+          <sphereGeometry args={[0.32, 28, 20]} />
+          <meshStandardMaterial color={skin} roughness={0.62} />
         </mesh>
-        <mesh position={[0.245, 2.45, -0.02]} scale={[0.28, 0.5, 0.66]}>
-          <sphereGeometry args={[0.28, 16, 12]} />
-          <meshStandardMaterial color="#11131a" roughness={0.72} />
+
+        <mesh position={[0, 2.6, -0.025]} scale={[0.82, 0.48, 0.79]}>
+          <sphereGeometry args={[0.34, 22, 16]} />
+          <meshStandardMaterial color={hair} roughness={0.78} />
         </mesh>
-        <mesh position={[-0.12, 2.39, 0.29]}>
-          <sphereGeometry args={[0.035, 10, 8]} />
-          <meshStandardMaterial color="#09101b" roughness={0.25} />
+        <mesh position={[-0.225, 2.47, -0.035]} scale={[0.26, 0.53, 0.66]}>
+          <sphereGeometry args={[0.3, 18, 14]} />
+          <meshStandardMaterial color={hair} roughness={0.78} />
         </mesh>
-        <mesh position={[0.12, 2.39, 0.29]}>
-          <sphereGeometry args={[0.035, 10, 8]} />
-          <meshStandardMaterial color="#09101b" roughness={0.25} />
+        <mesh position={[0.225, 2.47, -0.035]} scale={[0.26, 0.53, 0.66]}>
+          <sphereGeometry args={[0.3, 18, 14]} />
+          <meshStandardMaterial color={hair} roughness={0.78} />
         </mesh>
-        <mesh position={[0, 2.28, 0.318]} scale={[0.16, 0.025, 0.025]}>
+        <mesh position={[-0.12, 2.63, 0.18]} rotation={[0.12, 0, -0.34]} scale={[0.55, 0.22, 0.36]}>
+          <sphereGeometry args={[0.18, 14, 10]} />
+          <meshStandardMaterial color={hair} roughness={0.78} />
+        </mesh>
+        <mesh position={[0.08, 2.64, 0.19]} rotation={[0.08, 0, 0.22]} scale={[0.62, 0.2, 0.34]}>
+          <sphereGeometry args={[0.18, 14, 10]} />
+          <meshStandardMaterial color={hair} roughness={0.78} />
+        </mesh>
+
+        <mesh position={[-0.105, 2.43, 0.253]} scale={[1.36, 0.72, 0.35]}>
+          <sphereGeometry args={[0.047, 14, 10]} />
+          <meshStandardMaterial color="#eef7ff" roughness={0.25} />
+        </mesh>
+        <mesh position={[0.105, 2.43, 0.253]} scale={[1.36, 0.72, 0.35]}>
+          <sphereGeometry args={[0.047, 14, 10]} />
+          <meshStandardMaterial color="#eef7ff" roughness={0.25} />
+        </mesh>
+        <mesh position={[-0.105, 2.43, 0.289]} scale={[0.82, 1, 0.45]}>
+          <sphereGeometry args={[0.028, 12, 8]} />
+          <meshStandardMaterial color="#27364c" roughness={0.22} />
+        </mesh>
+        <mesh position={[0.105, 2.43, 0.289]} scale={[0.82, 1, 0.45]}>
+          <sphereGeometry args={[0.028, 12, 8]} />
+          <meshStandardMaterial color="#27364c" roughness={0.22} />
+        </mesh>
+        <mesh position={[-0.105, 2.43, 0.31]}>
+          <sphereGeometry args={[0.012, 8, 6]} />
+          <meshBasicMaterial color="#050911" />
+        </mesh>
+        <mesh position={[0.105, 2.43, 0.31]}>
+          <sphereGeometry args={[0.012, 8, 6]} />
+          <meshBasicMaterial color="#050911" />
+        </mesh>
+        <mesh position={[-0.105, 2.49, 0.27]} rotation={[0, 0, -0.08]} scale={[0.13, 0.018, 0.02]}>
           <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial color="#5f332b" roughness={0.7} />
+          <meshStandardMaterial color={hair} roughness={0.7} />
+        </mesh>
+        <mesh position={[0.105, 2.49, 0.27]} rotation={[0, 0, 0.08]} scale={[0.13, 0.018, 0.02]}>
+          <boxGeometry args={[1, 1, 1]} />
+          <meshStandardMaterial color={hair} roughness={0.7} />
+        </mesh>
+
+        <mesh position={[-0.105, 2.43, 0.305]}>
+          <torusGeometry args={[0.066, 0.009, 6, 20]} />
+          <meshStandardMaterial color="#0a1424" roughness={0.26} metalness={0.35} />
+        </mesh>
+        <mesh position={[0.105, 2.43, 0.305]}>
+          <torusGeometry args={[0.066, 0.009, 6, 20]} />
+          <meshStandardMaterial color="#0a1424" roughness={0.26} metalness={0.35} />
+        </mesh>
+        <mesh position={[0, 2.43, 0.307]} scale={[0.08, 0.012, 0.012]}>
+          <boxGeometry args={[1, 1, 1]} />
+          <meshStandardMaterial color="#0a1424" roughness={0.26} metalness={0.35} />
+        </mesh>
+
+        <mesh position={[0, 2.355, 0.294]} scale={[0.48, 0.92, 0.56]}>
+          <sphereGeometry args={[0.045, 12, 8]} />
+          <meshStandardMaterial color={skinShadow} roughness={0.64} />
+        </mesh>
+        <mesh position={[0, 2.293, 0.307]} scale={[0.115, 0.022, 0.02]}>
+          <boxGeometry args={[1, 1, 1]} />
+          <meshStandardMaterial color="#69362f" roughness={0.68} />
+        </mesh>
+        <mesh position={[0, 2.275, 0.292]} scale={[0.09, 0.012, 0.016]}>
+          <boxGeometry args={[1, 1, 1]} />
+          <meshStandardMaterial color="#9c584f" roughness={0.72} />
         </mesh>
       </group>
     </group>
