@@ -176,7 +176,7 @@ export function PageHeading({
 }) {
   const reduce = useReducedMotion();
   return (
-    <header className="relative mb-14 overflow-hidden border-b border-border pb-12 md:mb-20 md:pb-16">
+    <header className="page-heading relative mb-14 overflow-hidden border-b border-border pb-12 md:mb-20 md:pb-16">
       <motion.span
         aria-hidden
         initial={reduce ? false : { opacity: 0, x: 20 }}

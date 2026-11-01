@@ -281,6 +281,440 @@ body::before {
   }
 }
 
+/* End-to-end phone and tablet responsiveness. */
+@media (max-width: 900px) {
+  .site-section,
+  .site-section > *,
+  .contact-layout,
+  .contact-layout > *,
+  .about-profile-content > *,
+  .cert-overview > *,
+  .portfolio-overview > *,
+  .services-intro > * {
+    min-width: 0;
+  }
+
+  .page-heading h1,
+  .page-heading p,
+  .about-profile-copy h2,
+  .skills-command-copy h2,
+  .cert-overview-copy h2,
+  .portfolio-overview-copy h2,
+  .services-intro-copy h2,
+  .portfolio-featured-body h3,
+  .service-title,
+  .timeline-title {
+    overflow-wrap: anywhere;
+  }
+
+  .contact-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .contact-layout a[href^="mailto:"] {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 680px) {
+  .path-world-main,
+  .path-world-main .studio-home,
+  .path-world-main .studio-home-shell,
+  .path-world-main .path-experience {
+    width: 100%;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+  }
+
+  .path-map-trigger {
+    top: max(0.7rem, env(safe-area-inset-top));
+    right: max(0.7rem, env(safe-area-inset-right));
+    width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  .path-intro-card {
+    top: max(4.05rem, calc(env(safe-area-inset-top) + 3.4rem));
+    left: max(0.65rem, env(safe-area-inset-left));
+    width: min(20rem, calc(100% - 1.3rem));
+    max-height: calc(100dvh - 9.6rem - env(safe-area-inset-bottom));
+    padding: 1rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .path-intro-card h1 {
+    font-size: clamp(2.1rem, 11.5vw, 2.75rem);
+  }
+
+  .path-intro-card > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .path-intro-card button,
+  .path-intro-card a {
+    width: 100%;
+    min-height: 2.75rem;
+    padding-inline: 0.6rem;
+    text-align: center;
+  }
+
+  .path-destination-card {
+    top: auto;
+    right: max(0.65rem, env(safe-area-inset-right));
+    bottom: calc(5.8rem + env(safe-area-inset-bottom));
+    left: max(0.65rem, env(safe-area-inset-left));
+    width: auto;
+    max-height: min(42dvh, 20rem);
+    padding: 0.95rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .path-destination-card h2 {
+    font-size: clamp(1.7rem, 8.5vw, 2.15rem);
+  }
+
+  .path-destination-card img {
+    height: 4.75rem;
+  }
+
+  .path-destination-card > a {
+    min-height: 2.75rem;
+  }
+
+  .path-mobile-controls {
+    bottom: max(0.7rem, env(safe-area-inset-bottom));
+    left: max(0.7rem, env(safe-area-inset-left));
+    grid-template-columns: repeat(3, 2.75rem);
+    grid-template-rows: repeat(2, 2.75rem);
+    gap: 0.3rem;
+  }
+
+  .path-mobile-controls button {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    border-radius: 0.8rem;
+    touch-action: none;
+  }
+
+  .path-map-overlay {
+    padding: max(0.5rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right))
+      max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left));
+  }
+
+  .path-map-panel {
+    max-height: calc(100dvh - 1rem);
+  }
+
+  .path-map-panel > header h2 {
+    font-size: clamp(1.4rem, 7vw, 1.75rem);
+  }
+
+  .path-map-panel > header button,
+  .path-map-canvas > button {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    height: calc(4rem + env(safe-area-inset-top));
+    padding-top: max(0.55rem, env(safe-area-inset-top));
+    padding-right: max(0.65rem, env(safe-area-inset-right));
+    padding-left: max(0.65rem, env(safe-area-inset-left));
+  }
+
+  .site-header-inner {
+    height: 3.2rem;
+  }
+
+  .mobile-menu {
+    min-height: 100dvh;
+    padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+      max(1.5rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  }
+
+  .mobile-nav-link {
+    grid-template-columns: 2rem minmax(0, 1fr);
+    min-height: 3.4rem;
+    padding-block: 0.75rem;
+    font-size: clamp(1.85rem, 9vw, 2.7rem);
+  }
+
+  .site-section {
+    padding: 4.25rem 1rem 4.5rem;
+  }
+
+  .page-heading {
+    margin-bottom: 3rem;
+    padding-bottom: 2.25rem;
+  }
+
+  .page-heading h1 {
+    margin-top: 0.9rem;
+    font-size: clamp(2.55rem, 13vw, 4rem);
+    line-height: 0.94;
+  }
+
+  .page-heading .ghost-word {
+    right: 0;
+    bottom: -0.08em;
+    max-width: 100%;
+    overflow: hidden;
+    font-size: clamp(4rem, 24vw, 7rem);
+  }
+
+  .page-heading p:last-child {
+    margin-top: 1.1rem;
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+
+  .site-footer {
+    gap: 1rem;
+    width: calc(100% - 2rem);
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .site-footer > div:first-child p {
+    line-height: 1.55;
+  }
+
+  .social-link,
+  .site-header-actions > button,
+  .mobile-menu button {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  .cert-overview,
+  .portfolio-overview,
+  .services-intro,
+  .skills-command,
+  .about-profile-copy {
+    padding: 1.2rem;
+    border-radius: 1.25rem;
+  }
+
+  .about-profile-content,
+  .skills-command {
+    gap: 1.5rem;
+  }
+
+  .about-profile-facts,
+  .about-actions,
+  .home-actions {
+    gap: 0.55rem;
+  }
+
+  .about-profile-facts li {
+    max-width: 100%;
+  }
+
+  .about-actions > a {
+    min-height: 2.75rem;
+  }
+
+  .about-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .timeline-section-header {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .timeline-section-count {
+    grid-column: 2;
+    justify-self: start;
+    font-size: 1.25rem;
+  }
+
+  .timeline-entry {
+    grid-template-columns: 2.2rem minmax(0, 1fr);
+    gap: 0.6rem;
+  }
+
+  .timeline-list::before {
+    left: 1.05rem;
+  }
+
+  .timeline-node {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+
+  .timeline-body {
+    min-width: 0;
+    padding: 0.9rem;
+  }
+
+  .skills-orbit-scene {
+    width: min(15rem, 76vw);
+  }
+
+  .skills-category-tab {
+    min-height: 6rem;
+  }
+
+  .skills-category-name {
+    overflow-wrap: anywhere;
+  }
+
+  .skills-panel-header {
+    padding-top: 1.5rem;
+  }
+
+  .skill-row > p {
+    overflow-wrap: anywhere;
+  }
+
+  .cert-browser,
+  .portfolio-browser,
+  .services-grid-heading {
+    margin-top: 3.75rem;
+  }
+
+  .cert-card-body,
+  .portfolio-card-body {
+    min-height: 0;
+    padding: 1.1rem;
+  }
+
+  .cert-card-body > a,
+  .portfolio-card-link,
+  .service-card-link {
+    min-height: 2.75rem;
+  }
+
+  .portfolio-featured-media {
+    min-height: 15rem;
+  }
+
+  .portfolio-featured-body {
+    padding: 1.2rem;
+  }
+
+  .portfolio-project-meta {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .service-card {
+    padding: 1.2rem;
+  }
+
+  .service-card-header {
+    margin-bottom: 1.65rem;
+  }
+
+  .service-card-outcome {
+    margin-top: 1.2rem;
+  }
+
+  .page-end-cta > div {
+    min-width: 0;
+  }
+
+  .page-end-cta h2 {
+    overflow-wrap: anywhere;
+  }
+
+  .contact-layout {
+    gap: 2.5rem;
+  }
+
+  .contact-layout form,
+  .contact-layout .editorial-card {
+    min-width: 0;
+  }
+
+  .contact-layout .editorial-card {
+    padding: 1.25rem;
+  }
+
+  .field {
+    min-height: 3rem;
+    font-size: 1rem;
+  }
+
+  textarea.field {
+    min-height: 10rem;
+    resize: vertical;
+  }
+
+  .form-status,
+  .form-status a {
+    overflow-wrap: anywhere;
+  }
+
+  .certificate-dialog {
+    width: calc(100vw - 1rem);
+    max-height: calc(100dvh - 1rem);
+    padding: 0.8rem;
+    border-radius: 1rem;
+  }
+}
+
+@media (max-width: 430px) {
+  .cert-metrics,
+  .portfolio-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cert-metrics > div,
+  .portfolio-metrics > div {
+    min-height: 6.6rem;
+  }
+
+  .cert-metrics > div:last-child,
+  .portfolio-metrics > div:last-child {
+    grid-column: 1 / -1;
+    min-height: 5.6rem;
+    border-top: 1px solid var(--border);
+    border-left: 0;
+  }
+
+  .path-intro-card {
+    width: calc(100% - 1.3rem);
+  }
+
+  .path-intro-card > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .path-intro-card > span {
+    font-size: 0.67rem;
+  }
+}
+
+@media (max-height: 560px) and (orientation: landscape) {
+  .path-intro-card,
+  .path-destination-card {
+    top: 0.65rem;
+    bottom: 0.65rem;
+    left: 0.65rem;
+    width: min(18rem, 48vw);
+    max-height: none;
+  }
+
+  .path-map-trigger {
+    top: 0.65rem;
+  }
+
+  .path-map-canvas {
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+
+  .path-map-panel > footer {
+    display: none;
+  }
+}
+
 /* Walkable portfolio trail */
 .studio-home {
   padding: 0.65rem clamp(0.75rem, 2vw, 1.5rem) 0.8rem;

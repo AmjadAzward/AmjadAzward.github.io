@@ -7,6 +7,7 @@ import {
   Group,
   MathUtils,
   Mesh,
+  PerspectiveCamera,
   SRGBColorSpace,
   Vector3,
 } from "three";
@@ -671,6 +672,10 @@ function SocialIconSculpture({
         document.body.style.cursor = "";
       }}
     >
+      <mesh position={[0, 0, -0.02]}>
+        <boxGeometry args={[0.9, 0.9, 0.34]} />
+        <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
+      </mesh>
       <mesh geometry={plateGeometry}>
         <meshStandardMaterial
           color={item.color}
@@ -1364,11 +1369,23 @@ function StudioWorld({
 
   useFrame(({ camera, size }) => {
     const character = characterPositionRef.current;
+    const compactViewport = size.width < 680;
+    const tabletViewport = size.width < 1024;
     const panelOffset = size.width >= 860 ? 1.45 : 0;
-    desiredCamera.set(character.x - panelOffset * 0.28, 4.15, character.z + 7.6);
+    const cameraHeight = compactViewport ? 4.75 : tabletViewport ? 4.4 : 4.15;
+    const cameraDistance = compactViewport ? 9.1 : tabletViewport ? 8.25 : 7.6;
+    desiredCamera.set(character.x - panelOffset * 0.28, cameraHeight, character.z + cameraDistance);
     camera.position.lerp(desiredCamera, reducedMotion ? 0.2 : 0.045);
-    cameraTarget.set(character.x - panelOffset, 1.1, character.z - 1.45);
+    cameraTarget.set(character.x - panelOffset, compactViewport ? 0.95 : 1.1, character.z - 1.45);
     camera.lookAt(cameraTarget);
+
+    const perspectiveCamera = camera as PerspectiveCamera;
+    const targetFov = compactViewport ? 52 : tabletViewport ? 48 : 45;
+    const nextFov = MathUtils.lerp(perspectiveCamera.fov, targetFov, 0.08);
+    if (Math.abs(nextFov - perspectiveCamera.fov) > 0.001) {
+      perspectiveCamera.fov = nextFov;
+      perspectiveCamera.updateProjectionMatrix();
+    }
 
     let nearest: StudioZoneId | null = null;
     let nearestDistance = 1.18;
