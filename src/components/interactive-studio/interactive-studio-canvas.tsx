@@ -2,9 +2,11 @@ import { Canvas, type ThreeEvent, useFrame, useThree } from "@react-three/fiber"
 import { useEffect, useMemo, useRef, type RefObject } from "react";
 import {
   ACESFilmicToneMapping,
+  CanvasTexture,
   CatmullRomCurve3,
   Color,
   Group,
+  LinearFilter,
   MathUtils,
   Mesh,
   PerspectiveCamera,
@@ -39,6 +41,12 @@ const ZONES: Zone[] = [
   { id: "services", position: [4.9, 0.03, -13.4], color: "#278cff" },
   { id: "portfolio", position: [-3.8, 0.03, -18.8], color: "#57b8ff" },
   { id: "contact", position: [3.8, 0.03, -24], color: "#30a7e8" },
+];
+
+const SERVICE_NODE_POSITIONS: Array<[number, number]> = [
+  [-0.5, 0.38],
+  [0.52, 0.34],
+  [0, -0.52],
 ];
 
 const START_POSITION = new Vector3(0, 0, 5);
@@ -188,12 +196,14 @@ function useKeyboard() {
 function DigitalEngineer({
   inputRef,
   positionRef,
+  headingRef,
   mapPositionRef,
   reducedMotion,
   darkMode,
 }: {
   inputRef: RefObject<StudioInput>;
   positionRef: RefObject<Vector3>;
+  headingRef: RefObject<number>;
   mapPositionRef: RefObject<StudioPosition>;
   reducedMotion: boolean;
   darkMode: boolean;
@@ -232,6 +242,7 @@ function DigitalEngineer({
     if (input.spawn) {
       root.position.set(input.spawn.x, 0, input.spawn.z);
       root.rotation.y = 0;
+      headingRef.current = 0;
       positionRef.current?.copy(root.position);
       input.spawn = null;
     }
@@ -278,6 +289,7 @@ function DigitalEngineer({
     }
 
     positionRef.current?.copy(root.position);
+    headingRef.current = root.rotation.y;
     if (mapPositionRef.current) {
       mapPositionRef.current.x = root.position.x;
       mapPositionRef.current.z = root.position.z;
@@ -552,10 +564,12 @@ function DigitalEngineer({
 
 function RobotCompanion({
   positionRef,
+  headingRef,
   darkMode,
   reducedMotion,
 }: {
   positionRef: RefObject<Vector3>;
+  headingRef: RefObject<number>;
   darkMode: boolean;
   reducedMotion: boolean;
 }) {
@@ -579,12 +593,25 @@ function RobotCompanion({
     const robot = robotRef.current;
     const character = positionRef.current;
     if (!robot || !character) return;
-    target.set(character.x + 0.88, 0, character.z + 0.36);
-    robot.position.lerp(target, reducedMotion ? 0.1 : 0.045);
+    const heading = headingRef.current;
+    const forwardX = Math.sin(heading);
+    const forwardZ = Math.cos(heading);
+    const rightX = Math.cos(heading);
+    const rightZ = -Math.sin(heading);
+    target.set(
+      character.x + rightX * 0.82 - forwardX * 0.38,
+      0,
+      character.z + rightZ * 0.82 - forwardZ * 0.38,
+    );
+    robot.position.lerp(target, reducedMotion ? 0.22 : 0.095);
     robot.position.y = reducedMotion
       ? 0.08
       : 0.09 + Math.sin(state.clock.elapsedTime * 2.8) * 0.045;
-    robot.rotation.y = MathUtils.lerp(robot.rotation.y, 0, 0.08);
+    const rotationDelta = Math.atan2(
+      Math.sin(heading - robot.rotation.y),
+      Math.cos(heading - robot.rotation.y),
+    );
+    robot.rotation.y += rotationDelta * (reducedMotion ? 0.2 : 0.11);
   });
 
   return (
@@ -893,6 +920,254 @@ function SocialLandmarks({
   );
 }
 
+function RoadSignLabel({ label, index }: { label: string; index: number }) {
+  const texture = useMemo(() => {
+    if (typeof document === "undefined") return null;
+    const canvas = document.createElement("canvas");
+    canvas.width = 512;
+    canvas.height = 128;
+    const context = canvas.getContext("2d");
+    if (!context) return null;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = "#f4f9ff";
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    const fontSize = label.length > 12 ? 37 : 46;
+    context.font = `700 ${fontSize}px Arial, sans-serif`;
+    context.fillText(`${String(index + 1).padStart(2, "0")}  ${label.toUpperCase()}`, 256, 66);
+    const nextTexture = new CanvasTexture(canvas);
+    nextTexture.colorSpace = SRGBColorSpace;
+    nextTexture.minFilter = LinearFilter;
+    nextTexture.magFilter = LinearFilter;
+    nextTexture.needsUpdate = true;
+    return nextTexture;
+  }, [index, label]);
+
+  useEffect(() => () => texture?.dispose(), [texture]);
+
+  return (
+    <mesh position={[0, 0, 0.071]}>
+      <planeGeometry args={[1.62, 0.4]} />
+      <meshBasicMaterial map={texture} transparent />
+    </mesh>
+  );
+}
+
+function SectionLandmark({
+  zone,
+  index,
+  side,
+  darkMode,
+  structure,
+  pathEdge,
+}: {
+  zone: Zone;
+  index: number;
+  side: number;
+  darkMode: boolean;
+  structure: string;
+  pathEdge: string;
+}) {
+  const glow = darkMode ? 0.72 : 0.12;
+  const pale = darkMode ? "#dceeff" : "#f4f9ff";
+  const deep = darkMode ? "#0b1b31" : "#274969";
+
+  return (
+    <group>
+      <mesh position={[0, 0.08, 0]}>
+        <cylinderGeometry args={[0.82, 0.9, 0.16, 12]} />
+        <meshStandardMaterial color={pathEdge} roughness={0.68} metalness={0.08} />
+      </mesh>
+      <mesh position={[0, 0.18, 0]}>
+        <cylinderGeometry args={[0.7, 0.76, 0.12, 12]} />
+        <meshStandardMaterial
+          color={zone.color}
+          emissive={zone.color}
+          emissiveIntensity={darkMode ? 0.24 : 0.04}
+          roughness={0.38}
+          metalness={0.2}
+        />
+      </mesh>
+
+      {index === 0 ? (
+        <group position={[0, 0.25, 0]}>
+          <mesh position={[-0.48, 0.62, 0]}>
+            <boxGeometry args={[0.14, 1.12, 0.24]} />
+            <meshStandardMaterial color={structure} roughness={0.42} />
+          </mesh>
+          <mesh position={[0.48, 0.62, 0]}>
+            <boxGeometry args={[0.14, 1.12, 0.24]} />
+            <meshStandardMaterial color={structure} roughness={0.42} />
+          </mesh>
+          <mesh position={[0, 1.13, 0]}>
+            <boxGeometry args={[1.1, 0.14, 0.24]} />
+            <meshStandardMaterial
+              color={zone.color}
+              emissive={zone.color}
+              emissiveIntensity={glow}
+            />
+          </mesh>
+          <mesh position={[0, 0.79, 0.15]}>
+            <sphereGeometry args={[0.2, 18, 12]} />
+            <meshStandardMaterial color={pale} roughness={0.46} />
+          </mesh>
+          <mesh position={[0, 0.42, 0.14]} scale={[1.25, 0.72, 0.46]}>
+            <sphereGeometry args={[0.3, 18, 12]} />
+            <meshStandardMaterial color={deep} roughness={0.5} />
+          </mesh>
+        </group>
+      ) : null}
+
+      {index === 1 ? (
+        <group position={[0, 0.25, 0]}>
+          {[0.55, 0.84, 1.12, 0.75, 0.96].map((height, barIndex) => (
+            <mesh key={barIndex} position={[-0.48 + barIndex * 0.24, height / 2, 0]}>
+              <boxGeometry args={[0.14, height, 0.22]} />
+              <meshStandardMaterial
+                color={barIndex % 2 === 0 ? zone.color : pale}
+                emissive={barIndex % 2 === 0 ? zone.color : "#000000"}
+                emissiveIntensity={barIndex % 2 === 0 ? glow : 0}
+                roughness={0.38}
+              />
+            </mesh>
+          ))}
+          <mesh position={[0, 0.62, -0.02]}>
+            <boxGeometry args={[1.18, 0.055, 0.3]} />
+            <meshStandardMaterial color={deep} roughness={0.5} />
+          </mesh>
+        </group>
+      ) : null}
+
+      {index === 2 ? (
+        <group position={[0, 0.81, 0]}>
+          <mesh>
+            <boxGeometry args={[1.12, 0.92, 0.2]} />
+            <meshStandardMaterial color={pale} roughness={0.42} />
+          </mesh>
+          {[-0.2, 0, 0.2].map((y) => (
+            <mesh key={y} position={[-0.16, y, 0.115]}>
+              <boxGeometry args={[0.55, 0.045, 0.025]} />
+              <meshStandardMaterial color={structure} roughness={0.48} />
+            </mesh>
+          ))}
+          <mesh position={[0.3, -0.18, 0.14]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.17, 0.17, 0.05, 20]} />
+            <meshStandardMaterial
+              color={zone.color}
+              emissive={zone.color}
+              emissiveIntensity={glow}
+            />
+          </mesh>
+          <mesh position={[0.24, -0.46, 0.13]} rotation={[0, 0, 0.18]}>
+            <boxGeometry args={[0.12, 0.35, 0.04]} />
+            <meshStandardMaterial color={zone.color} roughness={0.42} />
+          </mesh>
+          <mesh position={[0.37, -0.46, 0.13]} rotation={[0, 0, -0.18]}>
+            <boxGeometry args={[0.12, 0.35, 0.04]} />
+            <meshStandardMaterial color={zone.color} roughness={0.42} />
+          </mesh>
+        </group>
+      ) : null}
+
+      {index === 3 ? (
+        <group position={[0, 0.82, 0]}>
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.34, 0.34, 0.2, 6]} />
+            <meshStandardMaterial
+              color={zone.color}
+              emissive={zone.color}
+              emissiveIntensity={glow}
+            />
+          </mesh>
+          {SERVICE_NODE_POSITIONS.map(([x, y], nodeIndex) => (
+            <group key={nodeIndex}>
+              <mesh position={[x / 2, y / 2, 0.02]} rotation={[0, 0, Math.atan2(y, x)]}>
+                <boxGeometry args={[Math.hypot(x, y), 0.045, 0.08]} />
+                <meshStandardMaterial color={structure} roughness={0.48} />
+              </mesh>
+              <mesh position={[x, y, 0.04]}>
+                <sphereGeometry args={[0.16, 14, 10]} />
+                <meshStandardMaterial color={pale} roughness={0.4} />
+              </mesh>
+            </group>
+          ))}
+        </group>
+      ) : null}
+
+      {index === 4 ? (
+        <group position={[0, 0.82, 0]}>
+          {[-0.38, 0, 0.38].map((x, cardIndex) => (
+            <mesh
+              key={x}
+              position={[x, cardIndex === 1 ? 0.13 : 0, cardIndex === 1 ? 0.1 : 0]}
+              rotation={[0, 0, (cardIndex - 1) * 0.12]}
+            >
+              <boxGeometry args={[0.48, 0.76, 0.1]} />
+              <meshStandardMaterial
+                color={cardIndex === 1 ? zone.color : pale}
+                emissive={cardIndex === 1 ? zone.color : "#000000"}
+                emissiveIntensity={cardIndex === 1 ? glow : 0}
+                roughness={0.38}
+              />
+            </mesh>
+          ))}
+        </group>
+      ) : null}
+
+      {index === 5 ? (
+        <group position={[0, 0.82, 0]}>
+          <mesh>
+            <boxGeometry args={[1.15, 0.78, 0.22]} />
+            <meshStandardMaterial color={deep} roughness={0.38} metalness={0.18} />
+          </mesh>
+          <mesh position={[-0.28, 0.06, 0.13]} rotation={[0, 0, -0.58]}>
+            <boxGeometry args={[0.72, 0.065, 0.04]} />
+            <meshStandardMaterial
+              color={zone.color}
+              emissive={zone.color}
+              emissiveIntensity={glow}
+            />
+          </mesh>
+          <mesh position={[0.28, 0.06, 0.13]} rotation={[0, 0, 0.58]}>
+            <boxGeometry args={[0.72, 0.065, 0.04]} />
+            <meshStandardMaterial
+              color={zone.color}
+              emissive={zone.color}
+              emissiveIntensity={glow}
+            />
+          </mesh>
+          <mesh position={[0, -0.2, 0.13]}>
+            <boxGeometry args={[0.62, 0.065, 0.04]} />
+            <meshStandardMaterial color={pale} roughness={0.4} />
+          </mesh>
+        </group>
+      ) : null}
+
+      <group position={[0, 2.16, 0]}>
+        <mesh position={[0, -0.55, -0.04]}>
+          <cylinderGeometry args={[0.055, 0.07, 1.08, 10]} />
+          <meshStandardMaterial color={structure} roughness={0.35} metalness={0.52} />
+        </mesh>
+        <mesh>
+          <boxGeometry args={[1.78, 0.5, 0.14]} />
+          <meshStandardMaterial
+            color={zone.color}
+            emissive={zone.color}
+            emissiveIntensity={darkMode ? 0.42 : 0.08}
+            roughness={0.32}
+            metalness={0.18}
+          />
+        </mesh>
+        <RoadSignLabel label={zone.id} index={index} />
+        <mesh position={[side * 0.96, 0, 0]} rotation={[0, 0, (side * -Math.PI) / 2]}>
+          <coneGeometry args={[0.25, 0.34, 3]} />
+          <meshStandardMaterial color={zone.color} roughness={0.32} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
 function PathEnvironment({
   darkMode,
   inputRef,
@@ -1164,44 +1439,14 @@ function PathEnvironment({
           key={station.id}
           position={[station.position[0] + station.side * 1.9, 0, station.position[2]]}
         >
-          <mesh position={[0, station.height / 2, 0]}>
-            <boxGeometry args={[1.75, station.height, 0.22]} />
-            <meshStandardMaterial color={structure} roughness={0.42} metalness={0.2} />
-          </mesh>
-          <mesh position={[-station.side * 0.88, 0.72, 0]} rotation={[0, 0, station.side * -0.08]}>
-            <boxGeometry args={[0.08, 1.5, 0.08]} />
-            <meshStandardMaterial
-              color={accent}
-              emissive={accent}
-              emissiveIntensity={darkMode ? 1.1 : 0.2}
-            />
-          </mesh>
-          <mesh position={[0, station.height + 0.13, 0]}>
-            <boxGeometry args={[1.15, 0.08, 0.3]} />
-            <meshStandardMaterial
-              color={station.color}
-              emissive={station.color}
-              emissiveIntensity={darkMode ? 0.75 : 0.12}
-            />
-          </mesh>
-          {index === 4 ? (
-            <group position={[0, 0.72, station.side * -0.18]}>
-              {[-0.5, 0, 0.5].map((x, cardIndex) => (
-                <mesh
-                  key={x}
-                  position={[x, cardIndex === 1 ? 0.12 : 0, 0]}
-                  rotation={[0, 0, (cardIndex - 1) * 0.08]}
-                >
-                  <boxGeometry args={[0.42, 0.6, 0.05]} />
-                  <meshStandardMaterial
-                    color={cardIndex === 1 ? accent : pathEdge}
-                    emissive={cardIndex === 1 ? accent : "#000000"}
-                    emissiveIntensity={darkMode ? 0.45 : 0.06}
-                  />
-                </mesh>
-              ))}
-            </group>
-          ) : null}
+          <SectionLandmark
+            zone={station}
+            index={index}
+            side={station.side}
+            darkMode={darkMode}
+            structure={structure}
+            pathEdge={pathEdge}
+          />
         </group>
       ))}
 
@@ -1511,6 +1756,7 @@ function StudioWorld({
   onZoneChange,
 }: Omit<StudioCanvasProps, "inView">) {
   const characterPositionRef = useRef(new Vector3().copy(START_POSITION));
+  const characterHeadingRef = useRef(0);
   const activeZoneRef = useRef<StudioZoneId | null>(null);
   const desiredCamera = useMemo(() => new Vector3(), []);
   const cameraTarget = useMemo(() => new Vector3(), []);
@@ -1591,12 +1837,14 @@ function StudioWorld({
       <DigitalEngineer
         inputRef={inputRef}
         positionRef={characterPositionRef}
+        headingRef={characterHeadingRef}
         mapPositionRef={explorerPositionRef}
         reducedMotion={reducedMotion}
         darkMode={darkMode}
       />
       <RobotCompanion
         positionRef={characterPositionRef}
+        headingRef={characterHeadingRef}
         darkMode={darkMode}
         reducedMotion={reducedMotion}
       />
