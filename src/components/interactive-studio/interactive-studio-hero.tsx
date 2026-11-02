@@ -125,7 +125,7 @@ const pathStops: Array<{
   },
 ];
 
-const WORLD_BOUNDS = { minX: -8.1, maxX: 8.1, northZ: 5.8, southZ: -25.8 };
+const WORLD_BOUNDS = { minX: -10.2, maxX: 10.2, northZ: 7.2, southZ: -28.5 };
 
 function worldToMapPosition(position: StudioPosition) {
   return {

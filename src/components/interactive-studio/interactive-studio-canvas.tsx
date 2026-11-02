@@ -5,10 +5,13 @@ import {
   CanvasTexture,
   CatmullRomCurve3,
   Color,
+  DoubleSide,
   Group,
+  InstancedMesh,
   LinearFilter,
   MathUtils,
   Mesh,
+  Object3D,
   PerspectiveCamera,
   SRGBColorSpace,
   Vector3,
@@ -50,6 +53,29 @@ const SERVICE_NODE_POSITIONS: Array<[number, number]> = [
 ];
 
 const START_POSITION = new Vector3(0, 0, 5);
+const WALK_BOUNDS = { minX: -10.2, maxX: 10.2, minZ: -28.5, maxZ: 7.2 };
+
+const MEADOW_PATCHES: Array<[number, number]> = [
+  [-8.8, 5.2],
+  [-7.6, 3.2],
+  [-8.9, -0.8],
+  [-8.4, -5.4],
+  [-9.1, -10.5],
+  [-8.3, -16.2],
+  [-8.9, -21.5],
+  [-7.5, -26.2],
+  [7.7, 4.7],
+  [8.8, 1.1],
+  [8.1, -4.2],
+  [8.8, -9.5],
+  [8.1, -14.8],
+  [8.9, -20.2],
+  [7.8, -25.8],
+  [-1.7, 4.3],
+  [2.2, 3.8],
+  [-1.8, -27.1],
+  [2.1, -27],
+];
 
 const FOREST_OBJECTS = Array.from({ length: 48 }, (_, index) => {
   const rightSide = index % 4 === 0;
@@ -287,8 +313,8 @@ function DigitalEngineer({
       const speed = sprinting ? 3.05 : 1.9;
       const stepX = direction.x * speed * delta;
       const stepZ = direction.z * speed * delta;
-      const nextX = MathUtils.clamp(root.position.x + stepX, -8.1, 8.1);
-      const nextZ = MathUtils.clamp(root.position.z + stepZ, -25.4, 5.8);
+      const nextX = MathUtils.clamp(root.position.x + stepX, WALK_BOUNDS.minX, WALK_BOUNDS.maxX);
+      const nextZ = MathUtils.clamp(root.position.z + stepZ, WALK_BOUNDS.minZ, WALK_BOUNDS.maxZ);
 
       // Resolve each axis independently so the explorer naturally slides along obstacles.
       if (!isWorldBlocked(nextX, root.position.z)) root.position.x = nextX;
@@ -1178,6 +1204,124 @@ function SectionLandmark({
   );
 }
 
+function NaturalLife({ darkMode, reducedMotion }: { darkMode: boolean; reducedMotion: boolean }) {
+  const grassRef = useRef<InstancedMesh>(null);
+  const leavesRef = useRef<InstancedMesh>(null);
+  const transform = useMemo(() => new Object3D(), []);
+  const grass = useMemo(
+    () =>
+      Array.from({ length: MEADOW_PATCHES.length * 9 }, (_, index) => {
+        const patch = MEADOW_PATCHES[index % MEADOW_PATCHES.length]!;
+        const angle = ((index * 137.5) % 360) * (Math.PI / 180);
+        const radius = 0.18 + ((index * 17) % 9) * 0.09;
+        return {
+          x: patch[0] + Math.cos(angle) * radius,
+          z: patch[1] + Math.sin(angle) * radius,
+          height: 0.7 + ((index * 11) % 7) * 0.08,
+          phase: index * 0.43,
+          yaw: angle,
+        };
+      }),
+    [],
+  );
+  const leaves = useMemo(
+    () =>
+      Array.from({ length: 34 }, (_, index) => ({
+        x: -8.7 + ((index * 47) % 174) * 0.1,
+        z: 5.5 - ((index * 71) % 325) * 0.1,
+        startY: 0.5 + ((index * 29) % 46) * 0.1,
+        speed: 0.22 + (index % 7) * 0.035,
+        phase: index * 0.71,
+        scale: 0.7 + (index % 5) * 0.09,
+      })),
+    [],
+  );
+
+  useFrame((state) => {
+    const time = reducedMotion ? 0 : state.clock.elapsedTime;
+    const grassMesh = grassRef.current;
+    if (grassMesh) {
+      grass.forEach((blade, index) => {
+        transform.position.set(blade.x, 0.16 * blade.height, blade.z);
+        transform.rotation.set(0, blade.yaw, Math.sin(time * 1.35 + blade.phase) * 0.12);
+        transform.scale.set(0.72, blade.height, 0.72);
+        transform.updateMatrix();
+        grassMesh.setMatrixAt(index, transform.matrix);
+      });
+      grassMesh.instanceMatrix.needsUpdate = true;
+    }
+
+    const leafMesh = leavesRef.current;
+    if (leafMesh) {
+      leaves.forEach((leaf, index) => {
+        const fallSpan = 5.2;
+        const fallingY =
+          0.28 + ((((leaf.startY - time * leaf.speed) % fallSpan) + fallSpan) % fallSpan);
+        transform.position.set(
+          leaf.x + Math.sin(time * 0.72 + leaf.phase) * 0.42,
+          fallingY,
+          leaf.z + Math.cos(time * 0.48 + leaf.phase) * 0.28,
+        );
+        transform.rotation.set(
+          time * 0.8 + leaf.phase,
+          time * 0.55 + leaf.phase * 0.6,
+          Math.sin(time + leaf.phase) * 0.9,
+        );
+        transform.scale.set(leaf.scale, leaf.scale, leaf.scale);
+        transform.updateMatrix();
+        leafMesh.setMatrixAt(index, transform.matrix);
+      });
+      leafMesh.instanceMatrix.needsUpdate = true;
+    }
+  });
+
+  return (
+    <group name="natural-life">
+      <instancedMesh
+        ref={grassRef}
+        args={[undefined, undefined, grass.length]}
+        frustumCulled={false}
+      >
+        <coneGeometry args={[0.035, 0.34, 3]} />
+        <meshStandardMaterial
+          color={darkMode ? "#3f7d3e" : "#5f9f4c"}
+          roughness={0.9}
+          side={DoubleSide}
+        />
+      </instancedMesh>
+      <instancedMesh
+        ref={leavesRef}
+        args={[undefined, undefined, leaves.length]}
+        frustumCulled={false}
+      >
+        <planeGeometry args={[0.11, 0.18]} />
+        <meshStandardMaterial
+          color={darkMode ? "#9e7e3f" : "#b38345"}
+          roughness={0.86}
+          side={DoubleSide}
+        />
+      </instancedMesh>
+      {MEADOW_PATCHES.filter((_, index) => index % 2 === 0).map(([x, z], index) => (
+        <group key={`wildflower-${x}-${z}`} position={[x + 0.35, 0, z - 0.22]}>
+          <mesh position={[0, 0.18, 0]}>
+            <cylinderGeometry args={[0.008, 0.012, 0.36, 6]} />
+            <meshStandardMaterial color={darkMode ? "#39733f" : "#4d8b45"} roughness={0.86} />
+          </mesh>
+          <mesh position={[0, 0.38, 0]}>
+            <sphereGeometry args={[0.045, 8, 6]} />
+            <meshStandardMaterial
+              color={index % 2 === 0 ? "#83cfff" : "#dceeff"}
+              emissive={index % 2 === 0 && darkMode ? "#236da2" : "#000000"}
+              emissiveIntensity={darkMode ? 0.22 : 0}
+              roughness={0.7}
+            />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
 function PathEnvironment({
   darkMode,
   inputRef,
@@ -1188,6 +1332,7 @@ function PathEnvironment({
   reducedMotion: boolean;
 }) {
   const waterRef = useRef<Group>(null);
+  const treeCanopyRefs = useRef<Array<Group | null>>([]);
   const ground = darkMode ? "#0b2719" : "#6f9f62";
   const path = darkMode ? "#493c2e" : "#d6c39a";
   const pathEdge = darkMode ? "#766247" : "#9a835c";
@@ -1321,36 +1466,47 @@ function PathEnvironment({
   );
 
   useFrame((state) => {
-    if (!waterRef.current || reducedMotion) return;
-    waterRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.7) * 0.025;
-    waterRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.22) * 0.0015;
+    const time = state.clock.elapsedTime;
+    if (waterRef.current && !reducedMotion) {
+      waterRef.current.position.y = Math.sin(time * 0.7) * 0.025;
+      waterRef.current.rotation.z = Math.sin(time * 0.22) * 0.0015;
+    }
+    treeCanopyRefs.current.forEach((canopy, index) => {
+      if (!canopy) return;
+      canopy.rotation.z = reducedMotion ? 0 : Math.sin(time * 0.62 + index * 0.73) * 0.035;
+      canopy.rotation.x = reducedMotion ? 0 : Math.cos(time * 0.48 + index * 0.51) * 0.018;
+    });
   });
 
   const walkTo = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation();
     const input = inputRef.current;
     if (!input) return;
-    const x = MathUtils.clamp(event.point.x, -8.1, 8.1);
-    const z = MathUtils.clamp(event.point.z, -25.4, 5.8);
+    const x = MathUtils.clamp(event.point.x, WALK_BOUNDS.minX, WALK_BOUNDS.maxX);
+    const z = MathUtils.clamp(event.point.z, WALK_BOUNDS.minZ, WALK_BOUNDS.maxZ);
     if (isWorldBlocked(x, z)) return;
     input.target = { x, z };
   };
 
   return (
     <group>
-      <mesh position={[0, -0.08, -10]} rotation={[-Math.PI / 2, 0, 0]} onPointerDown={walkTo}>
-        <planeGeometry args={[18.5, 36]} />
+      <mesh position={[0, -0.08, -10.65]} rotation={[-Math.PI / 2, 0, 0]} onPointerDown={walkTo}>
+        <planeGeometry args={[23, 42]} />
         <meshStandardMaterial color={ground} roughness={0.92} />
       </mesh>
 
-      <mesh position={[8.8, -0.055, -10]} rotation={[-Math.PI / 2, 0, 0]} onPointerDown={walkTo}>
-        <planeGeometry args={[2.1, 36]} />
+      <mesh
+        position={[11.05, -0.055, -10.65]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        onPointerDown={walkTo}
+      >
+        <planeGeometry args={[2.3, 42]} />
         <meshStandardMaterial color={sand} roughness={0.96} />
       </mesh>
 
       <group ref={waterRef}>
-        <mesh position={[12.9, -0.11, -10]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[6.4, 36, 1, 28]} />
+        <mesh position={[15.55, -0.11, -10.65]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[7.4, 42, 1, 32]} />
           <meshStandardMaterial
             color={water}
             emissive={darkMode ? "#03223a" : "#176d98"}
@@ -1364,10 +1520,10 @@ function PathEnvironment({
         {Array.from({ length: 7 }, (_, index) => (
           <mesh
             key={`wave-${index}`}
-            position={[9.75 + index * 0.52, -0.045 + (index % 2) * 0.012, -10]}
+            position={[12.05 + index * 0.58, -0.045 + (index % 2) * 0.012, -10.65]}
             rotation={[-Math.PI / 2, 0, 0]}
           >
-            <planeGeometry args={[0.035, 33]} />
+            <planeGeometry args={[0.035, 39]} />
             <meshBasicMaterial
               color={darkMode ? "#2a87b5" : "#a9e7f2"}
               transparent
@@ -1495,16 +1651,25 @@ function PathEnvironment({
             <cylinderGeometry args={[0.1, 0.17, 1.25, 8]} />
             <meshStandardMaterial color={darkMode ? "#4d321f" : "#704626"} roughness={0.94} />
           </mesh>
-          <mesh position={[0, 1.48, 0]} scale={[0.82, 1.18, 0.82]}>
-            <icosahedronGeometry args={[0.72, 1]} />
-            <meshStandardMaterial color={tree.light ? foliageLight : foliage} roughness={0.86} />
-          </mesh>
-          <mesh position={[0.18, 1.82, -0.05]} scale={[0.5, 0.64, 0.5]}>
-            <icosahedronGeometry args={[0.48, 1]} />
-            <meshStandardMaterial color={tree.light ? foliage : foliageLight} roughness={0.88} />
-          </mesh>
+          <group
+            ref={(node) => {
+              treeCanopyRefs.current[index] = node;
+            }}
+            position={[0, 0.56, 0]}
+          >
+            <mesh position={[0, 0.92, 0]} scale={[0.82, 1.18, 0.82]}>
+              <icosahedronGeometry args={[0.72, 1]} />
+              <meshStandardMaterial color={tree.light ? foliageLight : foliage} roughness={0.86} />
+            </mesh>
+            <mesh position={[0.18, 1.26, -0.05]} scale={[0.5, 0.64, 0.5]}>
+              <icosahedronGeometry args={[0.48, 1]} />
+              <meshStandardMaterial color={tree.light ? foliage : foliageLight} roughness={0.88} />
+            </mesh>
+          </group>
         </group>
       ))}
+
+      <NaturalLife darkMode={darkMode} reducedMotion={reducedMotion} />
 
       {shorelineRocks.map((rock, index) => (
         <mesh
@@ -1784,8 +1949,8 @@ function StudioWorld({
     const tabletViewport = size.width < 1024;
     const contactOffset = activeZoneRef.current === "contact" ? (compactViewport ? 1.2 : 0.75) : 0;
     const panelOffset = size.width >= 860 ? 1.45 : contactOffset;
-    const cameraHeight = compactViewport ? 4.75 : tabletViewport ? 4.4 : 4.15;
-    const cameraDistance = compactViewport ? 9.1 : tabletViewport ? 8.25 : 7.6;
+    const cameraHeight = compactViewport ? 4.55 : tabletViewport ? 4.12 : 3.88;
+    const cameraDistance = compactViewport ? 8.55 : tabletViewport ? 7.55 : 6.85;
     desiredCamera.set(character.x - panelOffset * 0.28, cameraHeight, character.z + cameraDistance);
     camera.position.lerp(desiredCamera, reducedMotion ? 0.2 : 0.045);
     cameraTarget.set(character.x - panelOffset, compactViewport ? 0.95 : 1.1, character.z - 1.45);
@@ -1866,7 +2031,7 @@ export default function InteractiveStudioCanvas(props: StudioCanvasProps) {
   return (
     <Canvas
       className="interactive-studio-canvas"
-      camera={{ position: [0, 4.15, 8.8], fov: 45, near: 0.1, far: 60 }}
+      camera={{ position: [0, 3.88, 8], fov: 45, near: 0.1, far: 64 }}
       dpr={[1, 1.5]}
       frameloop={props.inView ? "always" : "never"}
       gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
