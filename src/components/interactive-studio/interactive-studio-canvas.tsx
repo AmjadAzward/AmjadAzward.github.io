@@ -75,7 +75,7 @@ const LAMP_OBJECTS = Array.from({ length: 12 }, (_, index) => ({
 
 const SOCIAL_OBJECTS = socials.map((social, index) => ({
   ...social,
-  x: 0.45 + index * 0.78,
+  x: -1.55 + index * 0.72,
   z: -25.55,
   color: ["#0a66c2", "#24292f", "#1877f2", "#111827", "#833ab4"][index] ?? "#0878ee",
 }));
@@ -884,7 +884,7 @@ function SocialLandmarks({
         />
       ))}
       <pointLight
-        position={[3.8, 1.35, -24.65]}
+        position={[0, 1.35, -24.65]}
         color="#42a5ff"
         intensity={darkMode ? 2.2 : 0.35}
         distance={4.2}
