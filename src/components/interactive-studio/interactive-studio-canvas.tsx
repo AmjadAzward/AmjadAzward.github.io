@@ -76,6 +76,16 @@ const STATION_OBJECTS = ZONES.map((zone, index) => ({
   z: zone.position[2],
 }));
 
+const VISIBLE_FOREST_OBJECTS = FOREST_OBJECTS.filter((tree) => {
+  const clearOfLandmarks = STATION_OBJECTS.every(
+    (station) => Math.hypot(tree.x - station.x, tree.z - station.z) > 2.35,
+  );
+  const clearOfApproaches = ZONES.every(
+    (zone) => Math.hypot(tree.x - zone.position[0], tree.z - zone.position[2]) > 1.4,
+  );
+  return clearOfLandmarks && clearOfApproaches;
+});
+
 const LAMP_OBJECTS = Array.from({ length: 12 }, (_, index) => ({
   x: (index % 2 === 0 ? -1 : 1) * 2.75,
   z: -0.5 - Math.floor(index / 2) * 5.1,
@@ -89,7 +99,7 @@ const SOCIAL_OBJECTS = socials.map((social, index) => ({
 }));
 
 const WORLD_CIRCLE_COLLIDERS = [
-  ...FOREST_OBJECTS.map((tree) => ({
+  ...VISIBLE_FOREST_OBJECTS.map((tree) => ({
     x: tree.x,
     z: tree.z,
     radius: 0.28 + tree.scale * 0.16,
@@ -1299,7 +1309,7 @@ function PathEnvironment({
     ],
     [],
   );
-  const forest = FOREST_OBJECTS;
+  const forest = VISIBLE_FOREST_OBJECTS;
   const shorelineRocks = useMemo(
     () =>
       Array.from({ length: 22 }, (_, index) => ({
