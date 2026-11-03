@@ -1,12 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { lazy, Suspense } from "react";
 
+import InteractiveStudioHero from "@/components/interactive-studio/interactive-studio-hero";
 import { navItems } from "@/data/portfolio";
 import { makeHead } from "@/lib/head";
-
-const InteractiveStudioHero = lazy(
-  () => import("@/components/interactive-studio/interactive-studio-hero"),
-);
 
 export const Route = createFileRoute("/")({
   head: makeHead(
@@ -30,9 +26,7 @@ function Home() {
           ))}
       </nav>
       <div className="studio-home-shell">
-        <Suspense fallback={<div className="interactive-studio studio-loading" aria-hidden />}>
-          <InteractiveStudioHero />
-        </Suspense>
+        <InteractiveStudioHero />
       </div>
     </section>
   );

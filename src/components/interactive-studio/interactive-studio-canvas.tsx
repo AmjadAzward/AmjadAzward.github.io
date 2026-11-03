@@ -6,6 +6,7 @@ import {
   CatmullRomCurve3,
   Color,
   DoubleSide,
+  DynamicDrawUsage,
   Group,
   InstancedMesh,
   LinearFilter,
@@ -1204,9 +1205,95 @@ function SectionLandmark({
   );
 }
 
+function SwayingForest({ darkMode, reducedMotion }: { darkMode: boolean; reducedMotion: boolean }) {
+  const trunksRef = useRef<InstancedMesh>(null);
+  const lowerCanopiesRef = useRef<InstancedMesh>(null);
+  const upperCanopiesRef = useRef<InstancedMesh>(null);
+  const transform = useMemo(() => new Object3D(), []);
+  const lastUpdateRef = useRef(-1);
+
+  useEffect(() => {
+    trunksRef.current?.instanceMatrix.setUsage(DynamicDrawUsage);
+    lowerCanopiesRef.current?.instanceMatrix.setUsage(DynamicDrawUsage);
+    upperCanopiesRef.current?.instanceMatrix.setUsage(DynamicDrawUsage);
+  }, []);
+
+  useFrame((state) => {
+    const time = reducedMotion ? 0 : state.clock.elapsedTime;
+    if (!reducedMotion && time - lastUpdateRef.current < 1 / 24) return;
+    lastUpdateRef.current = time;
+
+    const trunks = trunksRef.current;
+    const lowerCanopies = lowerCanopiesRef.current;
+    const upperCanopies = upperCanopiesRef.current;
+    if (!trunks || !lowerCanopies || !upperCanopies) return;
+
+    VISIBLE_FOREST_OBJECTS.forEach((tree, index) => {
+      const swayZ = reducedMotion ? 0 : Math.sin(time * 0.62 + index * 0.73) * 0.035;
+      const swayX = reducedMotion ? 0 : Math.cos(time * 0.48 + index * 0.51) * 0.018;
+
+      transform.position.set(tree.x, 0.62 * tree.scale, tree.z);
+      transform.rotation.set(0, 0, 0);
+      transform.scale.setScalar(tree.scale);
+      transform.updateMatrix();
+      trunks.setMatrixAt(index, transform.matrix);
+
+      transform.position.set(tree.x, 1.48 * tree.scale, tree.z);
+      transform.rotation.set(swayX, 0, swayZ);
+      transform.scale.set(0.82 * tree.scale, 1.18 * tree.scale, 0.82 * tree.scale);
+      transform.updateMatrix();
+      lowerCanopies.setMatrixAt(index, transform.matrix);
+
+      transform.position.set(
+        tree.x + 0.18 * tree.scale,
+        1.82 * tree.scale,
+        tree.z - 0.05 * tree.scale,
+      );
+      transform.rotation.set(swayX * 1.15, 0, swayZ * 1.2);
+      transform.scale.set(0.5 * tree.scale, 0.64 * tree.scale, 0.5 * tree.scale);
+      transform.updateMatrix();
+      upperCanopies.setMatrixAt(index, transform.matrix);
+    });
+
+    trunks.instanceMatrix.needsUpdate = true;
+    lowerCanopies.instanceMatrix.needsUpdate = true;
+    upperCanopies.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <group name="swaying-forest">
+      <instancedMesh
+        ref={trunksRef}
+        args={[undefined, undefined, VISIBLE_FOREST_OBJECTS.length]}
+        frustumCulled={false}
+      >
+        <cylinderGeometry args={[0.1, 0.17, 1.25, 7]} />
+        <meshStandardMaterial color={darkMode ? "#4d321f" : "#704626"} roughness={0.94} />
+      </instancedMesh>
+      <instancedMesh
+        ref={lowerCanopiesRef}
+        args={[undefined, undefined, VISIBLE_FOREST_OBJECTS.length]}
+        frustumCulled={false}
+      >
+        <icosahedronGeometry args={[0.72, 1]} />
+        <meshStandardMaterial color={darkMode ? "#174b2a" : "#3f873f"} roughness={0.87} />
+      </instancedMesh>
+      <instancedMesh
+        ref={upperCanopiesRef}
+        args={[undefined, undefined, VISIBLE_FOREST_OBJECTS.length]}
+        frustumCulled={false}
+      >
+        <icosahedronGeometry args={[0.48, 1]} />
+        <meshStandardMaterial color={darkMode ? "#28623a" : "#62a557"} roughness={0.89} />
+      </instancedMesh>
+    </group>
+  );
+}
+
 function NaturalLife({ darkMode, reducedMotion }: { darkMode: boolean; reducedMotion: boolean }) {
   const grassRef = useRef<InstancedMesh>(null);
   const leavesRef = useRef<InstancedMesh>(null);
+  const lastUpdateRef = useRef(-1);
   const transform = useMemo(() => new Object3D(), []);
   const grass = useMemo(
     () =>
@@ -1237,8 +1324,15 @@ function NaturalLife({ darkMode, reducedMotion }: { darkMode: boolean; reducedMo
     [],
   );
 
+  useEffect(() => {
+    grassRef.current?.instanceMatrix.setUsage(DynamicDrawUsage);
+    leavesRef.current?.instanceMatrix.setUsage(DynamicDrawUsage);
+  }, []);
+
   useFrame((state) => {
     const time = reducedMotion ? 0 : state.clock.elapsedTime;
+    if (!reducedMotion && time - lastUpdateRef.current < 1 / 24) return;
+    lastUpdateRef.current = time;
     const grassMesh = grassRef.current;
     if (grassMesh) {
       grass.forEach((blade, index) => {
@@ -1332,7 +1426,6 @@ function PathEnvironment({
   reducedMotion: boolean;
 }) {
   const waterRef = useRef<Group>(null);
-  const treeCanopyRefs = useRef<Array<Group | null>>([]);
   const ground = darkMode ? "#0b2719" : "#6f9f62";
   const path = darkMode ? "#493c2e" : "#d6c39a";
   const pathEdge = darkMode ? "#766247" : "#9a835c";
@@ -1454,7 +1547,6 @@ function PathEnvironment({
     ],
     [],
   );
-  const forest = VISIBLE_FOREST_OBJECTS;
   const shorelineRocks = useMemo(
     () =>
       Array.from({ length: 22 }, (_, index) => ({
@@ -1471,11 +1563,6 @@ function PathEnvironment({
       waterRef.current.position.y = Math.sin(time * 0.7) * 0.025;
       waterRef.current.rotation.z = Math.sin(time * 0.22) * 0.0015;
     }
-    treeCanopyRefs.current.forEach((canopy, index) => {
-      if (!canopy) return;
-      canopy.rotation.z = reducedMotion ? 0 : Math.sin(time * 0.62 + index * 0.73) * 0.035;
-      canopy.rotation.x = reducedMotion ? 0 : Math.cos(time * 0.48 + index * 0.51) * 0.018;
-    });
   });
 
   const walkTo = (event: ThreeEvent<PointerEvent>) => {
@@ -1645,30 +1732,7 @@ function PathEnvironment({
         );
       })}
 
-      {forest.map((tree, index) => (
-        <group key={`tree-${index}`} position={[tree.x, 0, tree.z]} scale={tree.scale}>
-          <mesh position={[0, 0.62, 0]}>
-            <cylinderGeometry args={[0.1, 0.17, 1.25, 8]} />
-            <meshStandardMaterial color={darkMode ? "#4d321f" : "#704626"} roughness={0.94} />
-          </mesh>
-          <group
-            ref={(node) => {
-              treeCanopyRefs.current[index] = node;
-            }}
-            position={[0, 0.56, 0]}
-          >
-            <mesh position={[0, 0.92, 0]} scale={[0.82, 1.18, 0.82]}>
-              <icosahedronGeometry args={[0.72, 1]} />
-              <meshStandardMaterial color={tree.light ? foliageLight : foliage} roughness={0.86} />
-            </mesh>
-            <mesh position={[0.18, 1.26, -0.05]} scale={[0.5, 0.64, 0.5]}>
-              <icosahedronGeometry args={[0.48, 1]} />
-              <meshStandardMaterial color={tree.light ? foliage : foliageLight} roughness={0.88} />
-            </mesh>
-          </group>
-        </group>
-      ))}
-
+      <SwayingForest darkMode={darkMode} reducedMotion={reducedMotion} />
       <NaturalLife darkMode={darkMode} reducedMotion={reducedMotion} />
 
       {shorelineRocks.map((rock, index) => (
@@ -2032,7 +2096,7 @@ export default function InteractiveStudioCanvas(props: StudioCanvasProps) {
     <Canvas
       className="interactive-studio-canvas"
       camera={{ position: [0, 3.88, 8], fov: 45, near: 0.1, far: 64 }}
-      dpr={[1, 1.5]}
+      dpr={[1, 1.2]}
       frameloop={props.inView ? "always" : "never"}
       gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
       onCreated={({ gl }) => {

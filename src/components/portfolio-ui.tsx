@@ -26,27 +26,10 @@ function InitialLoader() {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    const startedAt = performance.now();
-    const minimumVisibleTime = reduce ? 0 : 720;
-    let hideTimer: number | undefined;
-
-    const hide = () => {
-      const remainingTime = Math.max(0, minimumVisibleTime - (performance.now() - startedAt));
-      hideTimer = window.setTimeout(() => setVisible(false), remainingTime);
-    };
-
-    if (document.readyState === "complete") {
-      hide();
-    } else {
-      window.addEventListener("load", hide, { once: true });
-    }
-
-    const safetyTimer = window.setTimeout(() => setVisible(false), 2200);
+    const hideTimer = window.setTimeout(() => setVisible(false), reduce ? 0 : 220);
 
     return () => {
-      window.removeEventListener("load", hide);
       window.clearTimeout(hideTimer);
-      window.clearTimeout(safetyTimer);
     };
   }, [reduce]);
 
@@ -57,7 +40,7 @@ function InitialLoader() {
           className="site-loader"
           initial={false}
           exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 1.015 }}
-          transition={{ duration: reduce ? 0.08 : 0.42, ease: cinematicEase }}
+          transition={{ duration: reduce ? 0.05 : 0.18, ease: cinematicEase }}
           role="status"
           aria-live="polite"
           aria-label="Loading Amjad Azward's portfolio"

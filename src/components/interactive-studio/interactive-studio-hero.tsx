@@ -291,10 +291,16 @@ function supportsWebGL() {
 }
 
 function prefersLightweightScene() {
-  const connection = (
-    navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }
-  ).connection;
-  return connection?.saveData === true || connection?.effectiveType === "2g";
+  const device = navigator as Navigator & {
+    connection?: { saveData?: boolean; effectiveType?: string };
+    deviceMemory?: number;
+  };
+  return (
+    device.connection?.saveData === true ||
+    device.connection?.effectiveType === "2g" ||
+    (device.deviceMemory !== undefined && device.deviceMemory <= 2) ||
+    navigator.hardwareConcurrency <= 2
+  );
 }
 
 function StudioStaticFallback({ darkMode }: { darkMode: boolean }) {

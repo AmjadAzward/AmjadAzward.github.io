@@ -247,7 +247,7 @@ body::before {
   background: linear-gradient(90deg, var(--primary), var(--secondary-accent));
   box-shadow: 0 0 12px color-mix(in oklab, var(--primary) 52%, transparent);
   transform-origin: left;
-  animation: site-loader-progress 0.85s var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both;
+  animation: site-loader-progress 0.28s var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both;
 }
 
 @keyframes site-loader-spin {
@@ -819,9 +819,9 @@ body::before {
   padding: clamp(1.35rem, 2.6vw, 2.25rem);
   border: 1px solid color-mix(in oklab, var(--primary) 30%, var(--border));
   border-radius: 1.45rem;
-  background: color-mix(in oklab, var(--background) 77%, transparent);
+  background: color-mix(in oklab, var(--background) 90%, transparent);
   box-shadow: 0 28px 80px rgb(0 10 28 / 34%);
-  backdrop-filter: blur(24px) saturate(135%);
+  backdrop-filter: blur(8px);
   animation: path-panel-in 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -1050,14 +1050,14 @@ body::before {
   padding: 0.5rem 0.8rem;
   border: 1px solid color-mix(in oklab, var(--primary) 18%, var(--border));
   border-radius: 999px;
-  background: color-mix(in oklab, var(--background) 68%, transparent);
+  background: color-mix(in oklab, var(--background) 86%, transparent);
   color: var(--muted-foreground);
   font-family: var(--font-mono);
   font-size: 0.49rem;
   letter-spacing: 0.07em;
   text-transform: uppercase;
   transform: translateX(-50%);
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(6px);
 }
 
 .path-controls-hint svg {
@@ -1427,7 +1427,7 @@ body::before {
   letter-spacing: 0.09em;
   text-transform: uppercase;
   box-shadow: 0 12px 36px rgb(0 18 35 / 18%);
-  backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(6px);
 }
 
 .path-map-trigger svg {
@@ -1444,7 +1444,7 @@ body::before {
   place-items: center;
   padding: clamp(0.75rem, 2vw, 1.5rem);
   background: rgb(2 12 22 / 72%);
-  backdrop-filter: blur(12px) saturate(90%);
+  backdrop-filter: blur(6px);
   animation: path-map-fade 0.28s ease both;
 }
 
