@@ -241,13 +241,12 @@ body::before {
 
 .site-loader-track i {
   display: block;
-  width: 100%;
+  width: 42%;
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, var(--primary), var(--secondary-accent));
   box-shadow: 0 0 12px color-mix(in oklab, var(--primary) 52%, transparent);
-  transform-origin: left;
-  animation: site-loader-progress 0.28s var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both;
+  animation: site-loader-progress 1.15s ease-in-out infinite;
 }
 
 @keyframes site-loader-spin {
@@ -265,11 +264,11 @@ body::before {
 
 @keyframes site-loader-progress {
   from {
-    transform: scaleX(0);
+    transform: translateX(-130%);
   }
 
   to {
-    transform: scaleX(1);
+    transform: translateX(340%);
   }
 }
 

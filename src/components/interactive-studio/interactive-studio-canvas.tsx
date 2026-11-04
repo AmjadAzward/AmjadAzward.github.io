@@ -2661,6 +2661,29 @@ function StudioWorld({
   );
 }
 
+function SceneReadySignal() {
+  const signalledRef = useRef(false);
+  const frameRequestRef = useRef(0);
+
+  useFrame(() => {
+    if (signalledRef.current) return;
+    signalledRef.current = true;
+    frameRequestRef.current = window.requestAnimationFrame(() => {
+      document.documentElement.dataset["studioReady"] = "true";
+      window.dispatchEvent(new Event("portfolio:studio-ready"));
+    });
+  });
+
+  useEffect(
+    () => () => {
+      window.cancelAnimationFrame(frameRequestRef.current);
+    },
+    [],
+  );
+
+  return null;
+}
+
 export default function InteractiveStudioCanvas(props: StudioCanvasProps) {
   return (
     <Canvas
@@ -2674,6 +2697,7 @@ export default function InteractiveStudioCanvas(props: StudioCanvasProps) {
         gl.toneMapping = ACESFilmicToneMapping;
       }}
     >
+      <SceneReadySignal />
       <StudioWorld
         darkMode={props.darkMode}
         reducedMotion={props.reducedMotion}

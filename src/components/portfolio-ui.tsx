@@ -21,17 +21,37 @@ import { cn } from "@/lib/utils";
 
 const cinematicEase = [0.16, 1, 0.3, 1] as const;
 
-function InitialLoader() {
+function InitialLoader({ waitForStudio }: { waitForStudio: boolean }) {
   const reduce = useReducedMotion();
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    const hideTimer = window.setTimeout(() => setVisible(false), reduce ? 0 : 220);
+    const startedAt = performance.now();
+    const minimumDuration = reduce ? 0 : waitForStudio ? 900 : 220;
+    let hideTimer = 0;
+    let safetyTimer = 0;
+
+    const hide = () => {
+      const remaining = Math.max(0, minimumDuration - (performance.now() - startedAt));
+      window.clearTimeout(hideTimer);
+      hideTimer = window.setTimeout(() => setVisible(false), remaining);
+    };
+
+    if (!waitForStudio) {
+      hide();
+    } else if (document.documentElement.dataset["studioReady"] === "true") {
+      hide();
+    } else {
+      window.addEventListener("portfolio:studio-ready", hide, { once: true });
+      safetyTimer = window.setTimeout(hide, 10_000);
+    }
 
     return () => {
       window.clearTimeout(hideTimer);
+      window.clearTimeout(safetyTimer);
+      window.removeEventListener("portfolio:studio-ready", hide);
     };
-  }, [reduce]);
+  }, [reduce, waitForStudio]);
 
   return (
     <AnimatePresence>
@@ -52,7 +72,7 @@ function InitialLoader() {
                 <i />
               </span>
             </div>
-            <p>Loading portfolio</p>
+            <p>{waitForStudio ? "Preparing 3D village" : "Loading portfolio"}</p>
             <span className="site-loader-track" aria-hidden>
               <i />
             </span>
@@ -431,7 +451,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [location.pathname, reduce]);
   return (
     <>
-      <InitialLoader />
+      <InitialLoader waitForStudio={isHome} />
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
