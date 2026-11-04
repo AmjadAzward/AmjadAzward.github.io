@@ -1005,12 +1005,27 @@ function RoadSignLabel({ label, index }: { label: string; index: number }) {
     const context = canvas.getContext("2d");
     if (!context) return null;
     context.clearRect(0, 0, canvas.width, canvas.height);
-    context.fillStyle = "#f4f9ff";
-    context.textAlign = "center";
+
+    context.fillStyle = "rgba(236, 247, 255, 0.88)";
+    context.beginPath();
+    context.roundRect(14, 18, 484, 92, 18);
+    context.fill();
+
+    context.fillStyle = "#06172a";
+    context.beginPath();
+    context.roundRect(28, 29, 88, 70, 15);
+    context.fill();
+
     context.textBaseline = "middle";
-    const fontSize = label.length > 12 ? 37 : 46;
-    context.font = `700 ${fontSize}px Arial, sans-serif`;
-    context.fillText(`${String(index + 1).padStart(2, "0")}  ${label.toUpperCase()}`, 256, 66);
+    context.textAlign = "center";
+    context.fillStyle = "#f4f9ff";
+    context.font = "800 32px Arial, sans-serif";
+    context.fillText(String(index + 1).padStart(2, "0"), 72, 65);
+
+    context.textAlign = "left";
+    context.fillStyle = "#06172a";
+    context.font = `800 ${label.length > 12 ? 35 : 43}px Arial, sans-serif`;
+    context.fillText(label.toUpperCase(), 140, 66, 336);
     const nextTexture = new CanvasTexture(canvas);
     nextTexture.colorSpace = SRGBColorSpace;
     nextTexture.minFilter = LinearFilter;
@@ -1555,7 +1570,7 @@ function SectionLandmark({
           <meshStandardMaterial
             color={zone.color}
             emissive={zone.color}
-            emissiveIntensity={darkMode ? 0.42 : 0.08}
+            emissiveIntensity={darkMode ? 0.16 : 0.03}
             roughness={0.32}
             metalness={0.18}
           />
