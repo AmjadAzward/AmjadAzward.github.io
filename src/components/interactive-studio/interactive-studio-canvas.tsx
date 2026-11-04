@@ -21,7 +21,12 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
 
 import { socials } from "@/data/portfolio";
 
-import type { StudioInput, StudioPosition, StudioZoneId } from "./interactive-studio-hero";
+import type {
+  ShowcaseSlide,
+  StudioInput,
+  StudioPosition,
+  StudioZoneId,
+} from "./interactive-studio-hero";
 
 type StudioCanvasProps = {
   darkMode: boolean;
@@ -30,6 +35,12 @@ type StudioCanvasProps = {
   inputRef: RefObject<StudioInput>;
   explorerPositionRef: RefObject<StudioPosition>;
   onZoneChange: (zone: StudioZoneId | null) => void;
+  showcase: { section: StudioZoneId; slide: number } | null;
+  showcaseSlide: ShowcaseSlide | null;
+  showcaseTotal: number;
+  onShowcasePrevious: () => void;
+  onShowcaseNext: () => void;
+  onShowcaseClose: () => void;
 };
 
 type Zone = {
@@ -1015,6 +1026,332 @@ function RoadSignLabel({ label, index }: { label: string; index: number }) {
       <planeGeometry args={[1.62, 0.4]} />
       <meshBasicMaterial map={texture} transparent />
     </mesh>
+  );
+}
+
+function drawScreenText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  lineHeight: number,
+  maxLines: number,
+) {
+  const words = text.split(/\s+/);
+  const lines: string[] = [];
+  let line = "";
+
+  for (const word of words) {
+    const candidate = line ? `${line} ${word}` : word;
+    if (context.measureText(candidate).width <= maxWidth || !line) {
+      line = candidate;
+      continue;
+    }
+    lines.push(line);
+    line = word;
+    if (lines.length === maxLines - 1) break;
+  }
+  if (line && lines.length < maxLines) lines.push(line);
+
+  if (lines.join(" ").length < text.length && lines.length) {
+    let finalLine = lines[lines.length - 1] ?? "";
+    while (context.measureText(`${finalLine}...`).width > maxWidth && finalLine.includes(" ")) {
+      finalLine = finalLine.slice(0, finalLine.lastIndexOf(" "));
+    }
+    lines[lines.length - 1] = `${finalLine}...`;
+  }
+
+  lines.forEach((value, index) => context.fillText(value, x, y + index * lineHeight));
+  return y + lines.length * lineHeight;
+}
+
+function VillageShowcaseScreen({
+  section,
+  slide,
+  slideIndex,
+  total,
+  darkMode,
+  onPrevious,
+  onNext,
+  onClose,
+}: {
+  section: StudioZoneId;
+  slide: ShowcaseSlide;
+  slideIndex: number;
+  total: number;
+  darkMode: boolean;
+  onPrevious: () => void;
+  onNext: () => void;
+  onClose: () => void;
+}) {
+  const screenGroupRef = useRef<Group>(null);
+  const zoneIndex = ZONES.findIndex((zone) => zone.id === section);
+  const zone = ZONES[Math.max(0, zoneIndex)]!;
+  const side = zoneIndex % 2 === 0 ? -1 : 1;
+  const texture = useMemo(() => {
+    if (typeof document === "undefined") return null;
+    const canvas = document.createElement("canvas");
+    canvas.width = 1280;
+    canvas.height = 720;
+    const nextTexture = new CanvasTexture(canvas);
+    nextTexture.colorSpace = SRGBColorSpace;
+    nextTexture.minFilter = LinearFilter;
+    nextTexture.magFilter = LinearFilter;
+    return nextTexture;
+  }, []);
+  const frameGeometry = useMemo(() => new RoundedBoxGeometry(4.5, 2.85, 0.2, 4, 0.18), []);
+
+  useEffect(() => {
+    if (!texture) return;
+    const canvas = texture.image as HTMLCanvasElement;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    let cancelled = false;
+
+    const draw = (image?: HTMLImageElement) => {
+      const gradient = context.createLinearGradient(0, 0, canvas.width, canvas.height);
+      gradient.addColorStop(0, "#05101f");
+      gradient.addColorStop(0.65, "#08182b");
+      gradient.addColorStop(1, "#0c2840");
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, canvas.width, canvas.height);
+
+      context.strokeStyle = "rgba(66,165,255,.13)";
+      context.lineWidth = 1;
+      for (let x = 0; x < canvas.width; x += 64) {
+        context.beginPath();
+        context.moveTo(x, 0);
+        context.lineTo(x, canvas.height);
+        context.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += 64) {
+        context.beginPath();
+        context.moveTo(0, y);
+        context.lineTo(canvas.width, y);
+        context.stroke();
+      }
+
+      context.fillStyle = "#42a5ff";
+      context.font = "700 24px Arial, sans-serif";
+      context.letterSpacing = "3px";
+      context.fillText(`AA VILLAGE / ${section.toUpperCase()}`, 66, 66);
+      context.letterSpacing = "0px";
+      context.textAlign = "right";
+      context.fillStyle = "#8fcfff";
+      context.fillText(
+        `${String(slideIndex + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`,
+        1210,
+        66,
+      );
+      context.textAlign = "left";
+
+      const hasImage = Boolean(image);
+      const copyX = hasImage ? 535 : 72;
+      const copyWidth = hasImage ? 670 : 1110;
+      if (image) {
+        const boxX = 62;
+        const boxY = 112;
+        const boxWidth = 410;
+        const boxHeight = 500;
+        context.save();
+        context.beginPath();
+        context.roundRect(boxX, boxY, boxWidth, boxHeight, 30);
+        context.clip();
+        context.fillStyle = "#020814";
+        context.fillRect(boxX, boxY, boxWidth, boxHeight);
+        const scale = Math.min(boxWidth / image.naturalWidth, boxHeight / image.naturalHeight);
+        const width = image.naturalWidth * scale;
+        const height = image.naturalHeight * scale;
+        context.drawImage(
+          image,
+          boxX + (boxWidth - width) / 2,
+          boxY + (boxHeight - height) / 2,
+          width,
+          height,
+        );
+        context.restore();
+        context.strokeStyle = "rgba(94,182,255,.42)";
+        context.lineWidth = 3;
+        context.beginPath();
+        context.roundRect(boxX, boxY, boxWidth, boxHeight, 30);
+        context.stroke();
+      }
+
+      context.fillStyle = "#61b8ff";
+      context.font = "700 22px Arial, sans-serif";
+      context.fillText(slide.eyebrow.toUpperCase(), copyX, 148);
+
+      let cursorY = 210;
+      if (slide.metric) {
+        context.fillStyle = "rgba(66,165,255,.14)";
+        context.beginPath();
+        context.roundRect(copyX, cursorY - 30, Math.min(copyWidth, 250), 48, 24);
+        context.fill();
+        context.fillStyle = "#a8dcff";
+        context.font = "700 21px Arial, sans-serif";
+        context.fillText(slide.metric, copyX + 20, cursorY + 2);
+        cursorY += 66;
+      }
+
+      context.fillStyle = "#f4f9ff";
+      context.font = `700 ${hasImage ? 54 : 64}px Arial, sans-serif`;
+      cursorY = drawScreenText(
+        context,
+        slide.title,
+        copyX,
+        cursorY,
+        copyWidth,
+        hasImage ? 58 : 68,
+        3,
+      );
+      context.fillStyle = "#a6bbcf";
+      context.font = "400 27px Arial, sans-serif";
+      cursorY = drawScreenText(context, slide.description, copyX, cursorY + 26, copyWidth, 39, 5);
+
+      if (slide.chips?.length) {
+        context.font = "600 20px Arial, sans-serif";
+        let chipX = copyX;
+        let chipY = Math.min(cursorY + 34, 630);
+        for (const chip of slide.chips.slice(0, 8)) {
+          const chipWidth = Math.min(context.measureText(chip).width + 34, copyWidth);
+          if (chipX + chipWidth > copyX + copyWidth) {
+            chipX = copyX;
+            chipY += 46;
+          }
+          if (chipY > 674) break;
+          context.fillStyle = "rgba(66,165,255,.12)";
+          context.beginPath();
+          context.roundRect(chipX, chipY - 27, chipWidth, 35, 18);
+          context.fill();
+          context.strokeStyle = "rgba(92,184,255,.28)";
+          context.stroke();
+          context.fillStyle = "#c4d8e9";
+          context.fillText(chip, chipX + 17, chipY - 3);
+          chipX += chipWidth + 12;
+        }
+      }
+
+      context.fillStyle = "rgba(158,214,255,.06)";
+      for (let y = 0; y < canvas.height; y += 6) context.fillRect(0, y, canvas.width, 1);
+      texture.needsUpdate = true;
+    };
+
+    draw();
+    if (slide.image) {
+      const image = new Image();
+      image.onload = () => {
+        if (!cancelled) draw(image);
+      };
+      image.src = slide.image;
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [section, slide, slideIndex, texture, total]);
+
+  useEffect(
+    () => () => {
+      texture?.dispose();
+      frameGeometry.dispose();
+    },
+    [frameGeometry, texture],
+  );
+
+  useFrame(() => {
+    if (!screenGroupRef.current) return;
+    screenGroupRef.current.scale.x = MathUtils.lerp(screenGroupRef.current.scale.x, 1, 0.12);
+    screenGroupRef.current.scale.y = MathUtils.lerp(screenGroupRef.current.scale.y, 1, 0.12);
+    screenGroupRef.current.scale.z = MathUtils.lerp(screenGroupRef.current.scale.z, 1, 0.12);
+  });
+
+  const handlePointerOver = () => {
+    document.body.style.cursor = "pointer";
+  };
+  const handlePointerOut = () => {
+    document.body.style.cursor = "";
+  };
+
+  return (
+    <group
+      ref={screenGroupRef}
+      position={[zone.position[0] + side * 1.9, 0, zone.position[2] + 0.22]}
+      scale={0.72}
+    >
+      <mesh position={[0, 2.25, 0]} geometry={frameGeometry}>
+        <meshStandardMaterial
+          color={darkMode ? "#07111f" : "#183451"}
+          roughness={0.3}
+          metalness={0.52}
+        />
+      </mesh>
+      <mesh position={[0, 2.25, 0.115]}>
+        <planeGeometry args={[4.15, 2.5]} />
+        <meshBasicMaterial map={texture} toneMapped={false} />
+      </mesh>
+      <pointLight position={[0, 2.2, 1.3]} color="#42a5ff" intensity={2.2} distance={5} />
+
+      <group position={[0, 0.55, 0.12]}>
+        <group
+          position={[-0.78, 0, 0]}
+          onPointerDown={(event) => {
+            event.stopPropagation();
+            onPrevious();
+          }}
+          onPointerOver={handlePointerOver}
+          onPointerOut={handlePointerOut}
+        >
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.28, 0.28, 0.14, 24]} />
+            <meshStandardMaterial color="#10243a" emissive="#42a5ff" emissiveIntensity={0.18} />
+          </mesh>
+          <mesh position={[0, 0, 0.09]} rotation={[0, 0, Math.PI / 2]}>
+            <coneGeometry args={[0.11, 0.24, 3]} />
+            <meshBasicMaterial color="#a7dcff" />
+          </mesh>
+        </group>
+        <group
+          onPointerDown={(event) => {
+            event.stopPropagation();
+            onClose();
+          }}
+          onPointerOver={handlePointerOver}
+          onPointerOut={handlePointerOut}
+        >
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.28, 0.28, 0.14, 24]} />
+            <meshStandardMaterial color="#10243a" emissive="#ff6b7a" emissiveIntensity={0.12} />
+          </mesh>
+          <mesh position={[0, 0, 0.09]} rotation={[0, 0, Math.PI / 4]}>
+            <boxGeometry args={[0.28, 0.04, 0.035]} />
+            <meshBasicMaterial color="#ffc2c8" />
+          </mesh>
+          <mesh position={[0, 0, 0.09]} rotation={[0, 0, -Math.PI / 4]}>
+            <boxGeometry args={[0.28, 0.04, 0.035]} />
+            <meshBasicMaterial color="#ffc2c8" />
+          </mesh>
+        </group>
+        <group
+          position={[0.78, 0, 0]}
+          onPointerDown={(event) => {
+            event.stopPropagation();
+            onNext();
+          }}
+          onPointerOver={handlePointerOver}
+          onPointerOut={handlePointerOut}
+        >
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.28, 0.28, 0.14, 24]} />
+            <meshStandardMaterial color="#10243a" emissive="#42a5ff" emissiveIntensity={0.18} />
+          </mesh>
+          <mesh position={[0, 0, 0.09]} rotation={[0, 0, -Math.PI / 2]}>
+            <coneGeometry args={[0.11, 0.24, 3]} />
+            <meshBasicMaterial color="#a7dcff" />
+          </mesh>
+        </group>
+      </group>
+    </group>
   );
 }
 
@@ -2151,6 +2488,12 @@ function StudioWorld({
   inputRef,
   explorerPositionRef,
   onZoneChange,
+  showcase,
+  showcaseSlide,
+  showcaseTotal,
+  onShowcasePrevious,
+  onShowcaseNext,
+  onShowcaseClose,
 }: Omit<StudioCanvasProps, "inView">) {
   const characterPositionRef = useRef(new Vector3().copy(START_POSITION));
   const characterHeadingRef = useRef(0);
@@ -2169,17 +2512,44 @@ function StudioWorld({
     const character = characterPositionRef.current;
     const compactViewport = size.width < 680;
     const tabletViewport = size.width < 1024;
-    const contactOffset = activeZoneRef.current === "contact" ? (compactViewport ? 1.2 : 0.75) : 0;
-    const panelOffset = size.width >= 860 ? 1.45 : contactOffset;
-    const cameraHeight = compactViewport ? 4.55 : tabletViewport ? 4.12 : 3.88;
-    const cameraDistance = compactViewport ? 8.55 : tabletViewport ? 7.55 : 6.85;
-    desiredCamera.set(character.x - panelOffset * 0.28, cameraHeight, character.z + cameraDistance);
-    camera.position.lerp(desiredCamera, reducedMotion ? 0.2 : 0.045);
-    cameraTarget.set(character.x - panelOffset, compactViewport ? 0.95 : 1.1, character.z - 1.45);
+    if (showcase) {
+      const zoneIndex = ZONES.findIndex((zone) => zone.id === showcase.section);
+      const zone = ZONES[Math.max(0, zoneIndex)]!;
+      const side = zoneIndex % 2 === 0 ? -1 : 1;
+      const screenX = zone.position[0] + side * 1.9;
+      const screenZ = zone.position[2] + 0.22;
+      desiredCamera.set(
+        screenX,
+        compactViewport ? 3.15 : 2.9,
+        screenZ + (compactViewport ? 7.6 : 6),
+      );
+      cameraTarget.set(screenX, 1.95, screenZ);
+    } else {
+      const contactOffset =
+        activeZoneRef.current === "contact" ? (compactViewport ? 1.2 : 0.75) : 0;
+      const panelOffset = size.width >= 860 ? 1.45 : contactOffset;
+      const cameraHeight = compactViewport ? 4.55 : tabletViewport ? 4.12 : 3.88;
+      const cameraDistance = compactViewport ? 8.55 : tabletViewport ? 7.55 : 6.85;
+      desiredCamera.set(
+        character.x - panelOffset * 0.28,
+        cameraHeight,
+        character.z + cameraDistance,
+      );
+      cameraTarget.set(character.x - panelOffset, compactViewport ? 0.95 : 1.1, character.z - 1.45);
+    }
+    camera.position.lerp(desiredCamera, reducedMotion ? 0.2 : showcase ? 0.08 : 0.045);
     camera.lookAt(cameraTarget);
 
     const perspectiveCamera = camera as PerspectiveCamera;
-    const targetFov = compactViewport ? 52 : tabletViewport ? 48 : 45;
+    const targetFov = showcase
+      ? compactViewport
+        ? 49
+        : 42
+      : compactViewport
+        ? 52
+        : tabletViewport
+          ? 48
+          : 45;
     const nextFov = MathUtils.lerp(perspectiveCamera.fov, targetFov, 0.08);
     if (Math.abs(nextFov - perspectiveCamera.fov) > 0.001) {
       perspectiveCamera.fov = nextFov;
@@ -2245,6 +2615,18 @@ function StudioWorld({
         darkMode={darkMode}
         reducedMotion={reducedMotion}
       />
+      {showcase && showcaseSlide ? (
+        <VillageShowcaseScreen
+          section={showcase.section}
+          slide={showcaseSlide}
+          slideIndex={showcase.slide}
+          total={showcaseTotal}
+          darkMode={darkMode}
+          onPrevious={onShowcasePrevious}
+          onNext={onShowcaseNext}
+          onClose={onShowcaseClose}
+        />
+      ) : null}
     </>
   );
 }
@@ -2268,6 +2650,12 @@ export default function InteractiveStudioCanvas(props: StudioCanvasProps) {
         inputRef={props.inputRef}
         explorerPositionRef={props.explorerPositionRef}
         onZoneChange={props.onZoneChange}
+        showcase={props.showcase}
+        showcaseSlide={props.showcaseSlide}
+        showcaseTotal={props.showcaseTotal}
+        onShowcasePrevious={props.onShowcasePrevious}
+        onShowcaseNext={props.onShowcaseNext}
+        onShowcaseClose={props.onShowcaseClose}
       />
     </Canvas>
   );

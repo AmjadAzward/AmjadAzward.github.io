@@ -129,7 +129,7 @@ const pathStops: Array<{
   },
 ];
 
-type ShowcaseSlide = {
+export type ShowcaseSlide = {
   eyebrow: string;
   title: string;
   description: string;
@@ -606,6 +606,12 @@ export default function InteractiveStudioHero() {
               inputRef={inputRef}
               explorerPositionRef={explorerPositionRef}
               onZoneChange={setActiveZone}
+              showcase={showcase}
+              showcaseSlide={activeShowcaseSlide ?? null}
+              showcaseTotal={activeShowcaseSlides.length}
+              onShowcasePrevious={() => changeShowcaseSlide(-1)}
+              onShowcaseNext={() => changeShowcaseSlide(1)}
+              onShowcaseClose={() => setShowcase(null)}
             />
           </Suspense>
         ) : (
@@ -853,7 +859,7 @@ export default function InteractiveStudioHero() {
         </section>
       ) : null}
 
-      {stop ? (
+      {stop && !showcase ? (
         <aside className="path-destination-card" aria-live="polite">
           <p className="path-card-eyebrow">
             <MapPin aria-hidden /> {stop.number} / {stop.eyebrow}
@@ -878,7 +884,7 @@ export default function InteractiveStudioHero() {
         </aside>
       ) : null}
 
-      {showcase && activeShowcaseSlide && activeShowcaseStop ? (
+      {mode !== "3d" && showcase && activeShowcaseSlide && activeShowcaseStop ? (
         <div
           className="path-tv-overlay"
           role="presentation"
