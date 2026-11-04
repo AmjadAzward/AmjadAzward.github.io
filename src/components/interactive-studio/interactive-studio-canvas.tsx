@@ -66,6 +66,7 @@ const SERVICE_NODE_POSITIONS: Array<[number, number]> = [
 
 const START_POSITION = new Vector3(0, 0, 5);
 const WALK_BOUNDS = { minX: -10.2, maxX: 10.2, minZ: -28.5, maxZ: 7.2 };
+const SHOWCASE_SCREEN_OFFSET = 3.25;
 
 const MEADOW_PATCHES: Array<[number, number]> = [
   [-8.8, 5.2],
@@ -1291,7 +1292,7 @@ function VillageShowcaseScreen({
   return (
     <group
       ref={screenGroupRef}
-      position={[zone.position[0] + side * 1.9, 0, zone.position[2] + 0.22]}
+      position={[zone.position[0] + side * SHOWCASE_SCREEN_OFFSET, 0, zone.position[2] + 0.22]}
       scale={0.72}
     >
       <mesh position={[0, 2.25, 0]} geometry={frameGeometry}>
@@ -1306,6 +1307,19 @@ function VillageShowcaseScreen({
         <meshBasicMaterial map={texture} toneMapped={false} />
       </mesh>
       <pointLight position={[0, 2.2, 1.3]} color="#42a5ff" intensity={2.2} distance={5} />
+      <pointLight
+        position={[-side * SHOWCASE_SCREEN_OFFSET, 1.75, 0.65]}
+        color="#8ed2ff"
+        intensity={darkMode ? 4.2 : 1.4}
+        distance={4.4}
+      />
+      <mesh
+        position={[-side * SHOWCASE_SCREEN_OFFSET, 0.035, -0.22]}
+        rotation={[-Math.PI / 2, 0, 0]}
+      >
+        <ringGeometry args={[0.58, 0.72, 40]} />
+        <meshBasicMaterial color="#42a5ff" transparent opacity={0.82} />
+      </mesh>
 
       <group position={[0, 0.55, 0.12]}>
         <group
@@ -2531,14 +2545,15 @@ function StudioWorld({
       const zoneIndex = ZONES.findIndex((zone) => zone.id === showcase.section);
       const zone = ZONES[Math.max(0, zoneIndex)]!;
       const side = zoneIndex % 2 === 0 ? -1 : 1;
-      const screenX = zone.position[0] + side * 1.9;
+      const screenX = zone.position[0] + side * SHOWCASE_SCREEN_OFFSET;
       const screenZ = zone.position[2] + 0.22;
+      const compositionX = screenX - side * 1.45;
       desiredCamera.set(
-        screenX,
+        compositionX,
         compactViewport ? 3.15 : 2.9,
-        screenZ + (compactViewport ? 7.6 : 6),
+        screenZ + (compactViewport ? 8.4 : 6.5),
       );
-      cameraTarget.set(screenX, 1.95, screenZ);
+      cameraTarget.set(compositionX, 1.72, screenZ - 0.15);
     } else {
       const contactOffset =
         activeZoneRef.current === "contact" ? (compactViewport ? 1.2 : 0.75) : 0;
