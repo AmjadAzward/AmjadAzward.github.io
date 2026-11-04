@@ -5679,44 +5679,6 @@ body::before {
   display: none;
 }
 
-.cursor-dot,
-.cursor-ring {
-  position: fixed;
-  z-index: 200;
-  top: 0;
-  left: 0;
-  display: none;
-  border-radius: 999px;
-  pointer-events: none;
-  will-change: transform;
-}
-
-.cursor-dot {
-  width: 5px;
-  height: 5px;
-  margin: -2.5px;
-  background: var(--primary);
-}
-
-.cursor-ring {
-  width: 30px;
-  height: 30px;
-  margin: -15px;
-  border: 1px solid color-mix(in oklab, var(--primary) 68%, transparent);
-  transition:
-    width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-    height 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-    margin 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-    background-color 0.28s;
-}
-
-.cursor-ring.is-hovering {
-  width: 46px;
-  height: 46px;
-  margin: -23px;
-  background: color-mix(in oklab, var(--primary) 8%, transparent);
-}
-
 /* Light theme: brighter color, clearer depth, and richer surfaces */
 :root:not(.dark) .site-atmosphere {
   background:
@@ -6222,13 +6184,6 @@ body::before {
   .contact-layout {
     grid-template-columns: minmax(0, 1.15fr) minmax(25rem, 0.65fr);
     gap: clamp(4rem, 7vw, 8rem);
-  }
-}
-
-@media (pointer: fine) and (min-width: 768px) {
-  .cursor-dot,
-  .cursor-ring {
-    display: block;
   }
 }
 
@@ -7366,10 +7321,5 @@ body::before {
   .tilt-surface,
   .skills-orbit {
     transform: none !important;
-  }
-
-  .cursor-dot,
-  .cursor-ring {
-    display: none !important;
   }
 }

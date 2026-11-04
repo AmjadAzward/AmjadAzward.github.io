@@ -422,46 +422,6 @@ function ScrollToTop() {
     </AnimatePresence>
   );
 }
-function CustomCursor() {
-  const dot = useRef<HTMLDivElement>(null);
-  const ring = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
-  useEffect(() => {
-    if (reduce || !window.matchMedia("(pointer:fine)").matches) return;
-    let x = -50,
-      y = -50,
-      raf = 0;
-    const move = (e: PointerEvent) => {
-      x = e.clientX;
-      y = e.clientY;
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        const transform = `translate3d(${x}px,${y}px,0)`;
-        dot.current?.style.setProperty("transform", transform);
-        ring.current?.style.setProperty("transform", transform);
-        raf = 0;
-      });
-    };
-    const hover = (e: PointerEvent) =>
-      ring.current?.classList.toggle(
-        "is-hovering",
-        Boolean((e.target as Element).closest("a,button,input,textarea,[data-cursor]")),
-      );
-    window.addEventListener("pointermove", move);
-    document.addEventListener("pointerover", hover);
-    return () => {
-      window.removeEventListener("pointermove", move);
-      document.removeEventListener("pointerover", hover);
-      cancelAnimationFrame(raf);
-    };
-  }, [reduce]);
-  return (
-    <>
-      <div ref={dot} className="cursor-dot" />
-      <div ref={ring} className="cursor-ring" />
-    </>
-  );
-}
 export function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation();
   const reduce = useReducedMotion();
@@ -475,7 +435,6 @@ export function AppShell({ children }: { children: ReactNode }) {
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
-      <CustomCursor />
       <div className="site-atmosphere" aria-hidden>
         <span className="atmosphere-contours" />
       </div>
