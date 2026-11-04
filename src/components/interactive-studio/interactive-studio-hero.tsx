@@ -1,8 +1,9 @@
-import { Link } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import {
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
   Compass,
   Facebook,
   Footprints,
@@ -15,7 +16,17 @@ import {
   X,
 } from "lucide-react";
 
-import { certifications, projects, services, skillGroups, socials } from "@/data/portfolio";
+import {
+  certifications,
+  education,
+  experience,
+  projects,
+  services,
+  skillGroups,
+  socials,
+  stats,
+} from "@/data/portfolio";
+import homePortrait from "../../../img/2-enhanced.jpg?url";
 
 const InteractiveStudioCanvas = lazy(() => import("./interactive-studio-canvas"));
 
@@ -41,7 +52,6 @@ const pathStops: Array<{
   eyebrow: string;
   title: string;
   description: string;
-  to: "/about" | "/skills" | "/certifications" | "/services" | "/portfolio" | "/contact";
   target: { x: number; z: number };
   facts: string[];
 }> = [
@@ -53,7 +63,6 @@ const pathStops: Array<{
     title: "Who I am",
     description:
       "A third-year Computer Science undergraduate building useful systems across software, data, cloud, and machine learning.",
-    to: "/about",
     target: { x: -4.8, z: 0.8 },
     facts: ["Colombo, Sri Lanka", "Software + data", "Open to collaboration"],
   },
@@ -65,7 +74,6 @@ const pathStops: Array<{
     title: "Tools for building",
     description:
       "Languages, frameworks, cloud platforms, databases, and product skills used to turn ideas into maintainable software.",
-    to: "/skills",
     target: { x: 4.6, z: -3.6 },
     facts: skillGroups.map((group) => group.title),
   },
@@ -77,7 +85,6 @@ const pathStops: Array<{
     title: "Always learning",
     description:
       "Selected certifications across AI, software engineering, cloud, databases, networking, and modern infrastructure.",
-    to: "/certifications",
     target: { x: -4.6, z: -8.9 },
     facts: certifications
       .slice(0, 3)
@@ -92,7 +99,6 @@ const pathStops: Array<{
     title: "Ways I can help",
     description:
       "Focused engineering support for web, mobile, desktop, AI, connected systems, and data-led product experiences.",
-    to: "/services",
     target: { x: 4.9, z: -13.4 },
     facts: services.slice(0, 4).map((item) => item.title),
   },
@@ -104,7 +110,6 @@ const pathStops: Array<{
     title: "Ideas made tangible",
     description:
       "A growing collection of practical products, intelligent systems, mobile experiences, and data-driven applications.",
-    to: "/portfolio",
     target: { x: -3.8, z: -18.8 },
     facts: projects
       .slice(0, 3)
@@ -119,11 +124,119 @@ const pathStops: Array<{
     title: "Let's build something",
     description:
       "Have a product, system, or idea worth exploring? The trail ends with an open line for a thoughtful conversation.",
-    to: "/contact",
     target: { x: 3.8, z: -24 },
     facts: ["Project enquiries", "Freelance work", "Engineering opportunities"],
   },
 ];
+
+type ShowcaseSlide = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  image?: string | undefined;
+  imageAlt?: string;
+  chips?: string[];
+  metric?: string | undefined;
+  action?: { label: string; href: string };
+};
+
+const showcaseSlides: Record<StudioZoneId, ShowcaseSlide[]> = {
+  about: [
+    {
+      eyebrow: "PROFILE / AMJAD AZWARD",
+      title: "Building where software meets intelligence.",
+      description:
+        "A third-year Computer Science undergraduate at NIBM, affiliated with Coventry University, freelancing as a software developer and gaining experience through AI-enabled engineering internships.",
+      image: homePortrait,
+      imageAlt: "Portrait of Amjad Azward",
+      chips: [
+        "Colombo, Sri Lanka",
+        "Software engineering",
+        "Data science",
+        "Open to collaboration",
+      ],
+    },
+    ...education.map((item, index) => ({
+      eyebrow: `EDUCATION / ${String(index + 1).padStart(2, "0")}`,
+      title: item.title,
+      description: item.place,
+      metric: item.date,
+      chips: ["Academic foundation", "Continuous learning"],
+    })),
+    ...experience.map((item, index) => ({
+      eyebrow: `EXPERIENCE / ${String(index + 1).padStart(2, "0")}`,
+      title: item.title,
+      description: item.place,
+      metric: item.date,
+      chips: ["Practical delivery", "Industry experience"],
+    })),
+    {
+      eyebrow: "PROFILE / SELECTED NUMBERS",
+      title: "Learning by building.",
+      description:
+        "A snapshot of practical work, continuous learning, academic progress, and experience.",
+      chips: stats.map((stat) => `${stat.value}${stat.suffix} ${stat.label}`),
+    },
+  ],
+  skills: skillGroups.map((group, index) => ({
+    eyebrow: `SKILL DISCIPLINE / ${String(index + 1).padStart(2, "0")}`,
+    title: group.title,
+    description: `${group.items.length} capabilities used to design, build, test, and improve maintainable digital products.`,
+    metric: `${group.items.length} skills`,
+    chips: group.items.map((skill) => `${skill.name} ${skill.level}%`),
+  })),
+  certifications: certifications.map((item, index) => ({
+    eyebrow: `CREDENTIAL / ${String(index + 1).padStart(2, "0")}`,
+    title: item.title ?? "Professional credential",
+    description: `Issued by ${item.issuer ?? "Professional learning provider"}.`,
+    metric: item.year,
+    image: item.image,
+    imageAlt: `${item.title ?? "Certification"} certificate`,
+    chips: [item.issuer ?? "Verified learning", item.year],
+    action: { label: "Verify credential", href: item.verify },
+  })),
+  services: services.map((service, index) => ({
+    eyebrow: `SERVICE / ${String(index + 1).padStart(2, "0")}`,
+    title: service.title,
+    description: service.desc,
+    metric: "Available",
+    chips: service.tags,
+    action: { label: "Start a conversation", href: "mailto:amjadazward693@gmail.com" },
+  })),
+  portfolio: projects.map((project, index) => ({
+    eyebrow: `PROJECT / ${String(index + 1).padStart(2, "0")}`,
+    title: project.title ?? "Selected project",
+    description: project.desc ?? "A practical digital product built around a real problem.",
+    metric: project.tag,
+    image: project.image,
+    imageAlt: `Preview of ${project.title ?? "project"}`,
+    chips: [project.tag ?? "Software project", "Designed and developed"],
+    action: { label: "View source profile", href: project.github },
+  })),
+  contact: [
+    {
+      eyebrow: "CONTACT / OPEN CHANNEL",
+      title: "Let's make something useful.",
+      description:
+        "For thoughtful products, engineering opportunities, freelance work, or ambitious ideas, send a message directly from the village.",
+      chips: [
+        "Project enquiries",
+        "Freelance work",
+        "Engineering opportunities",
+        "Remote collaboration",
+      ],
+      action: { label: "Email Amjad", href: "mailto:amjadazward693@gmail.com" },
+    },
+    ...socials.map((social, index) => ({
+      eyebrow: `SOCIAL CHANNEL / ${String(index + 1).padStart(2, "0")}`,
+      title: social.label,
+      description: `Continue the conversation with Amjad Azward on ${social.label}.`,
+      metric: "Online",
+      chips: ["Social profile", "Opens in a new tab"],
+      action: { label: `Open ${social.label}`, href: social.href },
+    })),
+  ],
+};
 
 const WORLD_BOUNDS = { minX: -10.2, maxX: 10.2, northZ: 7.2, southZ: -28.5 };
 
@@ -340,6 +453,7 @@ export default function InteractiveStudioHero() {
   const [activeZone, setActiveZone] = useState<StudioZoneId | null>(null);
   const [mapOpen, setMapOpen] = useState(false);
   const [journeyStarted, setJourneyStarted] = useState(false);
+  const [showcase, setShowcase] = useState<{ section: StudioZoneId; slide: number } | null>(null);
 
   useEffect(() => {
     setMode(supportsWebGL() && !prefersLightweightScene() ? "3d" : "static");
@@ -377,14 +491,30 @@ export default function InteractiveStudioHero() {
   };
 
   useEffect(() => {
-    inputRef.current.locked = mapOpen;
-    if (!mapOpen) return;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMapOpen(false);
+    inputRef.current.locked = mapOpen || showcase !== null;
+    if (!mapOpen && !showcase) return;
+    const handleViewerKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMapOpen(false);
+        setShowcase(null);
+        return;
+      }
+      if (!showcase || (event.key !== "ArrowLeft" && event.key !== "ArrowRight")) return;
+      event.preventDefault();
+      const slides = showcaseSlides[showcase.section];
+      const direction = event.key === "ArrowRight" ? 1 : -1;
+      setShowcase((current) =>
+        current
+          ? {
+              ...current,
+              slide: (current.slide + direction + slides.length) % slides.length,
+            }
+          : current,
+      );
     };
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [mapOpen]);
+    window.addEventListener("keydown", handleViewerKey);
+    return () => window.removeEventListener("keydown", handleViewerKey);
+  }, [mapOpen, showcase]);
 
   useEffect(() => {
     const startOnMovement = (event: KeyboardEvent) => {
@@ -432,7 +562,30 @@ export default function InteractiveStudioHero() {
     inputRef.current.z = 0;
   };
 
+  const openShowcase = (section: StudioZoneId) => {
+    inputRef.current.target = null;
+    inputRef.current.x = 0;
+    inputRef.current.z = 0;
+    setShowcase({ section, slide: 0 });
+  };
+
+  const changeShowcaseSlide = (direction: -1 | 1) => {
+    setShowcase((current) => {
+      if (!current) return current;
+      const slides = showcaseSlides[current.section];
+      return {
+        ...current,
+        slide: (current.slide + direction + slides.length) % slides.length,
+      };
+    });
+  };
+
   const stop = activeZone ? pathStops.find((item) => item.id === activeZone) : null;
+  const activeShowcaseSlides = showcase ? showcaseSlides[showcase.section] : [];
+  const activeShowcaseSlide = showcase ? activeShowcaseSlides[showcase.slide] : undefined;
+  const activeShowcaseStop = showcase
+    ? pathStops.find((item) => item.id === showcase.section)
+    : undefined;
   const explorerMapPosition = worldToMapPosition(explorerPositionRef.current);
   const streamMapY = worldToMapPosition({ x: 0, z: -15.65 }).top;
   const overlookMapPosition = worldToMapPosition({ x: 7.15, z: -17.8 });
@@ -689,7 +842,13 @@ export default function InteractiveStudioHero() {
             <button type="button" onClick={() => walkTo("about")}>
               Begin the journey <Footprints aria-hidden />
             </button>
-            <Link to="/portfolio">Open project index</Link>
+            <button
+              type="button"
+              className="path-secondary-action"
+              onClick={() => openShowcase("portfolio")}
+            >
+              Open project showcase
+            </button>
           </div>
         </section>
       ) : null}
@@ -709,10 +868,139 @@ export default function InteractiveStudioHero() {
           {stop.id === "portfolio" && projects[0] ? (
             <img src={projects[0].image} alt={`Preview of ${projects[0].title}`} />
           ) : null}
-          <Link to={stop.to}>
+          <button
+            type="button"
+            className="path-open-showcase"
+            onClick={() => openShowcase(stop.id)}
+          >
             Explore {stop.short.toLowerCase()} <ArrowRight aria-hidden />
-          </Link>
+          </button>
         </aside>
+      ) : null}
+
+      {showcase && activeShowcaseSlide && activeShowcaseStop ? (
+        <div
+          className="path-tv-overlay"
+          role="presentation"
+          onPointerDown={() => setShowcase(null)}
+        >
+          <section
+            className="path-tv"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="path-tv-title"
+            onPointerDown={(event) => event.stopPropagation()}
+          >
+            <header className="path-tv-header">
+              <div>
+                <span>AA VILLAGE NETWORK</span>
+                <strong>{activeShowcaseStop.short} channel</strong>
+              </div>
+              <div className="path-tv-status">
+                <i aria-hidden /> LIVE
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowcase(null)}
+                aria-label="Close showcase TV"
+              >
+                <X aria-hidden />
+              </button>
+            </header>
+
+            <div className="path-tv-body">
+              <div className="path-tv-screen">
+                <div className="path-tv-scanlines" aria-hidden />
+                <article
+                  className={`path-tv-slide ${activeShowcaseSlide.image ? "has-image" : ""}`}
+                >
+                  {activeShowcaseSlide.image ? (
+                    <figure>
+                      <img
+                        src={activeShowcaseSlide.image}
+                        alt={activeShowcaseSlide.imageAlt ?? "Portfolio showcase"}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </figure>
+                  ) : null}
+                  <div className="path-tv-copy">
+                    <p>{activeShowcaseSlide.eyebrow}</p>
+                    {activeShowcaseSlide.metric ? (
+                      <span className="path-tv-metric">{activeShowcaseSlide.metric}</span>
+                    ) : null}
+                    <h2 id="path-tv-title">{activeShowcaseSlide.title}</h2>
+                    <p className="path-tv-description">{activeShowcaseSlide.description}</p>
+                    {activeShowcaseSlide.chips?.length ? (
+                      <ul className="path-tv-chips" aria-label="Slide details">
+                        {activeShowcaseSlide.chips.map((chip) => (
+                          <li key={chip}>{chip}</li>
+                        ))}
+                      </ul>
+                    ) : null}
+                    {activeShowcaseSlide.action ? (
+                      <a
+                        href={activeShowcaseSlide.action.href}
+                        target={
+                          activeShowcaseSlide.action.href.startsWith("http") ? "_blank" : undefined
+                        }
+                        rel={
+                          activeShowcaseSlide.action.href.startsWith("http")
+                            ? "noopener noreferrer"
+                            : undefined
+                        }
+                      >
+                        {activeShowcaseSlide.action.label} <ArrowRight aria-hidden />
+                      </a>
+                    ) : null}
+                  </div>
+                </article>
+              </div>
+
+              <aside className="path-tv-controls" aria-label="Slideshow controls">
+                <div className="path-tv-speaker" aria-hidden>
+                  {Array.from({ length: 12 }, (_, index) => (
+                    <i key={index} />
+                  ))}
+                </div>
+                <span>
+                  {String(showcase.slide + 1).padStart(2, "0")} /{" "}
+                  {String(activeShowcaseSlides.length).padStart(2, "0")}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => changeShowcaseSlide(-1)}
+                  aria-label="Previous slide"
+                >
+                  <ChevronLeft aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => changeShowcaseSlide(1)}
+                  aria-label="Next slide"
+                >
+                  <ChevronRight aria-hidden />
+                </button>
+              </aside>
+            </div>
+
+            <footer className="path-tv-footer">
+              <div className="path-tv-dots" aria-label="Choose slide">
+                {activeShowcaseSlides.map((slide, index) => (
+                  <button
+                    key={`${slide.eyebrow}-${index}`}
+                    type="button"
+                    className={index === showcase.slide ? "is-active" : undefined}
+                    onClick={() => setShowcase({ ...showcase, slide: index })}
+                    aria-label={`Show slide ${index + 1}: ${slide.title}`}
+                    aria-current={index === showcase.slide ? "true" : undefined}
+                  />
+                ))}
+              </div>
+              <p>Use the arrows or keyboard ← → to browse</p>
+            </footer>
+          </section>
+        </div>
       ) : null}
 
       <div
