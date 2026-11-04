@@ -78,6 +78,23 @@ const MEADOW_PATCHES: Array<[number, number]> = [
   [2.1, -27],
 ];
 
+const FENCE_SEGMENTS: Array<{ x: number; z: number; rotation: number; length: number }> = [
+  { x: -9.25, z: 3.5, rotation: Math.PI / 2, length: 4.5 },
+  { x: -9.25, z: -3.5, rotation: Math.PI / 2, length: 5 },
+  { x: -9.25, z: -10.5, rotation: Math.PI / 2, length: 5 },
+  { x: -9.25, z: -17.5, rotation: Math.PI / 2, length: 5 },
+  { x: -9.25, z: -24.5, rotation: Math.PI / 2, length: 5 },
+  { x: 9.25, z: 3.5, rotation: Math.PI / 2, length: 4.5 },
+  { x: 9.25, z: -3.5, rotation: Math.PI / 2, length: 5 },
+  { x: 9.25, z: -10.5, rotation: Math.PI / 2, length: 5 },
+  { x: 9.25, z: -17.5, rotation: Math.PI / 2, length: 5 },
+  { x: 9.25, z: -24.5, rotation: Math.PI / 2, length: 5 },
+  { x: -6.35, z: 6.35, rotation: 0, length: 5.2 },
+  { x: 6.35, z: 6.35, rotation: 0, length: 5.2 },
+  { x: -6.3, z: -27.65, rotation: 0, length: 5.6 },
+  { x: 6.3, z: -27.65, rotation: 0, length: 5.6 },
+];
+
 const FOREST_OBJECTS = Array.from({ length: 48 }, (_, index) => {
   const rightSide = index % 4 === 0;
   const row = Math.floor(index / 2);
@@ -157,8 +174,19 @@ function isWorldBlocked(x: number, z: number) {
   );
   if (hitsStructure) return true;
 
+  const hitsFence = FENCE_SEGMENTS.some((fence) => {
+    const dx = x - fence.x;
+    const dz = z - fence.z;
+    const cosine = Math.cos(fence.rotation);
+    const sine = Math.sin(fence.rotation);
+    const localX = dx * cosine - dz * sine;
+    const localZ = dx * sine + dz * cosine;
+    return Math.abs(localX) < fence.length / 2 + 0.14 && Math.abs(localZ) < 0.2;
+  });
+  if (hitsFence) return true;
+
   const insideStream = z > -16.18 && z < -15.12;
-  const onBridge = x > -0.68 && x < 0.98;
+  const onBridge = x > -0.78 && x < 1.08;
   return insideStream && !onBridge;
 }
 
@@ -1205,6 +1233,101 @@ function SectionLandmark({
   );
 }
 
+function VillageFences({ darkMode }: { darkMode: boolean }) {
+  const postsRef = useRef<InstancedMesh>(null);
+  const railsRef = useRef<InstancedMesh>(null);
+  const capsRef = useRef<InstancedMesh>(null);
+  const transform = useMemo(() => new Object3D(), []);
+  const posts = useMemo(
+    () =>
+      FENCE_SEGMENTS.flatMap((segment) => {
+        const count = Math.ceil(segment.length / 0.72) + 1;
+        return Array.from({ length: count }, (_, index) => {
+          const localX = -segment.length / 2 + (index / (count - 1)) * segment.length;
+          return {
+            x: segment.x + localX * Math.cos(segment.rotation),
+            z: segment.z - localX * Math.sin(segment.rotation),
+            rotation: segment.rotation,
+          };
+        });
+      }),
+    [],
+  );
+  const rails = useMemo(
+    () =>
+      FENCE_SEGMENTS.flatMap((segment) => [
+        { ...segment, y: 0.34 },
+        { ...segment, y: 0.68 },
+      ]),
+    [],
+  );
+
+  useEffect(() => {
+    const postsMesh = postsRef.current;
+    const railsMesh = railsRef.current;
+    const capsMesh = capsRef.current;
+    if (!postsMesh || !railsMesh || !capsMesh) return;
+
+    posts.forEach((post, index) => {
+      transform.position.set(post.x, 0.42, post.z);
+      transform.rotation.set(0, post.rotation, 0);
+      transform.scale.set(0.09, 0.84, 0.09);
+      transform.updateMatrix();
+      postsMesh.setMatrixAt(index, transform.matrix);
+
+      transform.position.set(post.x, 0.88, post.z);
+      transform.rotation.set(0, 0, 0);
+      transform.scale.setScalar(1);
+      transform.updateMatrix();
+      capsMesh.setMatrixAt(index, transform.matrix);
+    });
+
+    rails.forEach((rail, index) => {
+      transform.position.set(rail.x, rail.y, rail.z);
+      transform.rotation.set(0, rail.rotation, 0);
+      transform.scale.set(rail.length, 0.075, 0.09);
+      transform.updateMatrix();
+      railsMesh.setMatrixAt(index, transform.matrix);
+    });
+
+    postsMesh.instanceMatrix.needsUpdate = true;
+    railsMesh.instanceMatrix.needsUpdate = true;
+    capsMesh.instanceMatrix.needsUpdate = true;
+  }, [posts, rails, transform]);
+
+  const wood = darkMode ? "#63472f" : "#946b43";
+  const woodTop = darkMode ? "#7d5b39" : "#b18455";
+
+  return (
+    <group name="village-fences">
+      <instancedMesh
+        ref={postsRef}
+        args={[undefined, undefined, posts.length]}
+        frustumCulled={false}
+      >
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial color={wood} roughness={0.86} />
+      </instancedMesh>
+      <instancedMesh
+        ref={railsRef}
+        args={[undefined, undefined, rails.length]}
+        frustumCulled={false}
+      >
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial color={wood} roughness={0.88} />
+      </instancedMesh>
+      <instancedMesh
+        ref={capsRef}
+        args={[undefined, undefined, posts.length]}
+        frustumCulled={false}
+      >
+        <sphereGeometry args={[0.075, 7, 5]} />
+        <meshStandardMaterial color={woodTop} roughness={0.8} />
+      </instancedMesh>
+    </group>
+  );
+}
+
 function SwayingForest({ darkMode, reducedMotion }: { darkMode: boolean; reducedMotion: boolean }) {
   const trunksRef = useRef<InstancedMesh>(null);
   const lowerCanopiesRef = useRef<InstancedMesh>(null);
@@ -1435,6 +1558,8 @@ function PathEnvironment({
   const foliageLight = darkMode ? "#245b32" : "#4f9849";
   const water = darkMode ? "#063356" : "#319ac5";
   const sand = darkMode ? "#5b513b" : "#d2bd83";
+  const bridgeDeck = darkMode ? "#6d5035" : "#a77d4f";
+  const bridgeRail = darkMode ? "#8a6844" : "#bd925d";
   const stations = useMemo(
     () =>
       ZONES.map((zone, index) => ({
@@ -1661,18 +1786,50 @@ function PathEnvironment({
           roughness={0.2}
         />
       </mesh>
-      {Array.from({ length: 8 }, (_, index) => (
-        <mesh key={`bridge-plank-${index}`} position={[0.15, 0.09, -16.12 + index * 0.14]}>
-          <boxGeometry args={[2.1, 0.09, 0.115]} />
-          <meshStandardMaterial color={darkMode ? "#3d5260" : "#9b8063"} roughness={0.82} />
-        </mesh>
-      ))}
-      {[-0.94, 1.24].map((x) => (
-        <mesh key={`bridge-rail-${x}`} position={[x, 0.22, -15.63]}>
-          <boxGeometry args={[0.055, 0.38, 1.35]} />
-          <meshStandardMaterial color={pathEdge} roughness={0.62} />
-        </mesh>
-      ))}
+      <group name="stream-bridge" onPointerDown={walkTo}>
+        {[-0.73, 1.03].map((x) => (
+          <mesh key={`bridge-support-${x}`} position={[x, 0.025, -15.65]}>
+            <boxGeometry args={[0.13, 0.16, 1.62]} />
+            <meshStandardMaterial color={pathEdge} roughness={0.9} />
+          </mesh>
+        ))}
+        {Array.from({ length: 10 }, (_, index) => (
+          <mesh key={`bridge-plank-${index}`} position={[0.15, 0.12, -16.28 + index * 0.14]}>
+            <boxGeometry args={[2.18, 0.11, 0.12]} />
+            <meshStandardMaterial color={bridgeDeck} roughness={0.84} />
+          </mesh>
+        ))}
+        {[-0.98, 1.28].map((x) => (
+          <group key={`bridge-side-${x}`}>
+            {[-16.28, -15.85, -15.42, -15.02].map((z) => (
+              <group key={z}>
+                <mesh position={[x, 0.46, z]}>
+                  <boxGeometry args={[0.09, 0.72, 0.09]} />
+                  <meshStandardMaterial color={bridgeRail} roughness={0.82} />
+                </mesh>
+                <mesh position={[x, 0.84, z]}>
+                  <sphereGeometry args={[0.07, 8, 6]} />
+                  <meshStandardMaterial color={bridgeRail} roughness={0.76} />
+                </mesh>
+              </group>
+            ))}
+            <mesh position={[x, 0.78, -15.65]}>
+              <boxGeometry args={[0.09, 0.085, 1.55]} />
+              <meshStandardMaterial color={bridgeRail} roughness={0.8} />
+            </mesh>
+            <mesh position={[x, 0.49, -15.65]}>
+              <boxGeometry args={[0.065, 0.065, 1.48]} />
+              <meshStandardMaterial color={bridgeRail} roughness={0.82} />
+            </mesh>
+          </group>
+        ))}
+        {[-16.33, -14.97].map((z) => (
+          <mesh key={`bridge-end-beam-${z}`} position={[0.15, 0.14, z]}>
+            <boxGeometry args={[2.28, 0.17, 0.1]} />
+            <meshStandardMaterial color={bridgeRail} roughness={0.84} />
+          </mesh>
+        ))}
+      </group>
 
       <group position={[7.15, 0.04, -17.8]}>
         <mesh>
@@ -1732,6 +1889,7 @@ function PathEnvironment({
         );
       })}
 
+      <VillageFences darkMode={darkMode} />
       <SwayingForest darkMode={darkMode} reducedMotion={reducedMotion} />
       <NaturalLife darkMode={darkMode} reducedMotion={reducedMotion} />
 
