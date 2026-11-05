@@ -72,6 +72,10 @@ jobs:
             cp dist/client/_shell.html dist/client/index.html
           fi
           cp dist/client/_shell.html dist/client/404.html
+          for route in about skills certifications services portfolio contact quick-view; do
+            mkdir -p "dist/client/$route"
+            cp dist/client/_shell.html "dist/client/$route/index.html"
+          done
 
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request'
