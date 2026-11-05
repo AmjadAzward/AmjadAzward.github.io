@@ -81,7 +81,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "Amjad Azward" },
       { property: "og:site_name", content: "Amjad Azward Portfolio" },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://amjadazward.github.io/" },
+      { property: "og:image", content: "https://amjadazward.github.io/profile-clean.png" },
+      { property: "og:image:alt", content: "Amjad Azward's interactive 3D portfolio" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://amjadazward.github.io/profile-clean.png" },
     ],
     links: [
       {
@@ -114,6 +118,29 @@ function RootShell({ children }: { children: ReactNode }) {
           }}
         />
         <HeadContent />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: "Amjad Azward",
+              url: "https://amjadazward.github.io/",
+              image: "https://amjadazward.github.io/profile-clean.png",
+              jobTitle: "Software Developer and Data Science Undergraduate",
+              sameAs: [
+                "https://github.com/AmjadAzward",
+                "https://www.linkedin.com/in/amjadazward",
+                "https://x.com/AmjadAzward",
+                "https://www.instagram.com/amjadazward/",
+              ],
+              alumniOf: {
+                "@type": "CollegeOrUniversity",
+                name: "National Institute of Business Management",
+              },
+            }),
+          }}
+        />
       </head>
       <body>
         {children}

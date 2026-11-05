@@ -1,18 +1,24 @@
+import { Link } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import {
   ArrowRight,
+  Bot,
   ChevronLeft,
   ChevronRight,
+  CircleHelp,
   Compass,
+  Download,
   Facebook,
   Footprints,
   Github,
   Instagram,
   Linkedin,
   LocateFixed,
+  Moon,
   Map as MapIcon,
   MapPin,
+  Sun,
   X,
 } from "lucide-react";
 
@@ -34,6 +40,7 @@ export type StudioZoneId =
   "about" | "skills" | "certifications" | "services" | "portfolio" | "contact";
 
 export type StudioPosition = { x: number; z: number };
+export type StudioQuality = "auto" | "low" | "high";
 
 export type StudioInput = {
   x: number;
@@ -236,6 +243,15 @@ const showcaseSlides: Record<StudioZoneId, ShowcaseSlide[]> = {
       action: { label: `Open ${social.label}`, href: social.href },
     })),
   ],
+};
+
+const robotGuidance: Record<StudioZoneId, string> = {
+  about: "This welcome house shares Amjad's background and journey.",
+  skills: "The technology lab maps the tools used across real projects.",
+  certifications: "The learning academy holds verified credentials and education.",
+  services: "The creative studio shows the ways Amjad can help build a product.",
+  portfolio: "The innovation workshop contains the complete project collection.",
+  contact: "The communication tower opens the direct contact and social channels.",
 };
 
 const WORLD_BOUNDS = { minX: -10.2, maxX: 10.2, northZ: 7.2, southZ: -28.5 };
@@ -454,9 +470,18 @@ export default function InteractiveStudioHero() {
   const [mapOpen, setMapOpen] = useState(false);
   const [journeyStarted, setJourneyStarted] = useState(false);
   const [showcase, setShowcase] = useState<{ section: StudioZoneId; slide: number } | null>(null);
+  const [mapSelection, setMapSelection] = useState<StudioZoneId | "welcome" | null>(null);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [guidanceEnabled, setGuidanceEnabled] = useState(true);
+  const [quality, setQuality] = useState<StudioQuality>("auto");
 
   useEffect(() => {
     setMode(supportsWebGL() && !prefersLightweightScene() ? "3d" : "static");
+    const storedQuality = window.localStorage.getItem("aa-village-quality");
+    if (storedQuality === "low" || storedQuality === "high" || storedQuality === "auto") {
+      setQuality(storedQuality);
+    }
+    setGuidanceEnabled(window.localStorage.getItem("aa-village-guidance") !== "off");
   }, []);
 
   useEffect(() => {
@@ -479,24 +504,63 @@ export default function InteractiveStudioHero() {
     setJourneyStarted(true);
   };
 
-  const spawnAt = (id: StudioZoneId) => {
-    const destination = pathStops.find((item) => item.id === id);
-    if (!destination) return;
-    inputRef.current.spawn = destination.target;
-    inputRef.current.target = null;
+  const beginJourney = () => {
+    if (window.localStorage.getItem("aa-village-tutorial") === "complete") {
+      walkTo("about");
+      return;
+    }
+    setTutorialOpen(true);
+  };
+
+  const finishTutorial = (startWalking: boolean) => {
+    window.localStorage.setItem("aa-village-tutorial", "complete");
+    setTutorialOpen(false);
+    if (startWalking) walkTo("about");
+  };
+
+  const travelFromMap = (kind: "walk" | "spawn") => {
+    if (!mapSelection) return;
+    const target =
+      mapSelection === "welcome"
+        ? { x: 0, z: 5 }
+        : pathStops.find((item) => item.id === mapSelection)?.target;
+    if (!target) return;
+    if (kind === "spawn") inputRef.current.spawn = target;
+    else inputRef.current.target = target;
     inputRef.current.x = 0;
     inputRef.current.z = 0;
     setJourneyStarted(true);
     setMapOpen(false);
+    setMapSelection(null);
+  };
+
+  const updateQuality = (nextQuality: StudioQuality) => {
+    setQuality(nextQuality);
+    window.localStorage.setItem("aa-village-quality", nextQuality);
+  };
+
+  const toggleGuidance = () => {
+    setGuidanceEnabled((enabled) => {
+      const next = !enabled;
+      window.localStorage.setItem("aa-village-guidance", next ? "on" : "off");
+      return next;
+    });
+  };
+
+  const toggleTheme = () => {
+    const nextDark = !document.documentElement.classList.contains("dark");
+    document.documentElement.classList.toggle("dark", nextDark);
+    window.localStorage.setItem("aa-theme", nextDark ? "dark" : "light");
   };
 
   useEffect(() => {
-    inputRef.current.locked = mapOpen || showcase !== null;
-    if (!mapOpen && !showcase) return;
+    inputRef.current.locked = mapOpen || showcase !== null || tutorialOpen;
+    if (!mapOpen && !showcase && !tutorialOpen) return;
     const handleViewerKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setMapOpen(false);
         setShowcase(null);
+        setTutorialOpen(false);
         return;
       }
       if (!showcase || (event.key !== "ArrowLeft" && event.key !== "ArrowRight")) return;
@@ -514,7 +578,7 @@ export default function InteractiveStudioHero() {
     };
     window.addEventListener("keydown", handleViewerKey);
     return () => window.removeEventListener("keydown", handleViewerKey);
-  }, [mapOpen, showcase]);
+  }, [mapOpen, showcase, tutorialOpen]);
 
   useEffect(() => {
     const startOnMovement = (event: KeyboardEvent) => {
@@ -569,6 +633,19 @@ export default function InteractiveStudioHero() {
     setShowcase({ section, slide: 0 });
   };
 
+  useEffect(() => {
+    const interact = (event: KeyboardEvent) => {
+      if (event.code !== "KeyE" || event.repeat || mapOpen || showcase || !activeZone) return;
+      event.preventDefault();
+      inputRef.current.target = null;
+      inputRef.current.x = 0;
+      inputRef.current.z = 0;
+      setShowcase({ section: activeZone, slide: 0 });
+    };
+    window.addEventListener("keydown", interact);
+    return () => window.removeEventListener("keydown", interact);
+  }, [activeZone, mapOpen, showcase]);
+
   const changeShowcaseSlide = (direction: -1 | 1) => {
     setShowcase((current) => {
       if (!current) return current;
@@ -587,6 +664,7 @@ export default function InteractiveStudioHero() {
     ? pathStops.find((item) => item.id === showcase.section)
     : undefined;
   const explorerMapPosition = worldToMapPosition(explorerPositionRef.current);
+  const welcomeMapPosition = worldToMapPosition({ x: 0, z: 5 });
   const streamMapY = worldToMapPosition({ x: 0, z: -15.65 }).top;
   const overlookMapPosition = worldToMapPosition({ x: 7.15, z: -17.8 });
 
@@ -602,6 +680,7 @@ export default function InteractiveStudioHero() {
             <InteractiveStudioCanvas
               darkMode={darkMode}
               reducedMotion={reducedMotion}
+              quality={quality}
               inView={inView}
               inputRef={inputRef}
               explorerPositionRef={explorerPositionRef}
@@ -619,15 +698,105 @@ export default function InteractiveStudioHero() {
         )}
       </div>
 
+      <div className="path-world-tools" aria-label="Village options">
+        <Link to="/quick-view" title="Open accessible Quick View">
+          Quick View
+        </Link>
+        <label title="3D rendering quality">
+          <span className="sr-only">Rendering quality</span>
+          <select
+            value={quality}
+            onChange={(event) => updateQuality(event.target.value as StudioQuality)}
+            aria-label="Rendering quality"
+          >
+            <option value="auto">Auto quality</option>
+            <option value="low">Low quality</option>
+            <option value="high">High quality</option>
+          </select>
+        </label>
+        <button
+          type="button"
+          onClick={toggleGuidance}
+          aria-pressed={guidanceEnabled}
+          title="Toggle robot guidance"
+        >
+          <Bot aria-hidden />
+          <span className="sr-only">Toggle robot guidance</span>
+        </button>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          title={darkMode ? "Switch to morning" : "Switch to evening"}
+        >
+          {darkMode ? <Sun aria-hidden /> : <Moon aria-hidden />}
+          <span className="sr-only">{darkMode ? "Switch to morning" : "Switch to evening"}</span>
+        </button>
+        <button type="button" onClick={() => setTutorialOpen(true)} title="How to explore">
+          <CircleHelp aria-hidden />
+          <span className="sr-only">How to explore</span>
+        </button>
+      </div>
+
       <button
         type="button"
         className="path-map-trigger"
-        onClick={() => setMapOpen(true)}
+        onClick={() => {
+          setMapSelection(null);
+          setMapOpen(true);
+        }}
         aria-label="Open trail map and fast travel"
       >
         <MapIcon aria-hidden />
         <span>Trail map</span>
       </button>
+
+      {tutorialOpen ? (
+        <div className="path-tutorial-overlay" role="presentation">
+          <section
+            className="path-tutorial"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="path-tutorial-title"
+          >
+            <button type="button" onClick={() => finishTutorial(false)} aria-label="Close tutorial">
+              <X aria-hidden />
+            </button>
+            <p>FIRST VISIT / CONTROLS</p>
+            <h2 id="path-tutorial-title">Ready to explore?</h2>
+            <span>
+              Use the village like a small adventure, or switch to Quick View at any time.
+            </span>
+            <ul>
+              <li>
+                <kbd>W A S D</kbd>
+                <strong>Walk around</strong>
+              </li>
+              <li>
+                <kbd>Arrow keys</kbd>
+                <strong>Alternative movement</strong>
+              </li>
+              <li>
+                <kbd>E</kbd>
+                <strong>Explore a nearby landmark</strong>
+              </li>
+              <li>
+                <kbd>Esc</kbd>
+                <strong>Close maps and showcases</strong>
+              </li>
+              <li>
+                <kbd>Shift</kbd>
+                <strong>Walk faster</strong>
+              </li>
+            </ul>
+            <div>
+              <button type="button" onClick={() => finishTutorial(!journeyStarted)}>
+                {journeyStarted ? "Got it" : "Start exploring"} <Footprints aria-hidden />
+              </button>
+              <Link to="/quick-view">Open Quick View</Link>
+            </div>
+          </section>
+        </div>
+      ) : null}
 
       {mapOpen ? (
         <div
@@ -758,17 +927,39 @@ export default function InteractiveStudioHero() {
                 </g>
               </svg>
 
+              <button
+                type="button"
+                className={`path-map-welcome ${mapSelection === "welcome" ? "is-selected" : ""}`}
+                style={{
+                  left: `${welcomeMapPosition.left}%`,
+                  top: `${welcomeMapPosition.top}%`,
+                }}
+                onClick={() => setMapSelection("welcome")}
+                aria-label="Select Welcome Plaza"
+              >
+                <span>
+                  <i>00</i>
+                </span>
+                <strong>Welcome</strong>
+              </button>
+
               {pathStops.map((item) => (
                 <button
                   key={`map-${item.id}`}
                   type="button"
-                  className={item.id === activeZone ? "is-current" : undefined}
+                  className={
+                    item.id === mapSelection
+                      ? "is-selected"
+                      : item.id === activeZone
+                        ? "is-current"
+                        : undefined
+                  }
                   style={{
                     left: `${worldToMapPosition(item.target).left}%`,
                     top: `${worldToMapPosition(item.target).top}%`,
                   }}
-                  onClick={() => spawnAt(item.id)}
-                  aria-label={`Fast travel to ${item.short}`}
+                  onClick={() => setMapSelection(item.id)}
+                  aria-label={`Select ${item.short}`}
                 >
                   <span>
                     <i>{item.number}</i>
@@ -812,9 +1003,28 @@ export default function InteractiveStudioHero() {
               </div>
             </div>
 
+            {mapSelection ? (
+              <div className="path-map-choice" role="group" aria-label="Travel method">
+                <div>
+                  <span>DESTINATION SELECTED</span>
+                  <strong>
+                    {mapSelection === "welcome"
+                      ? "Welcome Plaza"
+                      : pathStops.find((item) => item.id === mapSelection)?.short}
+                  </strong>
+                </div>
+                <button type="button" onClick={() => travelFromMap("walk")}>
+                  Walk there
+                </button>
+                <button type="button" onClick={() => travelFromMap("spawn")}>
+                  Fast travel
+                </button>
+              </div>
+            ) : null}
+
             <footer>
               <span>
-                <i className="map-legend-pin" /> Select a pin to spawn
+                <i className="map-legend-pin" /> Select a destination and travel method
               </span>
               <span>
                 <i className="map-legend-route" /> Walking trail
@@ -836,25 +1046,33 @@ export default function InteractiveStudioHero() {
       {!stop && !journeyStarted ? (
         <section className="path-intro-card" aria-labelledby="path-intro-title">
           <p>
-            <Compass aria-hidden /> Interactive portfolio trail
+            <Compass aria-hidden /> Interactive 3D portfolio
           </p>
-          <h1 id="path-intro-title">Walk through the work.</h1>
+          <h1 id="path-intro-title">Explore my world of code &amp; creativity.</h1>
           <span>
-            Choose your own route across a wide island of forest paths, bridges, water, and coastal
-            viewpoints. Each landmark reveals a different part of my story, skills, credentials,
-            services, and projects.
+            Step into an interactive island where every destination tells a story about my skills,
+            projects, experience, and journey in technology.
           </span>
-          <div>
-            <button type="button" onClick={() => walkTo("about")}>
-              Begin the journey <Footprints aria-hidden />
+          <strong className="path-intro-identity">
+            Amjad Azward <i aria-hidden /> Software Engineer &amp; Data Science Undergraduate
+          </strong>
+          <div className="path-intro-actions">
+            <button type="button" onClick={beginJourney}>
+              Start exploring <Footprints aria-hidden />
             </button>
             <button
               type="button"
               className="path-secondary-action"
               onClick={() => openShowcase("portfolio")}
             >
-              Open project showcase
+              View projects
             </button>
+          </div>
+          <div className="path-intro-links">
+            <Link to="/quick-view">Quick View mode</Link>
+            <a href="/cv.pdf" download>
+              <Download aria-hidden /> Download resume
+            </a>
           </div>
         </section>
       ) : null}
@@ -874,12 +1092,28 @@ export default function InteractiveStudioHero() {
           {stop.id === "portfolio" && projects[0] ? (
             <img src={projects[0].image} alt={`Preview of ${projects[0].title}`} />
           ) : null}
+          <span className="path-interaction-cue">
+            <kbd>E</kbd> Press E to explore
+          </span>
           <button
             type="button"
             className="path-open-showcase"
             onClick={() => openShowcase(stop.id)}
           >
             Explore {stop.short.toLowerCase()} <ArrowRight aria-hidden />
+          </button>
+        </aside>
+      ) : null}
+
+      {activeZone && guidanceEnabled && !mapOpen && !showcase && !tutorialOpen ? (
+        <aside className="path-robot-guidance" aria-live="polite">
+          <Bot aria-hidden />
+          <div>
+            <span>ROBOT COMPANION</span>
+            <p>{robotGuidance[activeZone]}</p>
+          </div>
+          <button type="button" onClick={toggleGuidance} aria-label="Disable robot guidance">
+            <X aria-hidden />
           </button>
         </aside>
       ) : null}

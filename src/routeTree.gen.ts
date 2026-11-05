@@ -14,6 +14,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as CertificationsRouteImport } from './routes/certifications'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
+import { Route as QuickViewRouteImport } from './routes/quick-view'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SkillsRouteImport } from './routes/skills'
 
@@ -42,6 +43,11 @@ const PortfolioRoute = PortfolioRouteImport.update({
   path: '/portfolio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QuickViewRoute = QuickViewRouteImport.update({
+  id: '/quick-view',
+  path: '/quick-view',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/certifications': typeof CertificationsRoute
   '/contact': typeof ContactRoute
   '/portfolio': typeof PortfolioRoute
+  '/quick-view': typeof QuickViewRoute
   '/services': typeof ServicesRoute
   '/skills': typeof SkillsRoute
 }
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   '/certifications': typeof CertificationsRoute
   '/contact': typeof ContactRoute
   '/portfolio': typeof PortfolioRoute
+  '/quick-view': typeof QuickViewRoute
   '/services': typeof ServicesRoute
   '/skills': typeof SkillsRoute
 }
@@ -78,6 +86,7 @@ export interface FileRoutesById {
   '/certifications': typeof CertificationsRoute
   '/contact': typeof ContactRoute
   '/portfolio': typeof PortfolioRoute
+  '/quick-view': typeof QuickViewRoute
   '/services': typeof ServicesRoute
   '/skills': typeof SkillsRoute
 }
@@ -89,6 +98,7 @@ export interface FileRouteTypes {
     | '/certifications'
     | '/contact'
     | '/portfolio'
+    | '/quick-view'
     | '/services'
     | '/skills'
   fileRoutesByTo: FileRoutesByTo
@@ -98,6 +108,7 @@ export interface FileRouteTypes {
     | '/certifications'
     | '/contact'
     | '/portfolio'
+    | '/quick-view'
     | '/services'
     | '/skills'
   id:
@@ -107,6 +118,7 @@ export interface FileRouteTypes {
     | '/certifications'
     | '/contact'
     | '/portfolio'
+    | '/quick-view'
     | '/services'
     | '/skills'
   fileRoutesById: FileRoutesById
@@ -117,6 +129,7 @@ export interface RootRouteChildren {
   CertificationsRoute: typeof CertificationsRoute
   ContactRoute: typeof ContactRoute
   PortfolioRoute: typeof PortfolioRoute
+  QuickViewRoute: typeof QuickViewRoute
   ServicesRoute: typeof ServicesRoute
   SkillsRoute: typeof SkillsRoute
 }
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/quick-view': {
+      id: '/quick-view'
+      path: '/quick-view'
+      fullPath: '/quick-view'
+      preLoaderRoute: typeof QuickViewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services': {
       id: '/services'
       path: '/services'
@@ -181,6 +201,7 @@ const rootRouteChildren: RootRouteChildren = {
   CertificationsRoute: CertificationsRoute,
   ContactRoute: ContactRoute,
   PortfolioRoute: PortfolioRoute,
+  QuickViewRoute: QuickViewRoute,
   ServicesRoute: ServicesRoute,
   SkillsRoute: SkillsRoute,
 }

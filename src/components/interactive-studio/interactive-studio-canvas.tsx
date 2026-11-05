@@ -25,12 +25,14 @@ import type {
   ShowcaseSlide,
   StudioInput,
   StudioPosition,
+  StudioQuality,
   StudioZoneId,
 } from "./interactive-studio-hero";
 
 type StudioCanvasProps = {
   darkMode: boolean;
   reducedMotion: boolean;
+  quality: StudioQuality;
   inView: boolean;
   inputRef: RefObject<StudioInput>;
   explorerPositionRef: RefObject<StudioPosition>;
@@ -1420,6 +1422,41 @@ function SectionLandmark({
         />
       </mesh>
 
+      <group position={[0, 0.24, -0.34]}>
+        <mesh position={[0, 0.7, 0]}>
+          <boxGeometry args={[1.52, 1.08, 0.72]} />
+          <meshStandardMaterial
+            color={index % 2 === 0 ? structure : deep}
+            roughness={0.52}
+            metalness={index === 1 || index === 3 ? 0.18 : 0.05}
+          />
+        </mesh>
+        <mesh position={[0, 1.42, 0]} rotation={[0, Math.PI / 4, 0]}>
+          <coneGeometry args={[1.02, 0.58, 4]} />
+          <meshStandardMaterial
+            color={zone.color}
+            emissive={zone.color}
+            emissiveIntensity={darkMode ? 0.12 : 0.02}
+            roughness={0.48}
+          />
+        </mesh>
+        <mesh position={[0, 0.47, 0.38]}>
+          <boxGeometry args={[0.34, 0.62, 0.055]} />
+          <meshStandardMaterial color={deep} roughness={0.4} />
+        </mesh>
+        {[-0.48, 0.48].map((x) => (
+          <mesh key={`window-${x}`} position={[x, 0.78, 0.385]}>
+            <boxGeometry args={[0.3, 0.3, 0.045]} />
+            <meshStandardMaterial
+              color="#ffd89a"
+              emissive="#ffbf69"
+              emissiveIntensity={darkMode ? 1.6 : 0.2}
+              roughness={0.24}
+            />
+          </mesh>
+        ))}
+      </group>
+
       {index === 0 ? (
         <group position={[0, 0.25, 0]}>
           <mesh position={[-0.48, 0.62, 0]}>
@@ -1915,17 +1952,18 @@ function PathEnvironment({
   reducedMotion: boolean;
 }) {
   const waterRef = useRef<Group>(null);
-  const ground = darkMode ? "#0b2719" : "#6f9f62";
-  const path = darkMode ? "#493c2e" : "#d6c39a";
-  const pathEdge = darkMode ? "#766247" : "#9a835c";
+  const ground = darkMode ? "#123923" : "#6f9f62";
+  const path = darkMode ? "#6a5843" : "#d6c39a";
+  const pathEdge = darkMode ? "#9a8059" : "#9a835c";
   const structure = darkMode ? "#173654" : "#d4e4ef";
   const accent = darkMode ? "#42a5ff" : "#0878ee";
-  const foliage = darkMode ? "#123d25" : "#2f773b";
-  const foliageLight = darkMode ? "#245b32" : "#4f9849";
+  const foliage = darkMode ? "#18502e" : "#2f773b";
+  const foliageLight = darkMode ? "#327044" : "#4f9849";
   const water = darkMode ? "#063356" : "#319ac5";
   const sand = darkMode ? "#5b513b" : "#d2bd83";
   const bridgeDeck = darkMode ? "#6d5035" : "#a77d4f";
   const bridgeRail = darkMode ? "#8a6844" : "#bd925d";
+  const lampColor = darkMode ? "#ffd38a" : "#ffdf9f";
   const stations = useMemo(
     () =>
       ZONES.map((zone, index) => ({
@@ -2210,6 +2248,52 @@ function PathEnvironment({
         ))}
       </group>
 
+      <group name="welcome-plaza" position={[0, 0.02, 5]}>
+        <mesh position={[0, 0.015, 0]}>
+          <cylinderGeometry args={[1.72, 1.8, 0.1, 16]} />
+          <meshStandardMaterial color={pathEdge} roughness={0.84} />
+        </mesh>
+        <mesh position={[0, 0.08, 0]}>
+          <cylinderGeometry args={[1.46, 1.52, 0.08, 16]} />
+          <meshStandardMaterial color={path} roughness={0.78} />
+        </mesh>
+        {[-1.05, 1.05].map((x) => (
+          <group key={`welcome-post-${x}`} position={[x, 0, -1.05]}>
+            <mesh position={[0, 0.82, 0]}>
+              <boxGeometry args={[0.16, 1.64, 0.16]} />
+              <meshStandardMaterial color={bridgeRail} roughness={0.74} />
+            </mesh>
+            <mesh position={[0, 1.72, 0]}>
+              <sphereGeometry args={[0.13, 12, 8]} />
+              <meshStandardMaterial
+                color={lampColor}
+                emissive={lampColor}
+                emissiveIntensity={darkMode ? 2.3 : 0.25}
+              />
+            </mesh>
+          </group>
+        ))}
+        <mesh position={[0, 1.45, -1.05]}>
+          <boxGeometry args={[2.25, 0.18, 0.18]} />
+          <meshStandardMaterial color={bridgeRail} roughness={0.72} />
+        </mesh>
+        <mesh position={[0, 1.48, -0.94]}>
+          <boxGeometry args={[1.25, 0.42, 0.08]} />
+          <meshStandardMaterial
+            color={accent}
+            emissive={accent}
+            emissiveIntensity={darkMode ? 0.48 : 0.08}
+            roughness={0.4}
+          />
+        </mesh>
+        <pointLight
+          position={[0, 2.1, -0.6]}
+          color={lampColor}
+          intensity={darkMode ? 3.2 : 0.28}
+          distance={5}
+        />
+      </group>
+
       {stations.map((station, index) => (
         <group
           key={station.id}
@@ -2238,16 +2322,16 @@ function PathEnvironment({
             <mesh position={[0, 1.55, 0]}>
               <sphereGeometry args={[0.11, 12, 8]} />
               <meshStandardMaterial
-                color={accent}
-                emissive={accent}
+                color={lampColor}
+                emissive={lampColor}
                 emissiveIntensity={darkMode ? 2.1 : 0.32}
               />
             </mesh>
             {index % 3 === 0 ? (
               <pointLight
                 position={[0, 1.5, 0]}
-                color={accent}
-                intensity={darkMode ? 1.8 : 0.15}
+                color={lampColor}
+                intensity={darkMode ? 2.2 : 0.18}
                 distance={4.2}
               />
             ) : null}
@@ -2514,6 +2598,7 @@ function ZoneBeacons({
 function StudioWorld({
   darkMode,
   reducedMotion,
+  quality,
   inputRef,
   explorerPositionRef,
   onZoneChange,
@@ -2530,11 +2615,11 @@ function StudioWorld({
   const desiredCamera = useMemo(() => new Vector3(), []);
   const cameraTarget = useMemo(() => new Vector3(), []);
   const renderer = useThree((state) => state.gl);
-  const background = darkMode ? "#07101c" : "#cfe8fb";
-  const fog = darkMode ? "#0a1726" : "#d8ebf8";
+  const background = darkMode ? "#0b1930" : "#cfe8fb";
+  const fog = darkMode ? "#10253d" : "#d8ebf8";
 
   useEffect(() => {
-    renderer.toneMappingExposure = darkMode ? 1.08 : 0.94;
+    renderer.toneMappingExposure = darkMode ? 1.18 : 0.94;
   }, [darkMode, renderer]);
 
   useFrame(({ camera, size }) => {
@@ -2604,17 +2689,17 @@ function StudioWorld({
   return (
     <>
       <color attach="background" args={[background]} />
-      <fog attach="fog" args={[fog, 12, 34]} />
+      <fog attach="fog" args={[fog, 14, 38]} />
       <hemisphereLight
-        intensity={darkMode ? 1.05 : 1.55}
-        color={darkMode ? "#8fbdff" : "#fff3d9"}
-        groundColor={darkMode ? "#10243c" : "#8db8d8"}
+        intensity={darkMode ? 1.42 : 1.55}
+        color={darkMode ? "#a7c9ff" : "#fff3d9"}
+        groundColor={darkMode ? "#183b50" : "#8db8d8"}
       />
-      <ambientLight intensity={darkMode ? 0.72 : 1.1} color={darkMode ? "#8bbcff" : "#fff4dc"} />
+      <ambientLight intensity={darkMode ? 0.96 : 1.1} color={darkMode ? "#9bc4ff" : "#fff4dc"} />
       <directionalLight
         position={[4, 7, 6]}
-        intensity={darkMode ? 1.35 : 2.4}
-        color={darkMode ? "#7fb5ff" : "#fff0c9"}
+        intensity={darkMode ? 1.75 : 2.4}
+        color={darkMode ? "#9fc4ff" : "#fff0c9"}
       />
       <pointLight
         position={[2.8, 3.2, -9]}
@@ -2629,7 +2714,11 @@ function StudioWorld({
         color="#38bdf8"
       />
 
-      <StudioEnvironment darkMode={darkMode} inputRef={inputRef} reducedMotion={reducedMotion} />
+      <StudioEnvironment
+        darkMode={darkMode}
+        inputRef={inputRef}
+        reducedMotion={reducedMotion || quality === "low"}
+      />
       <ZoneBeacons inputRef={inputRef} darkMode={darkMode} />
       <DigitalEngineer
         inputRef={inputRef}
@@ -2689,9 +2778,13 @@ export default function InteractiveStudioCanvas(props: StudioCanvasProps) {
     <Canvas
       className="interactive-studio-canvas"
       camera={{ position: [0, 3.88, 8], fov: 45, near: 0.1, far: 64 }}
-      dpr={[1, 1.2]}
+      dpr={props.quality === "low" ? 1 : props.quality === "high" ? [1, 1.5] : [1, 1.2]}
       frameloop={props.inView ? "always" : "never"}
-      gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
+      gl={{
+        antialias: props.quality !== "low",
+        alpha: false,
+        powerPreference: "high-performance",
+      }}
       onCreated={({ gl }) => {
         gl.outputColorSpace = SRGBColorSpace;
         gl.toneMapping = ACESFilmicToneMapping;
@@ -2701,6 +2794,7 @@ export default function InteractiveStudioCanvas(props: StudioCanvasProps) {
       <StudioWorld
         darkMode={props.darkMode}
         reducedMotion={props.reducedMotion}
+        quality={props.quality}
         inputRef={props.inputRef}
         explorerPositionRef={props.explorerPositionRef}
         onZoneChange={props.onZoneChange}

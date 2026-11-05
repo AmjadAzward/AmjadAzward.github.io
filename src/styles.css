@@ -36,6 +36,285 @@
   --radius-xl: 1.75rem;
 }
 
+/* Accessible quick-view portfolio mode */
+.quick-view-page {
+  scroll-behavior: smooth;
+}
+
+.quick-view-jump {
+  position: sticky;
+  z-index: 20;
+  top: 4.8rem;
+  display: flex;
+  gap: 0.45rem;
+  margin-bottom: clamp(2rem, 5vw, 4rem);
+  padding: 0.55rem;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--background) 82%, transparent);
+  backdrop-filter: blur(18px);
+  scrollbar-width: none;
+}
+
+.quick-view-jump a {
+  flex: 0 0 auto;
+  padding: 0.65rem 0.85rem;
+  border-radius: 999px;
+  color: var(--muted-foreground);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.quick-view-jump a:hover,
+.quick-view-jump a:focus-visible {
+  background: color-mix(in oklab, var(--primary) 13%, var(--card));
+  color: var(--foreground);
+}
+
+.quick-view-section {
+  scroll-margin-top: 8rem;
+  margin-bottom: clamp(3.5rem, 8vw, 7rem);
+}
+
+.quick-view-section > header,
+.quick-view-about {
+  max-width: 54rem;
+  margin-bottom: 1.5rem;
+}
+
+.quick-view-section h2 {
+  margin: 0.55rem 0 0;
+  color: var(--foreground);
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 5rem);
+  font-weight: 650;
+  letter-spacing: -0.065em;
+  line-height: 0.96;
+}
+
+.quick-view-about > p:not(.eyebrow),
+.quick-view-contact p {
+  max-width: 48rem;
+  margin-top: 1.25rem;
+  color: var(--muted-foreground);
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+  line-height: 1.75;
+}
+
+.quick-view-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+.quick-primary-action,
+.quick-secondary-action {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--primary);
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.quick-primary-action {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.quick-secondary-action {
+  color: var(--foreground);
+}
+
+.quick-primary-action svg,
+.quick-secondary-action svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.quick-skill-grid,
+.quick-service-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.quick-skill-grid article,
+.quick-service-grid article,
+.quick-view-split > div,
+.quick-view-contact {
+  border: 1px solid var(--border);
+  border-radius: 1.4rem;
+  background: color-mix(in oklab, var(--card) 76%, transparent);
+}
+
+.quick-skill-grid article,
+.quick-service-grid article {
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.quick-skill-grid h3,
+.quick-service-grid h3,
+.quick-project-grid h3,
+.quick-cert-grid h3,
+.quick-view-split h3 {
+  margin: 0;
+  color: var(--foreground);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+}
+
+.quick-skill-grid ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quick-skill-grid li {
+  padding: 0.42rem 0.58rem;
+  border: 1px solid color-mix(in oklab, var(--primary) 24%, var(--border));
+  border-radius: 999px;
+  color: var(--muted-foreground);
+  font-size: 0.66rem;
+}
+
+.quick-project-grid,
+.quick-cert-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.quick-project-grid article,
+.quick-cert-grid article {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  background: var(--card);
+}
+
+.quick-project-grid img,
+.quick-cert-grid img {
+  width: 100%;
+  height: 13rem;
+  background: color-mix(in oklab, var(--background) 85%, var(--card));
+  object-fit: contain;
+}
+
+.quick-project-grid article > div,
+.quick-cert-grid article > div {
+  padding: 1.1rem;
+}
+
+.quick-project-grid span,
+.quick-cert-grid span,
+.quick-view-split article > span {
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.quick-project-grid h3,
+.quick-cert-grid h3 {
+  margin-top: 0.55rem;
+}
+
+.quick-project-grid p,
+.quick-service-grid p,
+.quick-view-split p {
+  color: var(--muted-foreground);
+  font-size: 0.78rem;
+  line-height: 1.65;
+}
+
+.quick-project-grid a,
+.quick-cert-grid a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.8rem;
+  color: var(--primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.quick-project-grid a svg,
+.quick-cert-grid a svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.quick-view-split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.quick-view-split > div,
+.quick-view-contact {
+  padding: clamp(1.4rem, 4vw, 2.5rem);
+}
+
+.quick-view-split article {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.quick-service-grid article > svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--primary);
+}
+
+.quick-service-grid article > div {
+  margin-top: 1rem;
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+}
+
+.quick-view-contact {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .quick-project-grid,
+  .quick-cert-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .quick-view-jump {
+    top: 4.2rem;
+    border-radius: 1rem;
+  }
+
+  .quick-skill-grid,
+  .quick-service-grid,
+  .quick-project-grid,
+  .quick-cert-grid,
+  .quick-view-split {
+    grid-template-columns: 1fr;
+  }
+}
+
 :root {
   --background: oklch(0.965 0.018 251);
   --foreground: oklch(0.17 0.065 264);
@@ -247,6 +526,42 @@ body::before {
   background: linear-gradient(90deg, var(--primary), var(--secondary-accent));
   box-shadow: 0 0 12px color-mix(in oklab, var(--primary) 52%, transparent);
   animation: site-loader-progress 1.15s ease-in-out infinite;
+}
+
+.site-loader-recovery {
+  display: grid;
+  gap: 0.75rem;
+  width: min(30rem, calc(100vw - 2rem));
+  margin-top: 0.65rem;
+  color: rgb(226 240 255 / 82%);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.site-loader-recovery > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.site-loader-recovery a,
+.site-loader-recovery button {
+  display: inline-flex;
+  min-height: 2.35rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.85rem;
+  border: 1px solid rgb(108 198 255 / 40%);
+  border-radius: 999px;
+  background: rgb(7 23 42 / 68%);
+  color: #f1f7ff;
+  font: 600 0.68rem/1 var(--font-sans);
+}
+
+.site-loader-recovery a {
+  background: #42a5ff;
+  color: #06101d;
 }
 
 @keyframes site-loader-spin {
@@ -2289,11 +2604,15 @@ body::before {
 
 @media (max-width: 680px) {
   .path-map-trigger {
+    z-index: 12;
     top: 0.7rem;
     right: 0.7rem;
+    display: grid;
     width: 2.45rem;
     padding: 0;
-    justify-content: center;
+    place-items: center;
+    visibility: visible;
+    opacity: 1;
   }
 
   .path-map-trigger span {
@@ -2353,6 +2672,374 @@ body::before {
 .studio-home {
   display: block;
   padding: 0.75rem clamp(1rem, 3vw, 3rem) 1rem;
+}
+
+/* Village experience controls and accessible overlays */
+.path-world-tools {
+  position: absolute;
+  z-index: 9;
+  top: 0.7rem;
+  right: 7.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border: 1px solid color-mix(in oklab, var(--primary) 30%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--background) 86%, transparent);
+  box-shadow: 0 12px 34px rgb(0 12 31 / 20%);
+  backdrop-filter: blur(16px);
+}
+
+.path-world-tools a,
+.path-world-tools button,
+.path-world-tools select {
+  min-height: 2.15rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--foreground);
+  font: 600 0.66rem/1 var(--font-sans);
+}
+
+.path-world-tools a {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.75rem;
+}
+
+.path-world-tools button {
+  display: grid;
+  width: 2.15rem;
+  place-items: center;
+}
+
+.path-world-tools select {
+  max-width: 7.2rem;
+  padding: 0 1.8rem 0 0.65rem;
+  outline: none;
+}
+
+.path-world-tools a:hover,
+.path-world-tools a:focus-visible,
+.path-world-tools button:hover,
+.path-world-tools button:focus-visible,
+.path-world-tools button[aria-pressed="true"] {
+  background: color-mix(in oklab, var(--primary) 18%, transparent);
+  color: var(--primary);
+}
+
+.path-world-tools svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.path-intro-identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--foreground);
+  font-family: var(--font-mono);
+  font-size: clamp(0.62rem, 1vw, 0.76rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.path-intro-identity i {
+  width: 0.3rem;
+  height: 0.3rem;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 12px color-mix(in oklab, var(--primary) 75%, transparent);
+}
+
+.path-intro-card .path-intro-actions,
+.path-intro-card .path-intro-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.path-intro-card .path-intro-links {
+  margin-top: -0.15rem;
+}
+
+.path-intro-card .path-intro-links a {
+  min-height: auto;
+  padding: 0.2rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 0.72rem;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--primary) 45%, transparent);
+  text-underline-offset: 0.25rem;
+}
+
+.path-intro-card .path-intro-links a:hover,
+.path-intro-card .path-intro-links a:focus-visible {
+  color: var(--primary);
+}
+
+.path-intro-links svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.path-tutorial-overlay {
+  position: absolute;
+  z-index: 16;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(2 10 22 / 68%);
+  backdrop-filter: blur(10px);
+}
+
+.path-tutorial {
+  position: relative;
+  width: min(34rem, 100%);
+  padding: clamp(1.35rem, 4vw, 2.2rem);
+  border: 1px solid rgb(104 193 255 / 38%);
+  border-radius: 1.5rem;
+  background: color-mix(in oklab, var(--background) 92%, #0b2038);
+  box-shadow: 0 28px 80px rgb(0 9 23 / 48%);
+}
+
+.path-tutorial > button:first-child {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--foreground);
+}
+
+.path-tutorial > p,
+.path-tutorial > span {
+  color: var(--muted-foreground);
+}
+
+.path-tutorial > p {
+  margin-bottom: 0.55rem;
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+}
+
+.path-tutorial h2 {
+  margin: 0 0 0.65rem;
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+
+.path-tutorial ul {
+  display: grid;
+  gap: 0.42rem;
+  margin: 1.2rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.path-tutorial li {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.path-tutorial kbd,
+.path-interaction-cue kbd {
+  padding: 0.3rem 0.48rem;
+  border: 1px solid color-mix(in oklab, var(--primary) 36%, var(--border));
+  border-radius: 0.4rem;
+  background: color-mix(in oklab, var(--primary) 9%, var(--card));
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+}
+
+.path-tutorial > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.path-tutorial > div > * {
+  display: inline-flex;
+  min-height: 2.8rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0 1rem;
+  border: 1px solid color-mix(in oklab, var(--primary) 42%, var(--border));
+  border-radius: 999px;
+}
+
+.path-tutorial > div button {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 700;
+}
+
+.path-map-canvas > button.is-selected span {
+  border-color: #fff4b2;
+  background: #0878ee;
+  box-shadow:
+    0 0 0 0.35rem rgb(66 165 255 / 26%),
+    0 0 28px rgb(80 186 255 / 75%);
+  transform: rotate(45deg) scale(1.16);
+}
+
+.path-map-choice {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem;
+  border: 1px solid rgb(104 193 255 / 25%);
+  border-radius: 1rem;
+  background: color-mix(in oklab, var(--primary) 6%, var(--card));
+}
+
+.path-map-choice div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.path-map-choice span {
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.1em;
+}
+
+.path-map-choice button {
+  min-height: 2.35rem;
+  padding: 0 0.85rem;
+  border: 1px solid color-mix(in oklab, var(--primary) 35%, var(--border));
+  border-radius: 999px;
+  background: transparent;
+  color: var(--foreground);
+  font-weight: 700;
+}
+
+.path-map-choice button:last-child {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.path-interaction-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+}
+
+.path-robot-guidance {
+  position: absolute;
+  z-index: 8;
+  right: 1.2rem;
+  bottom: 1.2rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  width: min(23rem, calc(100% - 2.4rem));
+  align-items: start;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid rgb(104 193 255 / 32%);
+  border-radius: 1rem;
+  background: color-mix(in oklab, var(--background) 88%, transparent);
+  box-shadow: 0 18px 48px rgb(0 9 23 / 28%);
+  backdrop-filter: blur(14px);
+}
+
+.path-robot-guidance > svg {
+  width: 1.05rem;
+  color: var(--primary);
+}
+
+.path-robot-guidance span {
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.1em;
+}
+
+.path-robot-guidance p {
+  margin: 0.2rem 0 0;
+  color: var(--foreground);
+  font-size: 0.76rem;
+}
+
+.path-robot-guidance button {
+  display: grid;
+  width: 1.8rem;
+  height: 1.8rem;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted-foreground);
+}
+
+@media (max-width: 820px) {
+  .path-world-tools {
+    right: 3.6rem;
+  }
+
+  .path-world-tools label,
+  .path-world-tools > a {
+    display: none;
+  }
+}
+
+@media (max-width: 680px) {
+  .path-world-tools {
+    top: 0.55rem;
+    right: auto;
+    left: 0.55rem;
+    padding: 0.25rem;
+  }
+
+  .path-world-tools button {
+    width: 1.95rem;
+    min-height: 1.95rem;
+  }
+
+  .path-tutorial li {
+    grid-template-columns: 6.8rem 1fr;
+    font-size: 0.78rem;
+  }
+
+  .path-map-choice {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .path-map-choice div {
+    grid-column: 1 / -1;
+  }
+
+  .path-robot-guidance {
+    right: 0.65rem;
+    bottom: 0.65rem;
+    width: calc(100% - 1.3rem);
+  }
 }
 
 .studio-home-shell {
