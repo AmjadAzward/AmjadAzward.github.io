@@ -1746,6 +1746,7 @@ function SwayingForest({ darkMode, reducedMotion }: { darkMode: boolean; reduced
 
   useFrame((state) => {
     const time = reducedMotion ? 0 : state.clock.elapsedTime;
+    if (reducedMotion && lastUpdateRef.current >= 0) return;
     if (!reducedMotion && time - lastUpdateRef.current < 1 / 24) return;
     lastUpdateRef.current = time;
 
@@ -1857,6 +1858,7 @@ function NaturalLife({ darkMode, reducedMotion }: { darkMode: boolean; reducedMo
 
   useFrame((state) => {
     const time = reducedMotion ? 0 : state.clock.elapsedTime;
+    if (reducedMotion && lastUpdateRef.current >= 0) return;
     if (!reducedMotion && time - lastUpdateRef.current < 1 / 24) return;
     lastUpdateRef.current = time;
     const grassMesh = grassRef.current;
@@ -2752,36 +2754,45 @@ function StudioWorld({
 
 function SceneReadySignal() {
   const signalledRef = useRef(false);
-  const frameRequestRef = useRef(0);
 
   useFrame(() => {
     if (signalledRef.current) return;
     signalledRef.current = true;
-    frameRequestRef.current = window.requestAnimationFrame(() => {
-      document.documentElement.dataset["studioReady"] = "true";
-      window.dispatchEvent(new Event("portfolio:studio-ready"));
-    });
+    document.documentElement.dataset["studioReady"] = "true";
+    window.dispatchEvent(new Event("portfolio:studio-ready"));
   });
-
-  useEffect(
-    () => () => {
-      window.cancelAnimationFrame(frameRequestRef.current);
-    },
-    [],
-  );
 
   return null;
 }
 
+function shouldUseAutomaticLowQuality(quality: StudioQuality) {
+  if (quality !== "auto" || typeof window === "undefined") return false;
+  const device = navigator as Navigator & {
+    connection?: { saveData?: boolean; effectiveType?: string };
+    deviceMemory?: number;
+  };
+  return (
+    window.innerWidth <= 820 ||
+    device.connection?.saveData === true ||
+    device.connection?.effectiveType === "2g" ||
+    (device.deviceMemory !== undefined && device.deviceMemory <= 4) ||
+    navigator.hardwareConcurrency <= 4
+  );
+}
+
 export default function InteractiveStudioCanvas(props: StudioCanvasProps) {
+  const effectiveQuality: StudioQuality = shouldUseAutomaticLowQuality(props.quality)
+    ? "low"
+    : props.quality;
+
   return (
     <Canvas
       className="interactive-studio-canvas"
       camera={{ position: [0, 3.88, 8], fov: 45, near: 0.1, far: 64 }}
-      dpr={props.quality === "low" ? 1 : props.quality === "high" ? [1, 1.5] : [1, 1.2]}
+      dpr={effectiveQuality === "low" ? 1 : effectiveQuality === "high" ? [1, 1.5] : [1, 1.2]}
       frameloop={props.inView ? "always" : "never"}
       gl={{
-        antialias: props.quality !== "low",
+        antialias: effectiveQuality !== "low",
         alpha: false,
         powerPreference: "high-performance",
       }}
@@ -2794,7 +2805,7 @@ export default function InteractiveStudioCanvas(props: StudioCanvasProps) {
       <StudioWorld
         darkMode={props.darkMode}
         reducedMotion={props.reducedMotion}
-        quality={props.quality}
+        quality={effectiveQuality}
         inputRef={props.inputRef}
         explorerPositionRef={props.explorerPositionRef}
         onZoneChange={props.onZoneChange}

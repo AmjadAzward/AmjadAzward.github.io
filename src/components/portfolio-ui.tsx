@@ -24,17 +24,17 @@ const cinematicEase = [0.16, 1, 0.3, 1] as const;
 function InitialLoader({ waitForStudio }: { waitForStudio: boolean }) {
   const reduce = useReducedMotion();
   const [visible, setVisible] = useState(true);
-  const [loadingSlow, setLoadingSlow] = useState(false);
 
   useEffect(() => {
     const startedAt = performance.now();
-    const minimumDuration = reduce ? 0 : waitForStudio ? 900 : 220;
+    const minimumDuration = reduce ? 0 : waitForStudio ? 320 : 180;
     let hideTimer = 0;
     let safetyTimer = 0;
 
     const hide = () => {
       const remaining = Math.max(0, minimumDuration - (performance.now() - startedAt));
       window.clearTimeout(hideTimer);
+      window.clearTimeout(safetyTimer);
       hideTimer = window.setTimeout(() => setVisible(false), remaining);
     };
 
@@ -44,7 +44,7 @@ function InitialLoader({ waitForStudio }: { waitForStudio: boolean }) {
       hide();
     } else {
       window.addEventListener("portfolio:studio-ready", hide, { once: true });
-      safetyTimer = window.setTimeout(() => setLoadingSlow(true), 10_000);
+      safetyTimer = window.setTimeout(hide, 7_000);
     }
 
     return () => {
@@ -77,20 +77,6 @@ function InitialLoader({ waitForStudio }: { waitForStudio: boolean }) {
             <span className="site-loader-track" aria-hidden>
               <i />
             </span>
-            {loadingSlow ? (
-              <div className="site-loader-recovery">
-                <span>The 3D village is taking longer than expected.</span>
-                <div>
-                  <a href="/quick-view">Open Quick View</a>
-                  <button type="button" onClick={() => window.location.reload()}>
-                    Retry 3D
-                  </button>
-                  <button type="button" onClick={() => setVisible(false)}>
-                    Continue simplified
-                  </button>
-                </div>
-              </div>
-            ) : null}
           </div>
         </motion.div>
       ) : null}

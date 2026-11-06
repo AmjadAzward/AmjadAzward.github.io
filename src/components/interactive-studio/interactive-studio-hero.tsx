@@ -34,7 +34,8 @@ import {
 } from "@/data/portfolio";
 import homePortrait from "../../../img/2-enhanced.jpg?url";
 
-const InteractiveStudioCanvas = lazy(() => import("./interactive-studio-canvas"));
+const studioCanvasModule = import("./interactive-studio-canvas");
+const InteractiveStudioCanvas = lazy(() => studioCanvasModule);
 
 export type StudioZoneId =
   "about" | "skills" | "certifications" | "services" | "portfolio" | "contact";
@@ -473,14 +474,9 @@ export default function InteractiveStudioHero() {
   const [mapSelection, setMapSelection] = useState<StudioZoneId | "welcome" | null>(null);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [guidanceEnabled, setGuidanceEnabled] = useState(true);
-  const [quality, setQuality] = useState<StudioQuality>("auto");
 
   useEffect(() => {
     setMode(supportsWebGL() && !prefersLightweightScene() ? "3d" : "static");
-    const storedQuality = window.localStorage.getItem("aa-village-quality");
-    if (storedQuality === "low" || storedQuality === "high" || storedQuality === "auto") {
-      setQuality(storedQuality);
-    }
     setGuidanceEnabled(window.localStorage.getItem("aa-village-guidance") !== "off");
   }, []);
 
@@ -532,11 +528,6 @@ export default function InteractiveStudioHero() {
     setJourneyStarted(true);
     setMapOpen(false);
     setMapSelection(null);
-  };
-
-  const updateQuality = (nextQuality: StudioQuality) => {
-    setQuality(nextQuality);
-    window.localStorage.setItem("aa-village-quality", nextQuality);
   };
 
   const toggleGuidance = () => {
@@ -680,7 +671,7 @@ export default function InteractiveStudioHero() {
             <InteractiveStudioCanvas
               darkMode={darkMode}
               reducedMotion={reducedMotion}
-              quality={quality}
+              quality="auto"
               inView={inView}
               inputRef={inputRef}
               explorerPositionRef={explorerPositionRef}
@@ -699,30 +690,6 @@ export default function InteractiveStudioHero() {
       </div>
 
       <div className="path-world-tools" aria-label="Village options">
-        <Link to="/quick-view" title="Open accessible Quick View">
-          Quick View
-        </Link>
-        <label title="3D rendering quality">
-          <span className="sr-only">Rendering quality</span>
-          <select
-            value={quality}
-            onChange={(event) => updateQuality(event.target.value as StudioQuality)}
-            aria-label="Rendering quality"
-          >
-            <option value="auto">Auto quality</option>
-            <option value="low">Low quality</option>
-            <option value="high">High quality</option>
-          </select>
-        </label>
-        <button
-          type="button"
-          onClick={toggleGuidance}
-          aria-pressed={guidanceEnabled}
-          title="Toggle robot guidance"
-        >
-          <Bot aria-hidden />
-          <span className="sr-only">Toggle robot guidance</span>
-        </button>
         <button
           type="button"
           onClick={toggleTheme}
