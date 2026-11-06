@@ -67,25 +67,25 @@ const SERVICE_NODE_POSITIONS: Array<[number, number]> = [
 ];
 
 const START_POSITION = new Vector3(0, 0, 5);
-const WALK_BOUNDS = { minX: -10.2, maxX: 10.2, minZ: -28.5, maxZ: 7.2 };
+const WALK_BOUNDS = { minX: -12.8, maxX: 12.8, minZ: -28.5, maxZ: 7.2 };
 const SHOWCASE_SCREEN_OFFSET = 3.25;
 
 const MEADOW_PATCHES: Array<[number, number]> = [
-  [-8.8, 5.2],
-  [-7.6, 3.2],
-  [-8.9, -0.8],
-  [-8.4, -5.4],
-  [-9.1, -10.5],
-  [-8.3, -16.2],
-  [-8.9, -21.5],
-  [-7.5, -26.2],
-  [7.7, 4.7],
-  [8.8, 1.1],
-  [8.1, -4.2],
-  [8.8, -9.5],
-  [8.1, -14.8],
-  [8.9, -20.2],
-  [7.8, -25.8],
+  [-11.2, 5.2],
+  [-10.1, 3.2],
+  [-11.4, -0.8],
+  [-10.7, -5.4],
+  [-11.5, -10.5],
+  [-10.6, -16.2],
+  [-11.3, -21.5],
+  [-10.1, -26.2],
+  [10.2, 4.7],
+  [11.3, 1.1],
+  [10.5, -4.2],
+  [11.2, -9.5],
+  [10.5, -14.8],
+  [11.4, -20.2],
+  [10.2, -25.8],
   [-1.7, 4.3],
   [2.2, 3.8],
   [-1.8, -27.1],
@@ -93,40 +93,41 @@ const MEADOW_PATCHES: Array<[number, number]> = [
 ];
 
 const FENCE_SEGMENTS: Array<{ x: number; z: number; rotation: number; length: number }> = [
-  { x: -9.25, z: 3.5, rotation: Math.PI / 2, length: 4.5 },
-  { x: -9.25, z: -3.5, rotation: Math.PI / 2, length: 5 },
-  { x: -9.25, z: -10.5, rotation: Math.PI / 2, length: 5 },
-  { x: -9.25, z: -17.5, rotation: Math.PI / 2, length: 5 },
-  { x: -9.25, z: -24.5, rotation: Math.PI / 2, length: 5 },
-  { x: 9.25, z: 3.5, rotation: Math.PI / 2, length: 4.5 },
-  { x: 9.25, z: -3.5, rotation: Math.PI / 2, length: 5 },
-  { x: 9.25, z: -10.5, rotation: Math.PI / 2, length: 5 },
-  { x: 9.25, z: -17.5, rotation: Math.PI / 2, length: 5 },
-  { x: 9.25, z: -24.5, rotation: Math.PI / 2, length: 5 },
-  { x: -6.35, z: 6.35, rotation: 0, length: 5.2 },
-  { x: 6.35, z: 6.35, rotation: 0, length: 5.2 },
-  { x: -6.3, z: -27.65, rotation: 0, length: 5.6 },
-  { x: 6.3, z: -27.65, rotation: 0, length: 5.6 },
+  { x: -12.15, z: 3.5, rotation: Math.PI / 2, length: 4.5 },
+  { x: -12.15, z: -3.5, rotation: Math.PI / 2, length: 5 },
+  { x: -12.15, z: -10.5, rotation: Math.PI / 2, length: 5 },
+  { x: -12.15, z: -17.5, rotation: Math.PI / 2, length: 5 },
+  { x: -12.15, z: -24.5, rotation: Math.PI / 2, length: 5 },
+  { x: 12.15, z: 3.5, rotation: Math.PI / 2, length: 4.5 },
+  { x: 12.15, z: -3.5, rotation: Math.PI / 2, length: 5 },
+  { x: 12.15, z: -10.5, rotation: Math.PI / 2, length: 5 },
+  { x: 12.15, z: -17.5, rotation: Math.PI / 2, length: 5 },
+  { x: 12.15, z: -24.5, rotation: Math.PI / 2, length: 5 },
+  { x: -8.05, z: 6.35, rotation: 0, length: 7.5 },
+  { x: 8.05, z: 6.35, rotation: 0, length: 7.5 },
+  { x: -8.1, z: -27.65, rotation: 0, length: 7.8 },
+  { x: 8.1, z: -27.65, rotation: 0, length: 7.8 },
 ];
 
 const FOREST_OBJECTS = Array.from({ length: 48 }, (_, index) => {
-  const rightSide = index % 4 === 0;
+  const rightSide = index % 2 === 1;
   const row = Math.floor(index / 2);
+  const edgeOffset = ((index * 5) % 4) * 0.72;
   return {
-    x: rightSide ? 2.2 + (index % 4) * 1.12 : -2.1 - (index % 6) * 0.96,
-    z: 4.6 - row * 1.36 + ((index * 7) % 5) * 0.24,
-    scale: 0.72 + ((index * 11) % 7) * 0.07,
+    x: (rightSide ? 1 : -1) * (8.35 + edgeOffset),
+    z: 5 - row * 1.43 + ((index * 7) % 5) * 0.2,
+    scale: 0.64 + ((index * 11) % 7) * 0.06,
     light: index % 3 === 0,
   };
 });
 
 const HILL_OBJECTS: Array<[number, number, number]> = [
-  [-7.6, 2.4, 1.25],
-  [-7.3, -13.8, 1.65],
-  [-6.8, -22.7, 1.4],
-  [6.7, 1.2, 0.88],
-  [6.8, -9.4, 1.05],
-  [7.1, -21.4, 0.92],
+  [-10.4, 2.4, 1.2],
+  [-10.2, -13.8, 1.5],
+  [-9.8, -22.7, 1.32],
+  [9.8, 1.2, 0.86],
+  [9.9, -9.4, 1],
+  [10.1, -21.4, 0.9],
 ];
 
 const STATION_OBJECTS = ZONES.map((zone, index) => ({
@@ -136,10 +137,10 @@ const STATION_OBJECTS = ZONES.map((zone, index) => ({
 
 const VISIBLE_FOREST_OBJECTS = FOREST_OBJECTS.filter((tree) => {
   const clearOfLandmarks = STATION_OBJECTS.every(
-    (station) => Math.hypot(tree.x - station.x, tree.z - station.z) > 2.35,
+    (station) => Math.hypot(tree.x - station.x, tree.z - station.z) > 3.05,
   );
   const clearOfApproaches = ZONES.every(
-    (zone) => Math.hypot(tree.x - zone.position[0], tree.z - zone.position[2]) > 1.4,
+    (zone) => Math.hypot(tree.x - zone.position[0], tree.z - zone.position[2]) > 2.25,
   );
   return clearOfLandmarks && clearOfApproaches;
 });
@@ -2081,7 +2082,7 @@ function PathEnvironment({
   const shorelineRocks = useMemo(
     () =>
       Array.from({ length: 22 }, (_, index) => ({
-        x: 8.45 + ((index * 7) % 5) * 0.24,
+        x: 12.05 + ((index * 7) % 5) * 0.24,
         z: 4.3 - index * 1.42,
         scale: 0.18 + (index % 4) * 0.07,
       })),
@@ -2109,22 +2110,22 @@ function PathEnvironment({
   return (
     <group>
       <mesh position={[0, -0.08, -10.65]} rotation={[-Math.PI / 2, 0, 0]} onPointerDown={walkTo}>
-        <planeGeometry args={[23, 42]} />
+        <planeGeometry args={[30, 42]} />
         <meshStandardMaterial color={ground} roughness={0.92} />
       </mesh>
 
       <mesh
-        position={[11.05, -0.055, -10.65]}
+        position={[14.6, -0.055, -10.65]}
         rotation={[-Math.PI / 2, 0, 0]}
         onPointerDown={walkTo}
       >
-        <planeGeometry args={[2.3, 42]} />
+        <planeGeometry args={[2.6, 42]} />
         <meshStandardMaterial color={sand} roughness={0.96} />
       </mesh>
 
       <group ref={waterRef}>
-        <mesh position={[15.55, -0.11, -10.65]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[7.4, 42, 1, 32]} />
+        <mesh position={[19.2, -0.11, -10.65]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[7.6, 42, 1, 32]} />
           <meshStandardMaterial
             color={water}
             emissive={darkMode ? "#03223a" : "#176d98"}
@@ -2138,7 +2139,7 @@ function PathEnvironment({
         {Array.from({ length: 7 }, (_, index) => (
           <mesh
             key={`wave-${index}`}
-            position={[12.05 + index * 0.58, -0.045 + (index % 2) * 0.012, -10.65]}
+            position={[15.55 + index * 0.58, -0.045 + (index % 2) * 0.012, -10.65]}
             rotation={[-Math.PI / 2, 0, 0]}
           >
             <planeGeometry args={[0.035, 39]} />
@@ -2159,7 +2160,7 @@ function PathEnvironment({
           onPointerDown={walkTo}
         >
           <boxGeometry
-            args={[segment.key.startsWith("main") ? 1.85 : 1.18, 0.07, segment.length]}
+            args={[segment.key.startsWith("main") ? 2.45 : 1.68, 0.07, segment.length]}
           />
           <meshStandardMaterial color={path} roughness={0.82} metalness={0.02} />
         </mesh>
@@ -2184,7 +2185,7 @@ function PathEnvironment({
         ))}
 
       <mesh position={[0, -0.035, -15.65]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[18, 1.05]} />
+        <planeGeometry args={[24, 1.05]} />
         <meshStandardMaterial
           color={water}
           emissive={darkMode ? "#03223a" : "#176d98"}

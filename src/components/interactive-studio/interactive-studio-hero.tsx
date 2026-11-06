@@ -255,7 +255,7 @@ const robotGuidance: Record<StudioZoneId, string> = {
   contact: "The communication tower opens the direct contact and social channels.",
 };
 
-const WORLD_BOUNDS = { minX: -10.2, maxX: 10.2, northZ: 7.2, southZ: -28.5 };
+const WORLD_BOUNDS = { minX: -12.8, maxX: 12.8, northZ: 7.2, southZ: -28.5 };
 
 function worldToMapPosition(position: StudioPosition) {
   return {
@@ -364,24 +364,25 @@ const VILLAGE_TRAILS: Array<{ id: string; kind: "main" | "branch"; points: Studi
 ];
 
 const MAP_TREES = Array.from({ length: 48 }, (_, index) => {
-  const rightSide = index % 4 === 0;
+  const rightSide = index % 2 === 1;
   const row = Math.floor(index / 2);
+  const edgeOffset = ((index * 5) % 4) * 0.72;
   return {
     index,
     ...worldToMapPosition({
-      x: rightSide ? 2.2 + (index % 4) * 1.12 : -2.1 - (index % 6) * 0.96,
-      z: 4.6 - row * 1.36 + ((index * 7) % 5) * 0.24,
+      x: (rightSide ? 1 : -1) * (8.35 + edgeOffset),
+      z: 5 - row * 1.43 + ((index * 7) % 5) * 0.2,
     }),
   };
-}).filter((tree) => tree.index % 2 === 0);
+}).filter((tree) => tree.index % 4 < 2);
 
 const MAP_HILLS = [
-  { x: -7.6, z: 2.4 },
-  { x: -7.3, z: -13.8 },
-  { x: -6.8, z: -22.7 },
-  { x: 6.7, z: 1.2 },
-  { x: 6.8, z: -9.4 },
-  { x: 7.1, z: -21.4 },
+  { x: -10.4, z: 2.4 },
+  { x: -10.2, z: -13.8 },
+  { x: -9.8, z: -22.7 },
+  { x: 9.8, z: 1.2 },
+  { x: 9.9, z: -9.4 },
+  { x: 10.1, z: -21.4 },
 ].map(worldToMapPosition);
 
 const SOCIAL_MAP_POSITION = worldToMapPosition({ x: 2.01, z: -25.55 });
