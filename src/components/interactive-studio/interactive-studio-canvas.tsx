@@ -2093,10 +2093,12 @@ function PathEnvironment({
   darkMode,
   inputRef,
   reducedMotion,
+  hiddenZoneId,
 }: {
   darkMode: boolean;
   inputRef: RefObject<StudioInput>;
   reducedMotion: boolean;
+  hiddenZoneId: StudioZoneId | null;
 }) {
   const waterRef = useRef<Group>(null);
   const ground = darkMode ? "#123923" : "#6f9f62";
@@ -2448,21 +2450,23 @@ function PathEnvironment({
         />
       </group>
 
-      {stations.map((station, index) => (
-        <group
-          key={station.id}
-          position={[station.position[0] + station.side * 1.9, 0, station.position[2]]}
-        >
-          <SectionLandmark
-            zone={station}
-            index={index}
-            side={station.side}
-            darkMode={darkMode}
-            structure={structure}
-            pathEdge={pathEdge}
-          />
-        </group>
-      ))}
+      {stations.map((station, index) =>
+        station.id === hiddenZoneId ? null : (
+          <group
+            key={station.id}
+            position={[station.position[0] + station.side * 1.9, 0, station.position[2]]}
+          >
+            <SectionLandmark
+              zone={station}
+              index={index}
+              side={station.side}
+              darkMode={darkMode}
+              structure={structure}
+              pathEdge={pathEdge}
+            />
+          </group>
+        ),
+      )}
 
       {Array.from({ length: 12 }, (_, index) => {
         const side = index % 2 === 0 ? -1 : 1;
@@ -2545,10 +2549,12 @@ function StudioEnvironment({
   darkMode,
   inputRef,
   reducedMotion,
+  hiddenZoneId,
 }: {
   darkMode: boolean;
   inputRef: RefObject<StudioInput>;
   reducedMotion: boolean;
+  hiddenZoneId: StudioZoneId | null;
 }) {
   const city = useMemo(
     () =>
@@ -2561,7 +2567,12 @@ function StudioEnvironment({
   );
   if (ZONES.length > 0)
     return (
-      <PathEnvironment darkMode={darkMode} inputRef={inputRef} reducedMotion={reducedMotion} />
+      <PathEnvironment
+        darkMode={darkMode}
+        inputRef={inputRef}
+        reducedMotion={reducedMotion}
+        hiddenZoneId={hiddenZoneId}
+      />
     );
   const floor = darkMode ? "#0b192a" : "#dce9f8";
   const wall = darkMode ? "#13253b" : "#edf4fc";
@@ -2696,55 +2707,59 @@ function StudioEnvironment({
 function ZoneBeacons({
   inputRef,
   darkMode,
+  hiddenZoneId,
 }: {
   inputRef: RefObject<StudioInput>;
   darkMode: boolean;
+  hiddenZoneId: StudioZoneId | null;
 }) {
   return (
     <group>
-      {ZONES.map((zone, index) => (
-        <group
-          key={zone.id}
-          position={zone.position}
-          onPointerDown={(event) => {
-            event.stopPropagation();
-            if (inputRef.current) {
-              inputRef.current.target = { x: zone.position[0], z: zone.position[2] };
-            }
-          }}
-          onPointerOver={() => {
-            document.body.style.cursor = "pointer";
-          }}
-          onPointerOut={() => {
-            document.body.style.cursor = "";
-          }}
-        >
-          <mesh rotation={[-Math.PI / 2, 0, 0]}>
-            <torusGeometry args={[0.48, 0.025, 8, 42]} />
-            <meshStandardMaterial
-              color={zone.color}
-              emissive={zone.color}
-              emissiveIntensity={darkMode ? 1.15 : 0.3}
-            />
-          </mesh>
-          <mesh position={[0, 0.2, 0]}>
-            <cylinderGeometry args={[0.025, 0.05, 0.38, 10]} />
-            <meshStandardMaterial
-              color={zone.color}
-              emissive={zone.color}
-              emissiveIntensity={darkMode ? 0.9 : 0.2}
-            />
-          </mesh>
-          <mesh position={[0, 0.45, 0]}>
-            <sphereGeometry args={[0.075 + index * 0.002, 12, 8]} />
-            <meshStandardMaterial
-              color={zone.color}
-              emissive={zone.color}
-              emissiveIntensity={darkMode ? 1.4 : 0.35}
-            />
-          </mesh>
-        </group>
-      ))}
+      {ZONES.map((zone, index) =>
+        zone.id === hiddenZoneId ? null : (
+          <group
+            key={zone.id}
+            position={zone.position}
+            onPointerDown={(event) => {
+              event.stopPropagation();
+              if (inputRef.current) {
+                inputRef.current.target = { x: zone.position[0], z: zone.position[2] };
+              }
+            }}
+            onPointerOver={() => {
+              document.body.style.cursor = "pointer";
+            }}
+            onPointerOut={() => {
+              document.body.style.cursor = "";
+            }}
+          >
+            <mesh rotation={[-Math.PI / 2, 0, 0]}>
+              <torusGeometry args={[0.48, 0.025, 8, 42]} />
+              <meshStandardMaterial
+                color={zone.color}
+                emissive={zone.color}
+                emissiveIntensity={darkMode ? 1.15 : 0.3}
+              />
+            </mesh>
+            <mesh position={[0, 0.2, 0]}>
+              <cylinderGeometry args={[0.025, 0.05, 0.38, 10]} />
+              <meshStandardMaterial
+                color={zone.color}
+                emissive={zone.color}
+                emissiveIntensity={darkMode ? 0.9 : 0.2}
+              />
+            </mesh>
+            <mesh position={[0, 0.45, 0]}>
+              <sphereGeometry args={[0.075 + index * 0.002, 12, 8]} />
+              <meshStandardMaterial
+                color={zone.color}
+                emissive={zone.color}
+                emissiveIntensity={darkMode ? 1.4 : 0.35}
+              />
+            </mesh>
+          </group>
+        ),
+      )}
     </group>
   );
 }
@@ -2872,8 +2887,13 @@ function StudioWorld({
         darkMode={darkMode}
         inputRef={inputRef}
         reducedMotion={reducedMotion || quality === "low"}
+        hiddenZoneId={showcase?.section ?? null}
       />
-      <ZoneBeacons inputRef={inputRef} darkMode={darkMode} />
+      <ZoneBeacons
+        inputRef={inputRef}
+        darkMode={darkMode}
+        hiddenZoneId={showcase?.section ?? null}
+      />
       <DigitalEngineer
         inputRef={inputRef}
         positionRef={characterPositionRef}

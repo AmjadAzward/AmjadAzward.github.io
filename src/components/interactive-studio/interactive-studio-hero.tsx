@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import {
   ArrowRight,
@@ -469,6 +469,7 @@ export default function InteractiveStudioHero() {
   const [activeZone, setActiveZone] = useState<StudioZoneId | null>(null);
   const [mapOpen, setMapOpen] = useState(false);
   const [journeyStarted, setJourneyStarted] = useState(false);
+  const [guidedJourneyIndex, setGuidedJourneyIndex] = useState<number | null>(null);
   const [showcase, setShowcase] = useState<{ section: StudioZoneId; slide: number } | null>(null);
   const [mapSelection, setMapSelection] = useState<StudioZoneId | "welcome" | null>(null);
   const [tutorialOpen, setTutorialOpen] = useState(false);
@@ -499,9 +500,16 @@ export default function InteractiveStudioHero() {
     setJourneyStarted(true);
   };
 
+  const startGuidedJourney = () => {
+    const firstStop = pathStops[0];
+    if (!firstStop) return;
+    setGuidedJourneyIndex(0);
+    walkTo(firstStop.id);
+  };
+
   const beginJourney = () => {
     if (window.localStorage.getItem("aa-village-tutorial") === "complete") {
-      walkTo("about");
+      startGuidedJourney();
       return;
     }
     setTutorialOpen(true);
@@ -510,7 +518,7 @@ export default function InteractiveStudioHero() {
   const finishTutorial = (startWalking: boolean) => {
     window.localStorage.setItem("aa-village-tutorial", "complete");
     setTutorialOpen(false);
-    if (startWalking) walkTo("about");
+    if (startWalking) startGuidedJourney();
   };
 
   const travelFromMap = (kind: "walk" | "spawn") => {
@@ -525,6 +533,7 @@ export default function InteractiveStudioHero() {
     inputRef.current.x = 0;
     inputRef.current.z = 0;
     setJourneyStarted(true);
+    setGuidedJourneyIndex(null);
     setMapOpen(false);
     setMapSelection(null);
   };
@@ -543,13 +552,34 @@ export default function InteractiveStudioHero() {
     window.localStorage.setItem("aa-theme", nextDark ? "dark" : "light");
   };
 
+  const closeShowcase = useCallback(() => {
+    const closingSection = showcase?.section;
+    setShowcase(null);
+
+    if (guidedJourneyIndex === null) return;
+    const currentStop = pathStops[guidedJourneyIndex];
+    if (!currentStop || closingSection !== currentStop.id) return;
+
+    const nextIndex = guidedJourneyIndex + 1;
+    const nextStop = pathStops[nextIndex];
+    if (!nextStop) {
+      setGuidedJourneyIndex(null);
+      return;
+    }
+
+    setGuidedJourneyIndex(nextIndex);
+    inputRef.current.target = nextStop.target;
+    inputRef.current.x = 0;
+    inputRef.current.z = 0;
+  }, [guidedJourneyIndex, showcase]);
+
   useEffect(() => {
     inputRef.current.locked = mapOpen || showcase !== null || tutorialOpen;
     if (!mapOpen && !showcase && !tutorialOpen) return;
     const handleViewerKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setMapOpen(false);
-        setShowcase(null);
+        if (showcase) closeShowcase();
         setTutorialOpen(false);
         return;
       }
@@ -568,10 +598,21 @@ export default function InteractiveStudioHero() {
     };
     window.addEventListener("keydown", handleViewerKey);
     return () => window.removeEventListener("keydown", handleViewerKey);
-  }, [mapOpen, showcase, tutorialOpen]);
+  }, [closeShowcase, mapOpen, showcase, tutorialOpen]);
+
+  useEffect(() => {
+    if (guidedJourneyIndex === null || showcase || mapOpen || tutorialOpen) return;
+    const destination = pathStops[guidedJourneyIndex];
+    if (!destination || activeZone !== destination.id) return;
+    inputRef.current.target = null;
+    inputRef.current.x = 0;
+    inputRef.current.z = 0;
+    setShowcase({ section: destination.id, slide: 0 });
+  }, [activeZone, guidedJourneyIndex, mapOpen, showcase, tutorialOpen]);
 
   useEffect(() => {
     const startOnMovement = (event: KeyboardEvent) => {
+      if (inputRef.current.locked) return;
       if (
         [
           "KeyW",
@@ -585,6 +626,7 @@ export default function InteractiveStudioHero() {
         ].includes(event.code)
       ) {
         setJourneyStarted(true);
+        setGuidedJourneyIndex(null);
       }
     };
     window.addEventListener("keydown", startOnMovement);
@@ -596,6 +638,7 @@ export default function InteractiveStudioHero() {
       const id = (event as CustomEvent<string>).detail as StudioZoneId;
       const destination = pathStops.find((item) => item.id === id);
       if (!destination) return;
+      setGuidedJourneyIndex(null);
       inputRef.current.target = destination.target;
       inputRef.current.x = 0;
       inputRef.current.z = 0;
@@ -606,6 +649,7 @@ export default function InteractiveStudioHero() {
 
   const setDirection = (x: number, z: number) => {
     setJourneyStarted(true);
+    setGuidedJourneyIndex(null);
     inputRef.current.x = x;
     inputRef.current.z = z;
     inputRef.current.target = null;
@@ -617,6 +661,8 @@ export default function InteractiveStudioHero() {
   };
 
   const openShowcase = (section: StudioZoneId) => {
+    const guidedStop = guidedJourneyIndex === null ? null : pathStops[guidedJourneyIndex];
+    if (guidedStop?.id !== section) setGuidedJourneyIndex(null);
     inputRef.current.target = null;
     inputRef.current.x = 0;
     inputRef.current.z = 0;
@@ -680,7 +726,7 @@ export default function InteractiveStudioHero() {
               showcaseTotal={activeShowcaseSlides.length}
               onShowcasePrevious={() => changeShowcaseSlide(-1)}
               onShowcaseNext={() => changeShowcaseSlide(1)}
-              onShowcaseClose={() => setShowcase(null)}
+              onShowcaseClose={closeShowcase}
             />
           </Suspense>
         ) : (
@@ -1073,11 +1119,7 @@ export default function InteractiveStudioHero() {
       ) : null}
 
       {mode !== "3d" && showcase && activeShowcaseSlide && activeShowcaseStop ? (
-        <div
-          className="path-tv-overlay"
-          role="presentation"
-          onPointerDown={() => setShowcase(null)}
-        >
+        <div className="path-tv-overlay" role="presentation" onPointerDown={closeShowcase}>
           <section
             className="path-tv"
             role="dialog"
@@ -1093,11 +1135,7 @@ export default function InteractiveStudioHero() {
               <div className="path-tv-status">
                 <i aria-hidden /> LIVE
               </div>
-              <button
-                type="button"
-                onClick={() => setShowcase(null)}
-                aria-label="Close showcase TV"
-              >
+              <button type="button" onClick={closeShowcase} aria-label="Close showcase TV">
                 <X aria-hidden />
               </button>
             </header>
