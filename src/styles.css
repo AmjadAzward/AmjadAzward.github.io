@@ -1220,6 +1220,10 @@ body::before {
 }
 
 .path-tv {
+  --tv-wood-dark: #32190d;
+  --tv-wood-mid: #70401f;
+  --tv-wood-light: #a56a35;
+  --tv-wood-gold: #e5b16b;
   display: flex;
   width: min(64rem, 100%);
   height: min(42rem, calc(100% - 1rem));
@@ -1227,10 +1231,16 @@ body::before {
   min-height: 28rem;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid color-mix(in oklab, var(--primary) 48%, var(--border));
-  border-radius: 1.75rem;
-  background: linear-gradient(145deg, color-mix(in oklab, var(--card) 96%, #07101c), #07111e);
-  box-shadow: 0 32px 100px rgb(0 8 22 / 62%);
+  border: 0.55rem solid var(--tv-wood-dark);
+  border-radius: 1.15rem;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 3.9rem, rgb(43 20 8 / 38%) 4rem 4.08rem),
+    repeating-linear-gradient(90deg, rgb(255 226 175 / 3%) 0 1px, transparent 1px 2.8rem),
+    linear-gradient(115deg, var(--tv-wood-mid), var(--tv-wood-light) 52%, #71401f);
+  box-shadow:
+    0 0.45rem 0 #211006,
+    0 32px 100px rgb(0 8 22 / 62%),
+    inset 0 0 0 0.16rem #bd7d43;
   animation: path-map-panel-in 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -1241,7 +1251,8 @@ body::before {
   gap: 1rem;
   min-height: 4.25rem;
   padding: 0.7rem 0.9rem 0.7rem 1.2rem;
-  border-bottom: 1px solid color-mix(in oklab, var(--primary) 24%, var(--border));
+  border-bottom: 0.16rem solid #4a2712;
+  background: rgb(49 24 10 / 28%);
 }
 
 .path-tv-header > div:first-child {
@@ -1253,7 +1264,7 @@ body::before {
 .path-tv-status,
 .path-tv-copy > p:first-child,
 .path-tv-footer p {
-  color: var(--primary);
+  color: #ffd594;
   font-family: var(--font-mono);
   font-size: 0.58rem;
   letter-spacing: 0.13em;
@@ -1261,7 +1272,7 @@ body::before {
 }
 
 .path-tv-header strong {
-  color: var(--foreground);
+  color: #fff0c9;
   font-size: 0.82rem;
 }
 
@@ -1270,7 +1281,7 @@ body::before {
   align-items: center;
   gap: 0.4rem;
   padding: 0.36rem 0.55rem;
-  border: 1px solid color-mix(in oklab, var(--primary) 25%, var(--border));
+  border: 1px solid #c08445;
   border-radius: 999px;
 }
 
@@ -1278,8 +1289,8 @@ body::before {
   width: 0.42rem;
   height: 0.42rem;
   border-radius: 50%;
-  background: var(--primary);
-  box-shadow: 0 0 12px var(--primary);
+  background: #ffd18a;
+  box-shadow: 0 0 12px #ffc36b;
 }
 
 .path-tv-header > button {
@@ -1287,10 +1298,13 @@ body::before {
   width: 2.5rem;
   height: 2.5rem;
   place-items: center;
-  border: 1px solid var(--border);
+  border: 2px solid #3c1d0c;
   border-radius: 50%;
-  background: color-mix(in oklab, var(--background) 82%, transparent);
-  color: var(--foreground);
+  background: linear-gradient(180deg, #986037, #5c3018);
+  box-shadow:
+    0 0.2rem 0 #2a1408,
+    inset 0 1px 0 rgb(255 224 170 / 28%);
+  color: #ffe3ae;
   cursor: pointer;
 }
 
@@ -1448,9 +1462,12 @@ body::before {
   justify-content: flex-end;
   gap: 0.65rem;
   padding: 0.75rem 0.55rem;
-  border: 1px solid color-mix(in oklab, var(--primary) 20%, var(--border));
-  border-radius: 1rem;
-  background: color-mix(in oklab, var(--background) 82%, var(--card));
+  border: 2px solid #3c1d0c;
+  border-radius: 0.65rem;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 2.2rem, rgb(49 23 9 / 45%) 2.25rem),
+    linear-gradient(100deg, #6d3d1e, #8f582e);
+  box-shadow: inset 0 0 0 1px rgb(255 218 157 / 14%);
 }
 
 .path-tv-speaker {
@@ -1466,11 +1483,11 @@ body::before {
   width: 0.28rem;
   height: 0.28rem;
   border-radius: 50%;
-  background: color-mix(in oklab, var(--primary) 32%, var(--border));
+  background: #32190d;
 }
 
 .path-tv-controls > span {
-  color: var(--muted-foreground);
+  color: #ffe0ad;
   font-family: var(--font-mono);
   font-size: 0.56rem;
 }
@@ -1480,17 +1497,21 @@ body::before {
   width: 3.15rem;
   height: 3.15rem;
   place-items: center;
-  border: 1px solid color-mix(in oklab, var(--primary) 38%, var(--border));
+  border: 2px solid #32190d;
   border-radius: 50%;
-  background: color-mix(in oklab, var(--primary) 8%, var(--background));
-  color: var(--foreground);
+  background: linear-gradient(180deg, #a56a35, #683719);
+  box-shadow:
+    0 0.22rem 0 #281207,
+    inset 0 1px 0 rgb(255 226 175 / 24%);
+  color: #ffe6b7;
   cursor: pointer;
 }
 
 .path-tv-controls > button:hover,
 .path-tv-controls > button:focus-visible {
-  border-color: var(--primary);
-  color: var(--primary);
+  border-color: #e3ad68;
+  color: #fff3d2;
+  filter: brightness(1.08);
 }
 
 .path-tv-controls svg {
@@ -1505,12 +1526,13 @@ body::before {
   gap: 1rem;
   min-height: 3.5rem;
   padding: 0.65rem 1.1rem;
-  border-top: 1px solid color-mix(in oklab, var(--primary) 20%, var(--border));
+  border-top: 0.16rem solid #4a2712;
+  background: rgb(49 24 10 / 24%);
 }
 
 .path-tv-footer p {
   margin: 0;
-  color: var(--muted-foreground);
+  color: #f1d2a1;
   letter-spacing: 0.06em;
 }
 
@@ -1526,7 +1548,7 @@ body::before {
   height: 0.45rem;
   flex: 0 0 auto;
   padding: 0;
-  border: 1px solid color-mix(in oklab, var(--primary) 45%, var(--border));
+  border: 1px solid #e1a55f;
   border-radius: 50%;
   background: transparent;
   cursor: pointer;
@@ -1535,8 +1557,8 @@ body::before {
 .path-tv-dots button.is-active {
   width: 1.35rem;
   border-radius: 999px;
-  background: var(--primary);
-  box-shadow: 0 0 12px color-mix(in oklab, var(--primary) 55%, transparent);
+  background: #ffc36b;
+  box-shadow: 0 0 12px rgb(255 195 107 / 62%);
 }
 
 @media (max-width: 760px) {

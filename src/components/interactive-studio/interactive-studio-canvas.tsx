@@ -1123,6 +1123,11 @@ function VillageShowcaseScreen({
   const zoneIndex = ZONES.findIndex((zone) => zone.id === section);
   const zone = ZONES[Math.max(0, zoneIndex)]!;
   const side = zoneIndex % 2 === 0 ? -1 : 1;
+  const woodDark = darkMode ? "#32190d" : "#5a3018";
+  const woodMid = darkMode ? "#70401f" : "#8b542b";
+  const woodLight = darkMode ? "#a56a35" : "#b97a42";
+  const woodHighlight = darkMode ? "#d6a15d" : "#dca563";
+  const warmGlow = "#ffc36b";
   const texture = useMemo(() => {
     if (typeof document === "undefined") return null;
     const canvas = document.createElement("canvas");
@@ -1151,7 +1156,7 @@ function VillageShowcaseScreen({
       context.fillStyle = gradient;
       context.fillRect(0, 0, canvas.width, canvas.height);
 
-      context.strokeStyle = "rgba(66,165,255,.13)";
+      context.strokeStyle = "rgba(224,167,92,.13)";
       context.lineWidth = 1;
       for (let x = 0; x < canvas.width; x += 64) {
         context.beginPath();
@@ -1166,13 +1171,13 @@ function VillageShowcaseScreen({
         context.stroke();
       }
 
-      context.fillStyle = "#42a5ff";
+      context.fillStyle = "#e5b16b";
       context.font = "700 24px Arial, sans-serif";
       context.letterSpacing = "3px";
       context.fillText(`AA VILLAGE / ${section.toUpperCase()}`, 66, 66);
       context.letterSpacing = "0px";
       context.textAlign = "right";
-      context.fillStyle = "#8fcfff";
+      context.fillStyle = "#f1cf96";
       context.fillText(
         `${String(slideIndex + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`,
         1210,
@@ -1205,24 +1210,24 @@ function VillageShowcaseScreen({
           height,
         );
         context.restore();
-        context.strokeStyle = "rgba(94,182,255,.42)";
+        context.strokeStyle = "rgba(229,177,107,.52)";
         context.lineWidth = 3;
         context.beginPath();
         context.roundRect(boxX, boxY, boxWidth, boxHeight, 30);
         context.stroke();
       }
 
-      context.fillStyle = "#61b8ff";
+      context.fillStyle = "#e5b16b";
       context.font = "700 22px Arial, sans-serif";
       context.fillText(slide.eyebrow.toUpperCase(), copyX, 148);
 
       let cursorY = 210;
       if (slide.metric) {
-        context.fillStyle = "rgba(66,165,255,.14)";
+        context.fillStyle = "rgba(229,177,107,.14)";
         context.beginPath();
         context.roundRect(copyX, cursorY - 30, Math.min(copyWidth, 250), 48, 24);
         context.fill();
-        context.fillStyle = "#a8dcff";
+        context.fillStyle = "#f1cf96";
         context.font = "700 21px Arial, sans-serif";
         context.fillText(slide.metric, copyX + 20, cursorY + 2);
         cursorY += 66;
@@ -1254,11 +1259,11 @@ function VillageShowcaseScreen({
             chipY += 46;
           }
           if (chipY > 674) break;
-          context.fillStyle = "rgba(66,165,255,.12)";
+          context.fillStyle = "rgba(229,177,107,.12)";
           context.beginPath();
           context.roundRect(chipX, chipY - 27, chipWidth, 35, 18);
           context.fill();
-          context.strokeStyle = "rgba(92,184,255,.28)";
+          context.strokeStyle = "rgba(229,177,107,.34)";
           context.stroke();
           context.fillStyle = "#c4d8e9";
           context.fillText(chip, chipX + 17, chipY - 3);
@@ -1314,21 +1319,37 @@ function VillageShowcaseScreen({
       scale={0.72}
     >
       <mesh position={[0, 2.25, 0]} geometry={frameGeometry}>
-        <meshStandardMaterial
-          color={darkMode ? "#07111f" : "#183451"}
-          roughness={0.3}
-          metalness={0.52}
-        />
+        <meshStandardMaterial color={woodDark} roughness={0.82} metalness={0.03} />
       </mesh>
+      {[-1, 1].map((vertical) => (
+        <mesh key={`showcase-rail-${vertical}`} position={[0, 2.25 + vertical * 1.28, 0.14]}>
+          <boxGeometry args={[4.38, 0.16, 0.16]} />
+          <meshStandardMaterial color={vertical > 0 ? woodLight : woodMid} roughness={0.78} />
+        </mesh>
+      ))}
+      {[-1, 1].map((horizontal) => (
+        <mesh key={`showcase-side-${horizontal}`} position={[horizontal * 2.1, 2.25, 0.14]}>
+          <boxGeometry args={[0.16, 2.46, 0.16]} />
+          <meshStandardMaterial color={horizontal > 0 ? woodMid : woodLight} roughness={0.8} />
+        </mesh>
+      ))}
+      {[-1, 1].flatMap((x) =>
+        [-1, 1].map((y) => (
+          <mesh key={`showcase-bolt-${x}-${y}`} position={[x * 2.07, 2.25 + y * 1.22, 0.25]}>
+            <sphereGeometry args={[0.045, 10, 8]} />
+            <meshStandardMaterial color={woodHighlight} roughness={0.42} metalness={0.5} />
+          </mesh>
+        )),
+      )}
       <mesh position={[0, 2.25, 0.115]}>
         <planeGeometry args={[4.15, 2.5]} />
         <meshBasicMaterial map={texture} toneMapped={false} />
       </mesh>
-      <pointLight position={[0, 2.2, 1.3]} color="#42a5ff" intensity={2.2} distance={5} />
+      <pointLight position={[0, 2.2, 1.3]} color={warmGlow} intensity={1.8} distance={5} />
       <pointLight
         position={[-side * SHOWCASE_SCREEN_OFFSET, 1.75, 0.65]}
-        color="#8ed2ff"
-        intensity={darkMode ? 4.2 : 1.4}
+        color="#ffd89a"
+        intensity={darkMode ? 3.4 : 1.2}
         distance={4.4}
       />
       <mesh
@@ -1336,8 +1357,21 @@ function VillageShowcaseScreen({
         rotation={[-Math.PI / 2, 0, 0]}
       >
         <ringGeometry args={[0.58, 0.72, 40]} />
-        <meshBasicMaterial color="#42a5ff" transparent opacity={0.82} />
+        <meshBasicMaterial color={woodHighlight} transparent opacity={0.82} />
       </mesh>
+
+      <group position={[0, 0.48, -0.04]}>
+        <mesh position={[0, 0.1, 0]}>
+          <boxGeometry args={[2.55, 0.22, 0.34]} />
+          <meshStandardMaterial color={woodDark} roughness={0.84} />
+        </mesh>
+        {[-1, 1].map((x) => (
+          <mesh key={`showcase-post-${x}`} position={[x * 1.72, 0.3, -0.05]}>
+            <boxGeometry args={[0.2, 0.72, 0.22]} />
+            <meshStandardMaterial color={woodMid} roughness={0.86} />
+          </mesh>
+        ))}
+      </group>
 
       <group position={[0, 0.55, 0.12]}>
         <group
@@ -1351,11 +1385,11 @@ function VillageShowcaseScreen({
         >
           <mesh rotation={[Math.PI / 2, 0, 0]}>
             <cylinderGeometry args={[0.28, 0.28, 0.14, 24]} />
-            <meshStandardMaterial color="#10243a" emissive="#42a5ff" emissiveIntensity={0.18} />
+            <meshStandardMaterial color={woodMid} roughness={0.78} metalness={0.04} />
           </mesh>
           <mesh position={[0, 0, 0.09]} rotation={[0, 0, Math.PI / 2]}>
             <coneGeometry args={[0.11, 0.24, 3]} />
-            <meshBasicMaterial color="#a7dcff" />
+            <meshBasicMaterial color="#ffe6b7" />
           </mesh>
         </group>
         <group
@@ -1368,15 +1402,15 @@ function VillageShowcaseScreen({
         >
           <mesh rotation={[Math.PI / 2, 0, 0]}>
             <cylinderGeometry args={[0.28, 0.28, 0.14, 24]} />
-            <meshStandardMaterial color="#10243a" emissive="#ff6b7a" emissiveIntensity={0.12} />
+            <meshStandardMaterial color={woodDark} roughness={0.8} metalness={0.03} />
           </mesh>
           <mesh position={[0, 0, 0.09]} rotation={[0, 0, Math.PI / 4]}>
             <boxGeometry args={[0.28, 0.04, 0.035]} />
-            <meshBasicMaterial color="#ffc2c8" />
+            <meshBasicMaterial color="#f4bf78" />
           </mesh>
           <mesh position={[0, 0, 0.09]} rotation={[0, 0, -Math.PI / 4]}>
             <boxGeometry args={[0.28, 0.04, 0.035]} />
-            <meshBasicMaterial color="#ffc2c8" />
+            <meshBasicMaterial color="#f4bf78" />
           </mesh>
         </group>
         <group
@@ -1390,11 +1424,11 @@ function VillageShowcaseScreen({
         >
           <mesh rotation={[Math.PI / 2, 0, 0]}>
             <cylinderGeometry args={[0.28, 0.28, 0.14, 24]} />
-            <meshStandardMaterial color="#10243a" emissive="#42a5ff" emissiveIntensity={0.18} />
+            <meshStandardMaterial color={woodMid} roughness={0.78} metalness={0.04} />
           </mesh>
           <mesh position={[0, 0, 0.09]} rotation={[0, 0, -Math.PI / 2]}>
             <coneGeometry args={[0.11, 0.24, 3]} />
-            <meshBasicMaterial color="#a7dcff" />
+            <meshBasicMaterial color="#ffe6b7" />
           </mesh>
         </group>
       </group>
