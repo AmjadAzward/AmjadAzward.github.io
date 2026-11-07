@@ -358,7 +358,7 @@ function DigitalEngineer({
       x = input.target.x - root.position.x;
       z = input.target.z - root.position.z;
       if (Math.hypot(x, z) < 0.16) {
-        input.target = null;
+        input.target = input.route.shift() ?? null;
         x = 0;
         z = 0;
       }
@@ -2250,6 +2250,7 @@ function PathEnvironment({
     const x = MathUtils.clamp(event.point.x, WALK_BOUNDS.minX, WALK_BOUNDS.maxX);
     const z = MathUtils.clamp(event.point.z, WALK_BOUNDS.minZ, WALK_BOUNDS.maxZ);
     if (isWorldBlocked(x, z)) return;
+    input.route = [];
     input.target = { x, z };
   };
 
@@ -2584,6 +2585,7 @@ function StudioEnvironment({
     event.stopPropagation();
     const input = inputRef.current;
     if (!input) return;
+    input.route = [];
     input.target = {
       x: MathUtils.clamp(event.point.x, -4.35, 4.35),
       z: MathUtils.clamp(event.point.z, -3.2, 2.15),
@@ -2723,6 +2725,7 @@ function ZoneBeacons({
             onPointerDown={(event) => {
               event.stopPropagation();
               if (inputRef.current) {
+                inputRef.current.route = [];
                 inputRef.current.target = { x: zone.position[0], z: zone.position[2] };
               }
             }}

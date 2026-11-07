@@ -45,6 +45,7 @@ export type StudioInput = {
   x: number;
   z: number;
   target: { x: number; z: number } | null;
+  route: StudioPosition[];
   spawn: { x: number; z: number } | null;
   locked: boolean;
 };
@@ -134,6 +135,41 @@ const pathStops: Array<{
     facts: ["Project enquiries", "Freelance work", "Engineering opportunities"],
   },
 ];
+
+const GUIDED_ROUTES: Record<StudioZoneId, StudioPosition[]> = {
+  about: [
+    { x: -3.1, z: 3.6 },
+    { x: -4.8, z: 0.8 },
+  ],
+  skills: [
+    { x: -1.7, z: -0.9 },
+    { x: 1.5, z: -1.4 },
+    { x: 4.6, z: -3.6 },
+  ],
+  certifications: [
+    { x: 5.6, z: -8.1 },
+    { x: 4.9, z: -13.4 },
+    { x: 1.9, z: -10.8 },
+    { x: -1.8, z: -10.4 },
+    { x: -4.6, z: -8.9 },
+  ],
+  services: [
+    { x: -1.8, z: -10.4 },
+    { x: 1.9, z: -10.8 },
+    { x: 4.9, z: -13.4 },
+  ],
+  portfolio: [
+    { x: 1.9, z: -10.8 },
+    { x: 0, z: -15.3 },
+    { x: -0.8, z: -17.2 },
+    { x: -3.8, z: -18.8 },
+  ],
+  contact: [
+    { x: -0.8, z: -17.2 },
+    { x: 2.1, z: -18.6 },
+    { x: 3.8, z: -24 },
+  ],
+};
 
 export type ShowcaseSlide = {
   eyebrow: string;
@@ -460,6 +496,7 @@ export default function InteractiveStudioHero() {
     x: 0,
     z: 0,
     target: null,
+    route: [],
     spawn: null,
     locked: false,
   });
@@ -494,17 +531,28 @@ export default function InteractiveStudioHero() {
   const walkTo = (id: StudioZoneId) => {
     const destination = pathStops.find((item) => item.id === id);
     if (!destination) return;
+    inputRef.current.route = [];
     inputRef.current.target = destination.target;
     inputRef.current.x = 0;
     inputRef.current.z = 0;
     setJourneyStarted(true);
   };
 
+  const followGuidedRoute = useCallback((id: StudioZoneId) => {
+    const route = GUIDED_ROUTES[id].map((waypoint) => ({ ...waypoint }));
+    const firstWaypoint = route.shift() ?? null;
+    inputRef.current.route = route;
+    inputRef.current.target = firstWaypoint;
+    inputRef.current.x = 0;
+    inputRef.current.z = 0;
+    setJourneyStarted(true);
+  }, []);
+
   const startGuidedJourney = () => {
     const firstStop = pathStops[0];
     if (!firstStop) return;
     setGuidedJourneyIndex(0);
-    walkTo(firstStop.id);
+    followGuidedRoute(firstStop.id);
   };
 
   const beginJourney = () => {
@@ -530,6 +578,7 @@ export default function InteractiveStudioHero() {
     if (!target) return;
     if (kind === "spawn") inputRef.current.spawn = target;
     else inputRef.current.target = target;
+    inputRef.current.route = [];
     inputRef.current.x = 0;
     inputRef.current.z = 0;
     setJourneyStarted(true);
@@ -568,10 +617,8 @@ export default function InteractiveStudioHero() {
     }
 
     setGuidedJourneyIndex(nextIndex);
-    inputRef.current.target = nextStop.target;
-    inputRef.current.x = 0;
-    inputRef.current.z = 0;
-  }, [guidedJourneyIndex, showcase]);
+    followGuidedRoute(nextStop.id);
+  }, [followGuidedRoute, guidedJourneyIndex, showcase]);
 
   useEffect(() => {
     inputRef.current.locked = mapOpen || showcase !== null || tutorialOpen;
@@ -639,6 +686,7 @@ export default function InteractiveStudioHero() {
       const destination = pathStops.find((item) => item.id === id);
       if (!destination) return;
       setGuidedJourneyIndex(null);
+      inputRef.current.route = [];
       inputRef.current.target = destination.target;
       inputRef.current.x = 0;
       inputRef.current.z = 0;
@@ -650,6 +698,7 @@ export default function InteractiveStudioHero() {
   const setDirection = (x: number, z: number) => {
     setJourneyStarted(true);
     setGuidedJourneyIndex(null);
+    inputRef.current.route = [];
     inputRef.current.x = x;
     inputRef.current.z = z;
     inputRef.current.target = null;
@@ -663,6 +712,7 @@ export default function InteractiveStudioHero() {
   const openShowcase = (section: StudioZoneId) => {
     const guidedStop = guidedJourneyIndex === null ? null : pathStops[guidedJourneyIndex];
     if (guidedStop?.id !== section) setGuidedJourneyIndex(null);
+    inputRef.current.route = [];
     inputRef.current.target = null;
     inputRef.current.x = 0;
     inputRef.current.z = 0;
