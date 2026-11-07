@@ -69,6 +69,10 @@ const SERVICE_NODE_POSITIONS: Array<[number, number]> = [
 const START_POSITION = new Vector3(0, 0, 5);
 const WALK_BOUNDS = { minX: -12.8, maxX: 12.8, minZ: -28.5, maxZ: 7.2 };
 const SHOWCASE_SCREEN_OFFSET = 3.25;
+const STREAM_CENTER_Z = -15.65;
+const STREAM_HALF_WIDTH = 0.53;
+const MAIN_TRAIL_WIDTH = 2.45;
+const BRANCH_TRAIL_WIDTH = 1.68;
 
 const MEADOW_PATCHES: Array<[number, number]> = [
   [-11.2, 5.2],
@@ -200,7 +204,7 @@ function isWorldBlocked(x: number, z: number) {
   });
   if (hitsFence) return true;
 
-  const insideStream = z > -16.18 && z < -15.12;
+  const insideStream = Math.abs(z - STREAM_CENTER_Z) < STREAM_HALF_WIDTH;
   const onBridge = x > -0.78 && x < 1.08;
   return insideStream && !onBridge;
 }
@@ -239,6 +243,17 @@ function createTrailSegments(
       length: Math.hypot(dx, dz) + 0.18,
     };
   });
+}
+
+function isTrailSegmentOnLand(segment: TrailSegment) {
+  const width = segment.key.startsWith("main") ? MAIN_TRAIL_WIDTH : BRANCH_TRAIL_WIDTH;
+  const halfWorldZExtent =
+    (Math.abs(Math.cos(segment.rotation)) * segment.length) / 2 +
+    (Math.abs(Math.sin(segment.rotation)) * width) / 2;
+
+  return (
+    Math.abs(segment.position[2] - STREAM_CENTER_Z) - halfWorldZExtent > STREAM_HALF_WIDTH + 0.04
+  );
 }
 
 function useKeyboard() {
@@ -2152,21 +2167,28 @@ function PathEnvironment({
         ))}
       </group>
 
-      {[...mainTrail, ...forestBranch, ...coastBranch, ...crossTrails].map((segment) => (
-        <mesh
-          key={segment.key}
-          position={segment.position}
-          rotation={[0, segment.rotation, 0]}
-          onPointerDown={walkTo}
-        >
-          <boxGeometry
-            args={[segment.key.startsWith("main") ? 2.45 : 1.68, 0.07, segment.length]}
-          />
-          <meshStandardMaterial color={path} roughness={0.82} metalness={0.02} />
-        </mesh>
-      ))}
+      {[...mainTrail, ...forestBranch, ...coastBranch, ...crossTrails]
+        .filter(isTrailSegmentOnLand)
+        .map((segment) => (
+          <mesh
+            key={segment.key}
+            position={segment.position}
+            rotation={[0, segment.rotation, 0]}
+            onPointerDown={walkTo}
+          >
+            <boxGeometry
+              args={[
+                segment.key.startsWith("main") ? MAIN_TRAIL_WIDTH : BRANCH_TRAIL_WIDTH,
+                0.07,
+                segment.length,
+              ]}
+            />
+            <meshStandardMaterial color={path} roughness={0.82} metalness={0.02} />
+          </mesh>
+        ))}
 
       {mainTrail
+        .filter(isTrailSegmentOnLand)
         .filter((_, index) => index % 3 === 0)
         .map((segment, index) => (
           <mesh
@@ -2184,7 +2206,7 @@ function PathEnvironment({
           </mesh>
         ))}
 
-      <mesh position={[0, -0.035, -15.65]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[0, -0.035, STREAM_CENTER_Z]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[24, 1.05]} />
         <meshStandardMaterial
           color={water}
