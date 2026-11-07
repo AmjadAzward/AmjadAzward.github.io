@@ -2957,20 +2957,6 @@ body::before {
     inset 0 0 0 1px #b5814f;
 }
 
-.path-destination-card .path-interaction-cue {
-  color: #ead8b7;
-  text-shadow: 0 1px 0 rgb(48 25 11 / 76%);
-}
-
-.path-destination-card .path-interaction-cue kbd {
-  border: 1px solid #bd854e;
-  background: linear-gradient(180deg, #5a351d, #321c10);
-  color: #ffd28a;
-  box-shadow:
-    0 0.18rem 0 #241208,
-    inset 0 1px 0 rgb(255 225 173 / 14%);
-}
-
 .path-destination-card .path-open-showcase {
   border: 2px solid #4a2a15;
   background: linear-gradient(180deg, #e1ab63, #b97935);
@@ -3027,8 +3013,7 @@ body::before {
 
 :root:not(.dark) .path-destination-card .path-card-eyebrow,
 :root:not(.dark) .path-destination-card h2,
-:root:not(.dark) .path-destination-card > p:not(.path-card-eyebrow),
-:root:not(.dark) .path-destination-card .path-interaction-cue {
+:root:not(.dark) .path-destination-card > p:not(.path-card-eyebrow) {
   color: #2d190d;
   text-shadow: 0 1px 0 rgb(255 225 171 / 52%);
 }
@@ -3134,8 +3119,7 @@ body::before {
   border-bottom: 1px solid var(--border);
 }
 
-.path-tutorial kbd,
-.path-interaction-cue kbd {
+.path-tutorial kbd {
   padding: 0.3rem 0.48rem;
   border: 1px solid color-mix(in oklab, var(--primary) 36%, var(--border));
   border-radius: 0.4rem;
@@ -3213,16 +3197,6 @@ body::before {
 .path-map-choice button:last-child {
   background: var(--primary);
   color: var(--primary-foreground);
-}
-
-.path-interaction-cue {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--muted-foreground);
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  text-transform: uppercase;
 }
 
 .path-robot-guidance {

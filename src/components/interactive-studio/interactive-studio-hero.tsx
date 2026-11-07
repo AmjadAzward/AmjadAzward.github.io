@@ -1049,9 +1049,6 @@ export default function InteractiveStudioHero() {
           {stop.id === "portfolio" && projects[0] ? (
             <img src={projects[0].image} alt={`Preview of ${projects[0].title}`} />
           ) : null}
-          <span className="path-interaction-cue">
-            <kbd>E</kbd> Press E to explore
-          </span>
           <button
             type="button"
             className="path-open-showcase"
