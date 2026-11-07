@@ -809,7 +809,6 @@ export default function InteractiveStudioHero() {
         aria-label="Open trail map and fast travel"
       >
         <MapIcon aria-hidden />
-        <span>Trail map</span>
       </button>
 
       {tutorialOpen ? (

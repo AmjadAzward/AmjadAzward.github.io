@@ -1052,7 +1052,7 @@ body::before {
 .path-topbar {
   position: absolute;
   z-index: 7;
-  top: 1rem;
+  top: 0.7rem;
   left: 1rem;
   right: 1rem;
   display: grid;
@@ -2194,26 +2194,40 @@ body::before {
   right: 1rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  min-height: 2.45rem;
-  padding: 0.55rem 0.85rem;
-  border: 1px solid color-mix(in oklab, var(--primary) 34%, var(--border));
-  border-radius: 999px;
-  background: color-mix(in oklab, var(--background) 74%, transparent);
-  color: var(--foreground);
+  width: 2.75rem;
+  min-height: 2.75rem;
+  justify-content: center;
+  padding: 0;
+  border: 0.18rem solid #32190d;
+  border-radius: 0.72rem;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 1.15rem, rgb(47 21 7 / 34%) 1.2rem),
+    linear-gradient(125deg, #8f582e, #6b3b1d);
+  color: #ffe1aa;
   font-family: var(--font-mono);
   font-size: 0.56rem;
   font-weight: 600;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  box-shadow: 0 12px 36px rgb(0 18 35 / 18%);
-  backdrop-filter: blur(6px);
+  box-shadow:
+    0 0.24rem 0 #211006,
+    0 12px 36px rgb(0 18 35 / 24%),
+    inset 0 0 0 1px rgb(255 224 170 / 20%);
+  cursor: pointer;
 }
 
 .path-map-trigger svg {
   width: 1rem;
   height: 1rem;
-  color: var(--primary);
+  color: #ffd28a;
+}
+
+.path-map-trigger:hover,
+.path-map-trigger:focus-visible {
+  border-color: #b7793e;
+  color: #fff2cf;
+  filter: brightness(1.08);
+  transform: translateY(-1px);
 }
 
 .path-map-overlay {
@@ -2700,24 +2714,28 @@ body::before {
   position: absolute;
   z-index: 9;
   top: 0.7rem;
-  right: 7.8rem;
+  right: 4.35rem;
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.35rem;
-  border: 1px solid color-mix(in oklab, var(--primary) 30%, var(--border));
-  border-radius: 999px;
-  background: color-mix(in oklab, var(--background) 86%, transparent);
-  box-shadow: 0 12px 34px rgb(0 12 31 / 20%);
-  backdrop-filter: blur(16px);
+  padding: 0.28rem;
+  border: 0.18rem solid #32190d;
+  border-radius: 0.72rem;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 1.15rem, rgb(47 21 7 / 34%) 1.2rem),
+    linear-gradient(125deg, #8f582e, #6b3b1d);
+  box-shadow:
+    0 0.24rem 0 #211006,
+    0 12px 34px rgb(0 12 31 / 24%),
+    inset 0 0 0 1px rgb(255 224 170 / 20%);
 }
 
 .path-world-tools button {
   min-height: 2.15rem;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--foreground);
+  border: 1px solid transparent;
+  border-radius: 0.48rem;
+  background: rgb(48 23 9 / 18%);
+  color: #ffe1aa;
   font: 600 0.66rem/1 var(--font-sans);
   display: grid;
   width: 2.15rem;
@@ -2726,8 +2744,10 @@ body::before {
 
 .path-world-tools button:hover,
 .path-world-tools button:focus-visible {
-  background: color-mix(in oklab, var(--primary) 18%, transparent);
-  color: var(--primary);
+  border-color: #b7793e;
+  background: rgb(255 210 138 / 12%);
+  color: #fff2cf;
+  filter: brightness(1.08);
 }
 
 .path-world-tools svg {
@@ -3283,7 +3303,7 @@ body::before {
 
 @media (max-width: 820px) {
   .path-world-tools {
-    right: 3.6rem;
+    right: 4.35rem;
   }
 }
 
