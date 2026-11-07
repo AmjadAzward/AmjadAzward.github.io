@@ -2732,6 +2732,220 @@ body::before {
   height: 0.85rem;
 }
 
+/* The village welcome message is presented as a crafted timber noticeboard. */
+.path-intro-card {
+  --wood-frame-dark: #321c10;
+  --wood-frame-light: #7f512d;
+  --wood-plank-dark: #5b351c;
+  --wood-plank-mid: #81502b;
+  --wood-plank-light: #a26b3d;
+  isolation: isolate;
+  width: min(26.5rem, calc(100% - 2rem));
+  overflow: hidden;
+  border: 0.45rem solid var(--wood-frame-dark);
+  border-radius: 0.9rem;
+  background:
+    radial-gradient(ellipse at 14% 18%, rgb(55 29 13 / 48%) 0 0.18rem, transparent 0.2rem),
+    radial-gradient(ellipse at 84% 71%, rgb(55 29 13 / 38%) 0 0.24rem, transparent 0.27rem),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 4.55rem,
+      rgb(45 22 10 / 54%) 4.58rem 4.68rem,
+      rgb(181 125 74 / 32%) 4.7rem 4.76rem
+    ),
+    repeating-linear-gradient(
+      93deg,
+      transparent 0 0.6rem,
+      rgb(255 224 170 / 4%) 0.65rem 0.69rem,
+      transparent 0.74rem 1.35rem
+    ),
+    linear-gradient(
+      100deg,
+      var(--wood-plank-dark),
+      var(--wood-plank-mid) 48%,
+      var(--wood-plank-light)
+    );
+  box-shadow:
+    0 1.2rem 0 rgb(29 16 9 / 24%),
+    0 2rem 4.5rem rgb(0 7 18 / 46%),
+    inset 0 0 0 0.16rem var(--wood-frame-light),
+    inset 0.4rem 0.45rem 1.1rem rgb(255 207 133 / 10%),
+    inset -0.5rem -0.5rem 1.2rem rgb(32 15 6 / 38%);
+  backdrop-filter: none;
+}
+
+.path-intro-card::before,
+.path-intro-card::after {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  content: "";
+}
+
+.path-intro-card::before {
+  inset: 0.32rem;
+  border: 1px solid rgb(255 220 164 / 18%);
+  border-radius: 0.42rem;
+  box-shadow: inset 0 0 0 1px rgb(39 20 9 / 45%);
+}
+
+.path-intro-card::after {
+  inset: 0.6rem;
+  background:
+    radial-gradient(
+      circle at 0.18rem 0.18rem,
+      #d0a871 0 0.1rem,
+      #44301f 0.11rem 0.17rem,
+      transparent 0.18rem
+    ),
+    radial-gradient(
+      circle at calc(100% - 0.18rem) 0.18rem,
+      #d0a871 0 0.1rem,
+      #44301f 0.11rem 0.17rem,
+      transparent 0.18rem
+    ),
+    radial-gradient(
+      circle at 0.18rem calc(100% - 0.18rem),
+      #d0a871 0 0.1rem,
+      #44301f 0.11rem 0.17rem,
+      transparent 0.18rem
+    ),
+    radial-gradient(
+      circle at calc(100% - 0.18rem) calc(100% - 0.18rem),
+      #d0a871 0 0.1rem,
+      #44301f 0.11rem 0.17rem,
+      transparent 0.18rem
+    );
+}
+
+.path-intro-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.path-intro-card > p {
+  color: #ffd28a;
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgb(43 22 10 / 92%);
+}
+
+.path-intro-card h1 {
+  color: #fff1cb;
+  letter-spacing: -0.055em;
+  text-shadow:
+    0 2px 0 #3c210f,
+    0 3px 0 rgb(26 13 6 / 55%);
+}
+
+.path-intro-card > span {
+  color: #ead8b7;
+  text-shadow: 0 1px 0 rgb(48 25 11 / 70%);
+}
+
+.path-intro-card .path-intro-identity {
+  color: #fff0cc;
+  text-shadow: 0 1px 0 rgb(48 25 11 / 76%);
+}
+
+.path-intro-identity i {
+  background: #ffd17f;
+  box-shadow: 0 0 12px rgb(255 191 85 / 75%);
+}
+
+.path-intro-card button {
+  border: 2px solid #4a2a15;
+  background: linear-gradient(180deg, #e1ab63, #b97935);
+  box-shadow:
+    0 0.28rem 0 #4a2915,
+    inset 0 1px 0 rgb(255 237 188 / 52%);
+  color: #291609;
+  text-shadow: 0 1px 0 rgb(255 224 172 / 42%);
+}
+
+.path-intro-card .path-secondary-action {
+  border-color: #b5814f;
+  background: linear-gradient(180deg, #4e2e19, #321c10);
+  box-shadow:
+    0 0.28rem 0 #241208,
+    inset 0 1px 0 rgb(255 225 173 / 14%);
+  color: #fff0cc;
+  text-shadow: 0 1px 0 #190c05;
+}
+
+.path-intro-card button:hover,
+.path-intro-card button:focus-visible {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.path-intro-card .path-intro-links a {
+  color: #e8d4ae;
+  text-decoration-color: #dca45f;
+  text-shadow: 0 1px 0 rgb(48 25 11 / 76%);
+}
+
+.path-intro-card .path-intro-links a:hover,
+.path-intro-card .path-intro-links a:focus-visible {
+  color: #fff1cb;
+}
+
+:root:not(.dark) .path-intro-card {
+  --wood-frame-dark: #4b2b17;
+  --wood-frame-light: #a87543;
+  --wood-plank-dark: #a86f3d;
+  --wood-plank-mid: #c68b51;
+  --wood-plank-light: #dda767;
+  box-shadow:
+    0 1.2rem 0 rgb(61 34 17 / 18%),
+    0 2rem 4rem rgb(31 57 76 / 24%),
+    inset 0 0 0 0.16rem var(--wood-frame-light),
+    inset 0.4rem 0.45rem 1.1rem rgb(255 241 196 / 22%),
+    inset -0.5rem -0.5rem 1.2rem rgb(79 39 15 / 24%);
+}
+
+:root:not(.dark) .path-intro-card > p,
+:root:not(.dark) .path-intro-card h1,
+:root:not(.dark) .path-intro-card > span,
+:root:not(.dark) .path-intro-card .path-intro-identity,
+:root:not(.dark) .path-intro-card .path-intro-links a {
+  color: #2d190d;
+  text-shadow: 0 1px 0 rgb(255 225 171 / 52%);
+}
+
+:root:not(.dark) .path-intro-card h1 {
+  text-shadow:
+    0 1px 0 #f2c98e,
+    0 2px 0 rgb(80 38 15 / 25%);
+}
+
+:root:not(.dark) .path-intro-card > p {
+  color: #4c260f;
+}
+
+:root:not(.dark) .path-intro-card .path-intro-links a:hover,
+:root:not(.dark) .path-intro-card .path-intro-links a:focus-visible {
+  color: #050f1b;
+}
+
+@media (max-width: 1023px) {
+  .path-intro-card {
+    width: min(25rem, calc(100% - 2rem));
+  }
+}
+
+@media (max-width: 680px) {
+  .path-intro-card {
+    width: min(18.5rem, calc(100% - 1.4rem));
+    border-width: 0.36rem;
+    border-radius: 0.72rem;
+    box-shadow:
+      0 0.75rem 0 rgb(29 16 9 / 20%),
+      0 1.5rem 3rem rgb(0 7 18 / 38%),
+      inset 0 0 0 0.13rem var(--wood-frame-light),
+      inset -0.35rem -0.35rem 0.9rem rgb(32 15 6 / 32%);
+  }
+}
+
 .path-tutorial-overlay {
   position: absolute;
   z-index: 16;
