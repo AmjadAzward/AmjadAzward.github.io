@@ -1150,30 +1150,50 @@ function VillageShowcaseScreen({
 
     const draw = (image?: HTMLImageElement) => {
       const gradient = context.createLinearGradient(0, 0, canvas.width, canvas.height);
-      gradient.addColorStop(0, "#05101f");
-      gradient.addColorStop(0.65, "#08182b");
-      gradient.addColorStop(1, "#0c2840");
+      gradient.addColorStop(0, "#623719");
+      gradient.addColorStop(0.48, "#8a562d");
+      gradient.addColorStop(1, "#68401f");
       context.fillStyle = gradient;
       context.fillRect(0, 0, canvas.width, canvas.height);
 
-      context.strokeStyle = "rgba(224,167,92,.13)";
-      context.lineWidth = 1;
-      for (let x = 0; x < canvas.width; x += 64) {
+      context.strokeStyle = "rgba(255,225,174,.055)";
+      context.lineWidth = 2;
+      for (let x = 38; x < canvas.width; x += 118) {
         context.beginPath();
         context.moveTo(x, 0);
         context.lineTo(x, canvas.height);
         context.stroke();
       }
-      for (let y = 0; y < canvas.height; y += 64) {
+      for (let y = 0; y < canvas.height; y += 144) {
+        context.strokeStyle = "rgba(48,22,8,.52)";
+        context.lineWidth = 5;
         context.beginPath();
         context.moveTo(0, y);
         context.lineTo(canvas.width, y);
         context.stroke();
+        context.strokeStyle = "rgba(255,225,174,.1)";
+        context.lineWidth = 2;
+        context.beginPath();
+        context.moveTo(0, y + 5);
+        context.lineTo(canvas.width, y + 5);
+        context.stroke();
       }
 
-      context.fillStyle = "rgba(2,8,20,.42)";
+      [
+        [190, 320, 19],
+        [780, 575, 13],
+        [1120, 286, 16],
+      ].forEach(([x = 0, y = 0, radius = 0]) => {
+        context.strokeStyle = "rgba(52,24,9,.28)";
+        context.lineWidth = 5;
+        context.beginPath();
+        context.ellipse(x, y, radius * 1.8, radius, -0.18, 0, Math.PI * 2);
+        context.stroke();
+      });
+
+      context.fillStyle = "rgba(55,27,11,.48)";
       context.fillRect(0, 0, canvas.width, 96);
-      context.fillStyle = "rgba(229,177,107,.46)";
+      context.fillStyle = "rgba(255,214,142,.54)";
       context.fillRect(52, 94, 1176, 2);
 
       context.fillStyle = "#e5b16b";
@@ -1200,16 +1220,22 @@ function VillageShowcaseScreen({
       const copyX = infoPanelX + 36;
       const copyWidth = infoPanelWidth - 72;
 
-      context.fillStyle = "rgba(2,8,20,.48)";
-      context.strokeStyle = "rgba(229,177,107,.3)";
-      context.lineWidth = 2;
+      context.fillStyle = "rgba(68,34,14,.55)";
+      context.strokeStyle = "rgba(247,194,117,.46)";
+      context.lineWidth = 3;
       context.beginPath();
       context.roundRect(infoPanelX, mediaPanelY, infoPanelWidth, panelHeight, 22);
       context.fill();
       context.stroke();
 
+      context.strokeStyle = "rgba(45,20,7,.62)";
+      context.lineWidth = 2;
+      context.beginPath();
+      context.roundRect(infoPanelX + 8, mediaPanelY + 8, infoPanelWidth - 16, panelHeight - 16, 17);
+      context.stroke();
+
       if (image) {
-        context.fillStyle = "rgba(2,8,20,.56)";
+        context.fillStyle = "rgba(68,34,14,.62)";
         context.beginPath();
         context.roundRect(mediaPanelX, mediaPanelY, mediaPanelWidth, panelHeight, 22);
         context.fill();
@@ -1230,7 +1256,7 @@ function VillageShowcaseScreen({
         context.beginPath();
         context.roundRect(boxX, boxY, boxWidth, boxHeight, 16);
         context.clip();
-        context.fillStyle = "#020814";
+        context.fillStyle = "#2d180b";
         context.fillRect(boxX, boxY, boxWidth, boxHeight);
         const scale = Math.min(boxWidth / image.naturalWidth, boxHeight / image.naturalHeight);
         const width = image.naturalWidth * scale;
@@ -1249,7 +1275,7 @@ function VillageShowcaseScreen({
         context.roundRect(boxX, boxY, boxWidth, boxHeight, 16);
         context.stroke();
 
-        context.fillStyle = "#8295a9";
+        context.fillStyle = "#ead8b7";
         context.font = "600 16px Arial, sans-serif";
         context.fillText("Verified portfolio document", mediaPanelX + 28, mediaPanelY + 520);
       }
@@ -1276,7 +1302,7 @@ function VillageShowcaseScreen({
         cursorY += 60;
       }
 
-      context.fillStyle = "#f4f9ff";
+      context.fillStyle = "#fff1cb";
       context.font = `700 ${hasImage ? 50 : 60}px Arial, sans-serif`;
       cursorY = drawScreenText(
         context,
@@ -1289,7 +1315,7 @@ function VillageShowcaseScreen({
       );
 
       const dividerY = Math.min(cursorY + 20, 488);
-      context.fillStyle = "rgba(229,177,107,.28)";
+      context.fillStyle = "rgba(255,214,142,.42)";
       context.fillRect(copyX, dividerY, copyWidth, 2);
 
       context.fillStyle = "#d7a665";
@@ -1298,7 +1324,7 @@ function VillageShowcaseScreen({
       context.fillText("OVERVIEW", copyX, dividerY + 40);
       context.letterSpacing = "0px";
 
-      context.fillStyle = "#a6bbcf";
+      context.fillStyle = "#ead8b7";
       context.font = "400 24px Arial, sans-serif";
       cursorY = drawScreenText(
         context,
@@ -1328,19 +1354,19 @@ function VillageShowcaseScreen({
             chipY += 46;
           }
           if (chipY > 650) break;
-          context.fillStyle = "rgba(229,177,107,.12)";
+          context.fillStyle = "rgba(42,19,7,.34)";
           context.beginPath();
           context.roundRect(chipX, chipY - 27, chipWidth, 35, 18);
           context.fill();
-          context.strokeStyle = "rgba(229,177,107,.34)";
+          context.strokeStyle = "rgba(247,194,117,.52)";
           context.stroke();
-          context.fillStyle = "#c4d8e9";
+          context.fillStyle = "#f4dfba";
           context.fillText(chip, chipX + 17, chipY - 3);
           chipX += chipWidth + 12;
         }
       }
 
-      context.fillStyle = "rgba(158,214,255,.06)";
+      context.fillStyle = "rgba(255,225,175,.025)";
       for (let y = 0; y < canvas.height; y += 6) context.fillRect(0, y, canvas.width, 1);
       texture.needsUpdate = true;
     };
