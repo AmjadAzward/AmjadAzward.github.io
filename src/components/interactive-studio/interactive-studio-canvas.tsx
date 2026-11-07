@@ -1026,24 +1026,42 @@ function RoadSignLabel({ label, index }: { label: string; index: number }) {
     if (!context) return null;
     context.clearRect(0, 0, canvas.width, canvas.height);
 
-    context.fillStyle = "rgba(236, 247, 255, 0.88)";
+    const woodGradient = context.createLinearGradient(14, 18, 498, 110);
+    woodGradient.addColorStop(0, "#70401f");
+    woodGradient.addColorStop(0.5, "#a56a35");
+    woodGradient.addColorStop(1, "#74411f");
+    context.fillStyle = woodGradient;
     context.beginPath();
     context.roundRect(14, 18, 484, 92, 18);
     context.fill();
+    context.strokeStyle = "#32190d";
+    context.lineWidth = 8;
+    context.stroke();
+    context.strokeStyle = "rgba(255,224,170,.22)";
+    context.lineWidth = 2;
+    context.beginPath();
+    context.roundRect(22, 26, 468, 76, 13);
+    context.stroke();
 
-    context.fillStyle = "#06172a";
+    context.fillStyle = "#32190d";
     context.beginPath();
     context.roundRect(28, 29, 88, 70, 15);
     context.fill();
+    context.strokeStyle = "#d6a15d";
+    context.lineWidth = 3;
+    context.stroke();
 
     context.textBaseline = "middle";
     context.textAlign = "center";
-    context.fillStyle = "#f4f9ff";
+    context.fillStyle = "#ffe3ae";
     context.font = "800 32px Arial, sans-serif";
     context.fillText(String(index + 1).padStart(2, "0"), 72, 65);
 
     context.textAlign = "left";
-    context.fillStyle = "#06172a";
+    context.fillStyle = "#fff1cb";
+    context.shadowColor = "rgba(45,20,7,.85)";
+    context.shadowOffsetY = 3;
+    context.shadowBlur = 1;
     context.font = `800 ${label.length > 12 ? 35 : 43}px Arial, sans-serif`;
     context.fillText(label.toUpperCase(), 140, 66, 336);
     const nextTexture = new CanvasTexture(canvas);
@@ -1537,19 +1555,21 @@ function SectionLandmark({
   index,
   side,
   darkMode,
-  structure,
   pathEdge,
 }: {
   zone: Zone;
   index: number;
   side: number;
   darkMode: boolean;
-  structure: string;
   pathEdge: string;
 }) {
-  const glow = darkMode ? 0.72 : 0.12;
-  const pale = darkMode ? "#dceeff" : "#f4f9ff";
-  const deep = darkMode ? "#0b1b31" : "#274969";
+  const pale = "#fff1cb";
+  const deep = darkMode ? "#32190d" : "#4b2813";
+  const woodDark = deep;
+  const woodMid = darkMode ? "#70401f" : "#875029";
+  const woodLight = darkMode ? "#a56a35" : "#b8783e";
+  const brass = "#d6a15d";
+  const warmLight = "#ffd89a";
 
   return (
     <group>
@@ -1559,32 +1579,17 @@ function SectionLandmark({
       </mesh>
       <mesh position={[0, 0.18, 0]}>
         <cylinderGeometry args={[0.7, 0.76, 0.12, 12]} />
-        <meshStandardMaterial
-          color={zone.color}
-          emissive={zone.color}
-          emissiveIntensity={darkMode ? 0.24 : 0.04}
-          roughness={0.38}
-          metalness={0.2}
-        />
+        <meshStandardMaterial color={woodLight} roughness={0.82} metalness={0.02} />
       </mesh>
 
       <group position={[0, 0.24, -0.34]}>
         <mesh position={[0, 0.7, 0]}>
           <boxGeometry args={[1.52, 1.08, 0.72]} />
-          <meshStandardMaterial
-            color={index % 2 === 0 ? structure : deep}
-            roughness={0.52}
-            metalness={index === 1 || index === 3 ? 0.18 : 0.05}
-          />
+          <meshStandardMaterial color={index % 2 === 0 ? woodLight : woodMid} roughness={0.86} />
         </mesh>
         <mesh position={[0, 1.42, 0]} rotation={[0, Math.PI / 4, 0]}>
           <coneGeometry args={[1.02, 0.58, 4]} />
-          <meshStandardMaterial
-            color={zone.color}
-            emissive={zone.color}
-            emissiveIntensity={darkMode ? 0.12 : 0.02}
-            roughness={0.48}
-          />
+          <meshStandardMaterial color={deep} roughness={0.9} metalness={0.01} />
         </mesh>
         <mesh position={[0, 0.47, 0.38]}>
           <boxGeometry args={[0.34, 0.62, 0.055]} />
@@ -1594,7 +1599,7 @@ function SectionLandmark({
           <mesh key={`window-${x}`} position={[x, 0.78, 0.385]}>
             <boxGeometry args={[0.3, 0.3, 0.045]} />
             <meshStandardMaterial
-              color="#ffd89a"
+              color={warmLight}
               emissive="#ffbf69"
               emissiveIntensity={darkMode ? 1.6 : 0.2}
               roughness={0.24}
@@ -1607,18 +1612,18 @@ function SectionLandmark({
         <group position={[0, 0.25, 0]}>
           <mesh position={[-0.48, 0.62, 0]}>
             <boxGeometry args={[0.14, 1.12, 0.24]} />
-            <meshStandardMaterial color={structure} roughness={0.42} />
+            <meshStandardMaterial color={woodLight} roughness={0.86} />
           </mesh>
           <mesh position={[0.48, 0.62, 0]}>
             <boxGeometry args={[0.14, 1.12, 0.24]} />
-            <meshStandardMaterial color={structure} roughness={0.42} />
+            <meshStandardMaterial color={woodLight} roughness={0.86} />
           </mesh>
           <mesh position={[0, 1.13, 0]}>
             <boxGeometry args={[1.1, 0.14, 0.24]} />
             <meshStandardMaterial
-              color={zone.color}
-              emissive={zone.color}
-              emissiveIntensity={glow}
+              color={woodMid}
+              emissive="#7a421f"
+              emissiveIntensity={darkMode ? 0.08 : 0}
             />
           </mesh>
           <mesh position={[0, 0.79, 0.15]}>
@@ -1638,10 +1643,10 @@ function SectionLandmark({
             <mesh key={barIndex} position={[-0.48 + barIndex * 0.24, height / 2, 0]}>
               <boxGeometry args={[0.14, height, 0.22]} />
               <meshStandardMaterial
-                color={barIndex % 2 === 0 ? zone.color : pale}
-                emissive={barIndex % 2 === 0 ? zone.color : "#000000"}
-                emissiveIntensity={barIndex % 2 === 0 ? glow : 0}
-                roughness={0.38}
+                color={barIndex % 2 === 0 ? woodLight : pale}
+                emissive="#000000"
+                emissiveIntensity={0}
+                roughness={0.76}
               />
             </mesh>
           ))}
@@ -1661,24 +1666,24 @@ function SectionLandmark({
           {[-0.2, 0, 0.2].map((y) => (
             <mesh key={y} position={[-0.16, y, 0.115]}>
               <boxGeometry args={[0.55, 0.045, 0.025]} />
-              <meshStandardMaterial color={structure} roughness={0.48} />
+              <meshStandardMaterial color={woodMid} roughness={0.78} />
             </mesh>
           ))}
           <mesh position={[0.3, -0.18, 0.14]} rotation={[Math.PI / 2, 0, 0]}>
             <cylinderGeometry args={[0.17, 0.17, 0.05, 20]} />
             <meshStandardMaterial
-              color={zone.color}
-              emissive={zone.color}
-              emissiveIntensity={glow}
+              color={brass}
+              emissive="#9a642d"
+              emissiveIntensity={darkMode ? 0.12 : 0}
             />
           </mesh>
           <mesh position={[0.24, -0.46, 0.13]} rotation={[0, 0, 0.18]}>
             <boxGeometry args={[0.12, 0.35, 0.04]} />
-            <meshStandardMaterial color={zone.color} roughness={0.42} />
+            <meshStandardMaterial color={brass} roughness={0.46} metalness={0.24} />
           </mesh>
           <mesh position={[0.37, -0.46, 0.13]} rotation={[0, 0, -0.18]}>
             <boxGeometry args={[0.12, 0.35, 0.04]} />
-            <meshStandardMaterial color={zone.color} roughness={0.42} />
+            <meshStandardMaterial color={brass} roughness={0.46} metalness={0.24} />
           </mesh>
         </group>
       ) : null}
@@ -1688,16 +1693,16 @@ function SectionLandmark({
           <mesh rotation={[Math.PI / 2, 0, 0]}>
             <cylinderGeometry args={[0.34, 0.34, 0.2, 6]} />
             <meshStandardMaterial
-              color={zone.color}
-              emissive={zone.color}
-              emissiveIntensity={glow}
+              color={woodMid}
+              emissive="#7a421f"
+              emissiveIntensity={darkMode ? 0.08 : 0}
             />
           </mesh>
           {SERVICE_NODE_POSITIONS.map(([x, y], nodeIndex) => (
             <group key={nodeIndex}>
               <mesh position={[x / 2, y / 2, 0.02]} rotation={[0, 0, Math.atan2(y, x)]}>
                 <boxGeometry args={[Math.hypot(x, y), 0.045, 0.08]} />
-                <meshStandardMaterial color={structure} roughness={0.48} />
+                <meshStandardMaterial color={woodLight} roughness={0.82} />
               </mesh>
               <mesh position={[x, y, 0.04]}>
                 <sphereGeometry args={[0.16, 14, 10]} />
@@ -1718,10 +1723,10 @@ function SectionLandmark({
             >
               <boxGeometry args={[0.48, 0.76, 0.1]} />
               <meshStandardMaterial
-                color={cardIndex === 1 ? zone.color : pale}
-                emissive={cardIndex === 1 ? zone.color : "#000000"}
-                emissiveIntensity={cardIndex === 1 ? glow : 0}
-                roughness={0.38}
+                color={cardIndex === 1 ? woodLight : pale}
+                emissive="#000000"
+                emissiveIntensity={0}
+                roughness={0.76}
               />
             </mesh>
           ))}
@@ -1737,17 +1742,17 @@ function SectionLandmark({
           <mesh position={[-0.28, 0.06, 0.13]} rotation={[0, 0, -0.58]}>
             <boxGeometry args={[0.72, 0.065, 0.04]} />
             <meshStandardMaterial
-              color={zone.color}
-              emissive={zone.color}
-              emissiveIntensity={glow}
+              color={brass}
+              emissive="#9a642d"
+              emissiveIntensity={darkMode ? 0.12 : 0}
             />
           </mesh>
           <mesh position={[0.28, 0.06, 0.13]} rotation={[0, 0, 0.58]}>
             <boxGeometry args={[0.72, 0.065, 0.04]} />
             <meshStandardMaterial
-              color={zone.color}
-              emissive={zone.color}
-              emissiveIntensity={glow}
+              color={brass}
+              emissive="#9a642d"
+              emissiveIntensity={darkMode ? 0.12 : 0}
             />
           </mesh>
           <mesh position={[0, -0.2, 0.13]}>
@@ -1760,22 +1765,16 @@ function SectionLandmark({
       <group position={[0, 2.16, 0]}>
         <mesh position={[0, -0.55, -0.04]}>
           <cylinderGeometry args={[0.055, 0.07, 1.08, 10]} />
-          <meshStandardMaterial color={structure} roughness={0.35} metalness={0.52} />
+          <meshStandardMaterial color={woodDark} roughness={0.9} metalness={0.01} />
         </mesh>
         <mesh>
           <boxGeometry args={[1.78, 0.5, 0.14]} />
-          <meshStandardMaterial
-            color={zone.color}
-            emissive={zone.color}
-            emissiveIntensity={darkMode ? 0.16 : 0.03}
-            roughness={0.32}
-            metalness={0.18}
-          />
+          <meshStandardMaterial color={woodMid} roughness={0.84} metalness={0.02} />
         </mesh>
         <RoadSignLabel label={zone.id} index={index} />
         <mesh position={[side * 0.96, 0, 0]} rotation={[0, 0, (side * -Math.PI) / 2]}>
           <coneGeometry args={[0.25, 0.34, 3]} />
-          <meshStandardMaterial color={zone.color} roughness={0.32} />
+          <meshStandardMaterial color={woodLight} roughness={0.86} />
         </mesh>
       </group>
     </group>
@@ -2463,7 +2462,6 @@ function PathEnvironment({
               index={index}
               side={station.side}
               darkMode={darkMode}
-              structure={structure}
               pathEdge={pathEdge}
             />
           </group>
