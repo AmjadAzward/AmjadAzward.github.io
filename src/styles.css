@@ -2732,15 +2732,14 @@ body::before {
   height: 0.85rem;
 }
 
-/* The village welcome message is presented as a crafted timber noticeboard. */
-.path-intro-card {
+/* Village information is presented on crafted timber noticeboards. */
+:is(.path-intro-card, .path-destination-card) {
   --wood-frame-dark: #321c10;
   --wood-frame-light: #7f512d;
   --wood-plank-dark: #5b351c;
   --wood-plank-mid: #81502b;
   --wood-plank-light: #a26b3d;
   isolation: isolate;
-  width: min(26.5rem, calc(100% - 2rem));
   overflow: hidden;
   border: 0.45rem solid var(--wood-frame-dark);
   border-radius: 0.9rem;
@@ -2774,22 +2773,26 @@ body::before {
   backdrop-filter: none;
 }
 
-.path-intro-card::before,
-.path-intro-card::after {
+.path-intro-card {
+  width: min(26.5rem, calc(100% - 2rem));
+}
+
+:is(.path-intro-card, .path-destination-card)::before,
+:is(.path-intro-card, .path-destination-card)::after {
   position: absolute;
   z-index: 0;
   pointer-events: none;
   content: "";
 }
 
-.path-intro-card::before {
+:is(.path-intro-card, .path-destination-card)::before {
   inset: 0.32rem;
   border: 1px solid rgb(255 220 164 / 18%);
   border-radius: 0.42rem;
   box-shadow: inset 0 0 0 1px rgb(39 20 9 / 45%);
 }
 
-.path-intro-card::after {
+:is(.path-intro-card, .path-destination-card)::after {
   inset: 0.6rem;
   background:
     radial-gradient(
@@ -2818,7 +2821,7 @@ body::before {
     );
 }
 
-.path-intro-card > * {
+:is(.path-intro-card, .path-destination-card) > * {
   position: relative;
   z-index: 1;
 }
@@ -2890,7 +2893,79 @@ body::before {
   color: #fff1cb;
 }
 
-:root:not(.dark) .path-intro-card {
+.path-destination-card {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-color: #b5814f #3a2112;
+  scrollbar-width: thin;
+}
+
+.path-destination-card .path-card-eyebrow {
+  color: #ffd28a;
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgb(43 22 10 / 92%);
+}
+
+.path-destination-card h2 {
+  color: #fff1cb;
+  letter-spacing: -0.055em;
+  text-shadow:
+    0 2px 0 #3c210f,
+    0 3px 0 rgb(26 13 6 / 55%);
+}
+
+.path-destination-card > p:not(.path-card-eyebrow) {
+  color: #ead8b7;
+  text-shadow: 0 1px 0 rgb(48 25 11 / 70%);
+}
+
+.path-destination-card .path-fact-list span {
+  border: 1px solid #a97645;
+  background: rgb(55 29 14 / 46%);
+  color: #f4dfba;
+  box-shadow: inset 0 1px 0 rgb(255 224 170 / 10%);
+  text-shadow: 0 1px 0 #241208;
+}
+
+.path-destination-card img {
+  border: 0.28rem solid #4a2a15;
+  border-radius: 0.55rem;
+  box-shadow:
+    0 0.25rem 0 #2a1509,
+    inset 0 0 0 1px #b5814f;
+}
+
+.path-destination-card .path-interaction-cue {
+  color: #ead8b7;
+  text-shadow: 0 1px 0 rgb(48 25 11 / 76%);
+}
+
+.path-destination-card .path-interaction-cue kbd {
+  border: 1px solid #bd854e;
+  background: linear-gradient(180deg, #5a351d, #321c10);
+  color: #ffd28a;
+  box-shadow:
+    0 0.18rem 0 #241208,
+    inset 0 1px 0 rgb(255 225 173 / 14%);
+}
+
+.path-destination-card .path-open-showcase {
+  border: 2px solid #4a2a15;
+  background: linear-gradient(180deg, #e1ab63, #b97935);
+  box-shadow:
+    0 0.28rem 0 #4a2915,
+    inset 0 1px 0 rgb(255 237 188 / 52%);
+  color: #291609;
+  text-shadow: 0 1px 0 rgb(255 224 172 / 42%);
+}
+
+.path-destination-card .path-open-showcase:hover,
+.path-destination-card .path-open-showcase:focus-visible {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+:root:not(.dark) :is(.path-intro-card, .path-destination-card) {
   --wood-frame-dark: #4b2b17;
   --wood-frame-light: #a87543;
   --wood-plank-dark: #a86f3d;
@@ -2928,6 +3003,21 @@ body::before {
   color: #050f1b;
 }
 
+:root:not(.dark) .path-destination-card .path-card-eyebrow,
+:root:not(.dark) .path-destination-card h2,
+:root:not(.dark) .path-destination-card > p:not(.path-card-eyebrow),
+:root:not(.dark) .path-destination-card .path-interaction-cue {
+  color: #2d190d;
+  text-shadow: 0 1px 0 rgb(255 225 171 / 52%);
+}
+
+:root:not(.dark) .path-destination-card .path-fact-list span {
+  border-color: #78451f;
+  background: rgb(255 232 188 / 30%);
+  color: #2d190d;
+  text-shadow: 0 1px 0 rgb(255 225 171 / 52%);
+}
+
 @media (max-width: 1023px) {
   .path-intro-card {
     width: min(25rem, calc(100% - 2rem));
@@ -2935,8 +3025,7 @@ body::before {
 }
 
 @media (max-width: 680px) {
-  .path-intro-card {
-    width: min(18.5rem, calc(100% - 1.4rem));
+  :is(.path-intro-card, .path-destination-card) {
     border-width: 0.36rem;
     border-radius: 0.72rem;
     box-shadow:
@@ -2944,6 +3033,10 @@ body::before {
       0 1.5rem 3rem rgb(0 7 18 / 38%),
       inset 0 0 0 0.13rem var(--wood-frame-light),
       inset -0.35rem -0.35rem 0.9rem rgb(32 15 6 / 32%);
+  }
+
+  .path-intro-card {
+    width: min(18.5rem, calc(100% - 1.4rem));
   }
 }
 
