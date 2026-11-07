@@ -2830,6 +2830,7 @@ body::before {
 }
 
 .path-intro-card h1 {
+  margin-top: 0;
   color: #fff1cb;
   letter-spacing: -0.055em;
   text-shadow:

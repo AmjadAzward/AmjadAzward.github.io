@@ -7,8 +7,6 @@ import {
   ChevronLeft,
   ChevronRight,
   CircleHelp,
-  Compass,
-  Download,
   Facebook,
   Footprints,
   Github,
@@ -1013,9 +1011,6 @@ export default function InteractiveStudioHero() {
 
       {!stop && !journeyStarted ? (
         <section className="path-intro-card" aria-labelledby="path-intro-title">
-          <p>
-            <Compass aria-hidden /> Interactive 3D portfolio
-          </p>
           <h1 id="path-intro-title">Explore my world of code &amp; creativity.</h1>
           <span>
             Step into an interactive island where every destination tells a story about my skills,
@@ -1035,12 +1030,6 @@ export default function InteractiveStudioHero() {
             >
               View projects
             </button>
-          </div>
-          <div className="path-intro-links">
-            <Link to="/quick-view">Quick View mode</Link>
-            <a href="/cv.pdf" download>
-              <Download aria-hidden /> Download resume
-            </a>
           </div>
         </section>
       ) : null}
