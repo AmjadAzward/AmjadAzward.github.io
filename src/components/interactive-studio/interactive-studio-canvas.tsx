@@ -156,9 +156,8 @@ const LAMP_OBJECTS = Array.from({ length: 12 }, (_, index) => ({
 
 const SOCIAL_OBJECTS = socials.map((social, index) => ({
   ...social,
-  x: -1.55 + index * 0.72,
+  x: -2.2 + index * 1.1,
   z: -25.55,
-  color: ["#0a66c2", "#24292f", "#1877f2", "#111827", "#833ab4"][index] ?? "#0878ee",
 }));
 
 const WORLD_CIRCLE_COLLIDERS = [
@@ -780,11 +779,11 @@ function RobotCompanion({
 function SocialIconMark({ label }: { label: string }) {
   const markMaterial = (
     <meshStandardMaterial
-      color="#eef7ff"
-      emissive="#d9efff"
-      emissiveIntensity={0.24}
-      roughness={0.28}
-      metalness={0.08}
+      color="#ffe3ae"
+      emissive="#d59a4f"
+      emissiveIntensity={0.12}
+      roughness={0.46}
+      metalness={0.04}
     />
   );
 
@@ -911,6 +910,9 @@ function SocialIconSculpture({
 }) {
   const rootRef = useRef<Group>(null);
   const hoveredRef = useRef(false);
+  const woodDark = darkMode ? "#32190d" : "#4f2914";
+  const woodMid = darkMode ? "#70401f" : "#875029";
+  const woodLight = darkMode ? "#a56a35" : "#b8783e";
 
   useEffect(
     () => () => {
@@ -953,30 +955,29 @@ function SocialIconSculpture({
         <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
       </mesh>
       <mesh geometry={plateGeometry}>
-        <meshStandardMaterial
-          color={item.color}
-          emissive={item.color}
-          emissiveIntensity={darkMode ? 0.2 : 0.04}
-          roughness={0.24}
-          metalness={0.24}
-        />
+        <meshStandardMaterial color={woodDark} roughness={0.86} metalness={0.02} />
       </mesh>
-      <SocialIconMark label={item.label} />
+      <mesh position={[0, 0, 0.1]} scale={[0.86, 0.86, 0.34]} geometry={plateGeometry}>
+        <meshStandardMaterial color={woodMid} roughness={0.8} metalness={0.02} />
+      </mesh>
+      {[-1, 1].flatMap((x) =>
+        [-1, 1].map((y) => (
+          <mesh key={`social-bolt-${x}-${y}`} position={[x * 0.235, y * 0.245, 0.135]}>
+            <sphereGeometry args={[0.025, 10, 8]} />
+            <meshStandardMaterial color="#d6a15d" roughness={0.38} metalness={0.52} />
+          </mesh>
+        )),
+      )}
+      <group position={[0, 0, 0.075]}>
+        <SocialIconMark label={item.label} />
+      </group>
       <mesh position={[0, -0.48, 0]}>
         <cylinderGeometry args={[0.045, 0.06, 0.28, 10]} />
-        <meshStandardMaterial
-          color={darkMode ? "#60758d" : "#405d78"}
-          roughness={0.3}
-          metalness={0.62}
-        />
+        <meshStandardMaterial color={woodMid} roughness={0.88} metalness={0.02} />
       </mesh>
       <mesh position={[0, -0.65, 0.02]} scale={[0.45, 0.075, 0.28]}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial
-          color={darkMode ? "#14253a" : "#d7e8f5"}
-          roughness={0.38}
-          metalness={0.3}
-        />
+        <meshStandardMaterial color={woodLight} roughness={0.9} metalness={0.01} />
       </mesh>
     </group>
   );
@@ -1007,9 +1008,9 @@ function SocialLandmarks({
       ))}
       <pointLight
         position={[0, 1.35, -24.65]}
-        color="#42a5ff"
-        intensity={darkMode ? 2.2 : 0.35}
-        distance={4.2}
+        color="#ffc36b"
+        intensity={darkMode ? 1.8 : 0.28}
+        distance={5.2}
       />
     </group>
   );
