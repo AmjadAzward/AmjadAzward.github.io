@@ -1371,7 +1371,7 @@ function VillageShowcaseScreen({
         context.fillStyle = "#f1cf96";
         context.font = "700 19px Arial, sans-serif";
         context.fillText(slide.metric, copyX + 20, cursorY - 1);
-        cursorY += 60;
+        cursorY += 84;
       }
 
       const titleFontSize = hasImage
