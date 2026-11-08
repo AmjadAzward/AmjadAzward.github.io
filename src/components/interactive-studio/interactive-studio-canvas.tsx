@@ -1148,7 +1148,9 @@ function drawScreenText(
   }
 
   lines.forEach((value, index) => context.fillText(value, x, y + index * lineHeight));
-  return y + lines.length * lineHeight;
+  if (!lines.length) return y;
+  const lastBaseline = y + (lines.length - 1) * lineHeight;
+  return lastBaseline + lineHeight * 0.3;
 }
 
 function VillageShowcaseScreen({
