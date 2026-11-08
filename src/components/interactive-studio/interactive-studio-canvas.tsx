@@ -397,19 +397,18 @@ function DigitalEngineer({
     const time = state.clock.elapsedTime;
     const stride = moving && !reducedMotion ? Math.sin(time * 9.5) : 0;
     const idle = reducedMotion ? 0 : Math.sin(time * 1.6) * 0.012;
-    const waveEnvelope =
-      !reducedMotion && time > 0.65 && time < 3.65
-        ? Math.sin(MathUtils.clamp((time - 0.65) / 3, 0, 1) * Math.PI)
-        : 0;
 
     if (bodyRef.current)
       bodyRef.current.position.y = idle + (moving ? Math.abs(stride) * 0.025 : 0);
     if (leftLegRef.current) leftLegRef.current.rotation.x = stride * 0.5;
     if (rightLegRef.current) rightLegRef.current.rotation.x = -stride * 0.5;
-    if (leftArmRef.current) leftArmRef.current.rotation.x = -stride * 0.42;
+    if (leftArmRef.current) {
+      leftArmRef.current.rotation.x = -stride * 0.42;
+      leftArmRef.current.rotation.z = 0;
+    }
     if (rightArmRef.current) {
-      rightArmRef.current.rotation.x = stride * 0.42 + Math.sin(time * 9) * 0.11 * waveEnvelope;
-      rightArmRef.current.rotation.z = -1.65 * waveEnvelope;
+      rightArmRef.current.rotation.x = stride * 0.42;
+      rightArmRef.current.rotation.z = 0;
     }
   });
 
