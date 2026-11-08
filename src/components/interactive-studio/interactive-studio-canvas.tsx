@@ -1353,67 +1353,143 @@ function VillageShowcaseScreen({
         cursorY += 60;
       }
 
+      const titleFontSize = hasImage
+        ? slide.title.length > 52
+          ? 43
+          : 50
+        : slide.title.length > 62
+          ? 50
+          : slide.title.length > 42
+            ? 54
+            : 60;
+      const titleLineHeight = titleFontSize + 6;
       context.fillStyle = "#fff1cb";
-      context.font = `700 ${hasImage ? 50 : 60}px Arial, sans-serif`;
+      context.font = `700 ${titleFontSize}px Arial, sans-serif`;
       cursorY = drawScreenText(
         context,
         slide.title,
         copyX,
         cursorY,
         copyWidth,
-        hasImage ? 54 : 64,
-        3,
+        titleLineHeight,
+        hasImage ? 3 : 2,
       );
 
-      const dividerY = Math.min(cursorY + 20, 488);
+      const dividerY = Math.min(cursorY + 20, hasImage ? 488 : 430);
       context.fillStyle = "rgba(255,214,142,.42)";
       context.fillRect(copyX, dividerY, copyWidth, 2);
 
-      context.fillStyle = "#d7a665";
-      context.font = "700 16px Arial, sans-serif";
-      context.letterSpacing = "2px";
-      context.fillText("OVERVIEW", copyX, dividerY + 40);
-      context.letterSpacing = "0px";
+      if (!hasImage) {
+        const sectionTop = dividerY + 22;
+        const sectionBottom = 642;
+        const sectionHeight = sectionBottom - sectionTop;
+        const sectionGap = 20;
+        const overviewWidth = Math.floor(copyWidth * 0.62);
+        const detailsX = copyX + overviewWidth + sectionGap;
+        const detailsWidth = copyWidth - overviewWidth - sectionGap;
 
-      context.fillStyle = "#ead8b7";
-      context.font = "400 24px Arial, sans-serif";
-      cursorY = drawScreenText(
-        context,
-        slide.description,
-        copyX,
-        dividerY + 78,
-        copyWidth,
-        34,
-        hasImage ? 3 : 4,
-      );
+        [
+          [copyX, overviewWidth],
+          [detailsX, detailsWidth],
+        ].forEach(([panelX = 0, panelWidth = 0]) => {
+          context.fillStyle = "rgba(42,19,7,.2)";
+          context.strokeStyle = "rgba(247,194,117,.24)";
+          context.lineWidth = 2;
+          context.beginPath();
+          context.roundRect(panelX, sectionTop, panelWidth, sectionHeight, 16);
+          context.fill();
+          context.stroke();
+        });
 
-      if (slide.chips?.length) {
         context.fillStyle = "#d7a665";
-        context.font = "700 15px Arial, sans-serif";
+        context.font = "700 16px Arial, sans-serif";
         context.letterSpacing = "2px";
-        const detailsY = Math.min(cursorY + 24, 596);
-        context.fillText("DETAILS", copyX, detailsY);
+        context.fillText("OVERVIEW", copyX + 20, sectionTop + 32);
+        context.fillText("DETAILS", detailsX + 20, sectionTop + 32);
         context.letterSpacing = "0px";
 
-        context.font = "600 18px Arial, sans-serif";
-        let chipX = copyX;
-        let chipY = detailsY + 43;
-        for (const chip of slide.chips.slice(0, 8)) {
-          const chipWidth = Math.min(context.measureText(chip).width + 34, copyWidth);
-          if (chipX + chipWidth > copyX + copyWidth) {
-            chipX = copyX;
-            chipY += 46;
+        context.fillStyle = "#ead8b7";
+        context.font = "400 23px Arial, sans-serif";
+        drawScreenText(
+          context,
+          slide.description,
+          copyX + 20,
+          sectionTop + 72,
+          overviewWidth - 40,
+          32,
+          4,
+        );
+
+        if (slide.chips?.length) {
+          context.font = "600 17px Arial, sans-serif";
+          let chipX = detailsX + 20;
+          let chipY = sectionTop + 72;
+          const chipMaxX = detailsX + detailsWidth - 20;
+          for (const chip of slide.chips.slice(0, 8)) {
+            const chipWidth = Math.min(context.measureText(chip).width + 32, detailsWidth - 40);
+            if (chipX + chipWidth > chipMaxX) {
+              chipX = detailsX + 20;
+              chipY += 43;
+            }
+            if (chipY > sectionBottom - 14) break;
+            context.fillStyle = "rgba(42,19,7,.38)";
+            context.beginPath();
+            context.roundRect(chipX, chipY - 25, chipWidth, 34, 17);
+            context.fill();
+            context.strokeStyle = "rgba(247,194,117,.52)";
+            context.stroke();
+            context.fillStyle = "#f4dfba";
+            context.fillText(chip, chipX + 16, chipY - 2);
+            chipX += chipWidth + 10;
           }
-          if (chipY > 650) break;
-          context.fillStyle = "rgba(42,19,7,.34)";
-          context.beginPath();
-          context.roundRect(chipX, chipY - 27, chipWidth, 35, 18);
-          context.fill();
-          context.strokeStyle = "rgba(247,194,117,.52)";
-          context.stroke();
-          context.fillStyle = "#f4dfba";
-          context.fillText(chip, chipX + 17, chipY - 3);
-          chipX += chipWidth + 12;
+        }
+      } else {
+        context.fillStyle = "#d7a665";
+        context.font = "700 16px Arial, sans-serif";
+        context.letterSpacing = "2px";
+        context.fillText("OVERVIEW", copyX, dividerY + 40);
+        context.letterSpacing = "0px";
+
+        context.fillStyle = "#ead8b7";
+        context.font = "400 24px Arial, sans-serif";
+        cursorY = drawScreenText(
+          context,
+          slide.description,
+          copyX,
+          dividerY + 78,
+          copyWidth,
+          34,
+          3,
+        );
+
+        if (slide.chips?.length) {
+          context.fillStyle = "#d7a665";
+          context.font = "700 15px Arial, sans-serif";
+          context.letterSpacing = "2px";
+          const detailsY = Math.min(cursorY + 24, 596);
+          context.fillText("DETAILS", copyX, detailsY);
+          context.letterSpacing = "0px";
+
+          context.font = "600 18px Arial, sans-serif";
+          let chipX = copyX;
+          let chipY = detailsY + 43;
+          for (const chip of slide.chips.slice(0, 8)) {
+            const chipWidth = Math.min(context.measureText(chip).width + 34, copyWidth);
+            if (chipX + chipWidth > copyX + copyWidth) {
+              chipX = copyX;
+              chipY += 46;
+            }
+            if (chipY > 650) break;
+            context.fillStyle = "rgba(42,19,7,.34)";
+            context.beginPath();
+            context.roundRect(chipX, chipY - 27, chipWidth, 35, 18);
+            context.fill();
+            context.strokeStyle = "rgba(247,194,117,.52)";
+            context.stroke();
+            context.fillStyle = "#f4dfba";
+            context.fillText(chip, chipX + 17, chipY - 3);
+            chipX += chipWidth + 12;
+          }
         }
       }
 
