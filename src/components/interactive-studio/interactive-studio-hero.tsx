@@ -60,6 +60,7 @@ const pathStops: Array<{
   title: string;
   description: string;
   target: { x: number; z: number };
+  landmark: { x: number; z: number };
   facts: string[];
 }> = [
   {
@@ -70,7 +71,8 @@ const pathStops: Array<{
     title: "Who I am",
     description:
       "A third-year Computer Science undergraduate building useful systems across software, data, cloud, and machine learning.",
-    target: { x: -4.8, z: 0.8 },
+    target: { x: -5.42, z: 0.8 },
+    landmark: { x: -6.7, z: 0.8 },
     facts: ["Colombo, Sri Lanka", "Software + data", "Open to collaboration"],
   },
   {
@@ -81,7 +83,8 @@ const pathStops: Array<{
     title: "Tools for building",
     description:
       "Languages, frameworks, cloud platforms, databases, and product skills used to turn ideas into maintainable software.",
-    target: { x: 4.6, z: -3.6 },
+    target: { x: 5.22, z: -3.6 },
+    landmark: { x: 6.5, z: -3.6 },
     facts: skillGroups.map((group) => group.title),
   },
   {
@@ -92,7 +95,8 @@ const pathStops: Array<{
     title: "Always learning",
     description:
       "Selected certifications across AI, software engineering, cloud, databases, networking, and modern infrastructure.",
-    target: { x: -4.6, z: -8.9 },
+    target: { x: -5.22, z: -8.9 },
+    landmark: { x: -6.5, z: -8.9 },
     facts: certifications
       .slice(0, 3)
       .map((item) => item.issuer)
@@ -106,7 +110,8 @@ const pathStops: Array<{
     title: "Ways I can help",
     description:
       "Focused engineering support for web, mobile, desktop, AI, connected systems, and data-led product experiences.",
-    target: { x: 4.9, z: -13.4 },
+    target: { x: 5.52, z: -13.4 },
+    landmark: { x: 6.8, z: -13.4 },
     facts: services.slice(0, 4).map((item) => item.title),
   },
   {
@@ -117,7 +122,8 @@ const pathStops: Array<{
     title: "Ideas made tangible",
     description:
       "A growing collection of practical products, intelligent systems, mobile experiences, and data-driven applications.",
-    target: { x: -3.8, z: -18.8 },
+    target: { x: -4.42, z: -18.8 },
+    landmark: { x: -5.7, z: -18.8 },
     facts: projects
       .slice(0, 3)
       .map((item) => item.title)
@@ -131,7 +137,8 @@ const pathStops: Array<{
     title: "Let's build something",
     description:
       "Have a product, system, or idea worth exploring? The trail ends with an open line for a thoughtful conversation.",
-    target: { x: 3.8, z: -24 },
+    target: { x: 4.42, z: -24 },
+    landmark: { x: 5.7, z: -24 },
     facts: ["Project enquiries", "Freelance work", "Engineering opportunities"],
   },
 ];
@@ -140,11 +147,13 @@ const GUIDED_ROUTES: Record<StudioZoneId, StudioPosition[]> = {
   about: [
     { x: -3.1, z: 3.6 },
     { x: -4.8, z: 0.8 },
+    { x: -5.42, z: 0.8 },
   ],
   skills: [
     { x: -1.7, z: -0.9 },
     { x: 1.5, z: -1.4 },
     { x: 4.6, z: -3.6 },
+    { x: 5.22, z: -3.6 },
   ],
   certifications: [
     { x: 5.6, z: -8.1 },
@@ -152,22 +161,26 @@ const GUIDED_ROUTES: Record<StudioZoneId, StudioPosition[]> = {
     { x: 1.9, z: -10.8 },
     { x: -1.8, z: -10.4 },
     { x: -4.6, z: -8.9 },
+    { x: -5.22, z: -8.9 },
   ],
   services: [
     { x: -1.8, z: -10.4 },
     { x: 1.9, z: -10.8 },
     { x: 4.9, z: -13.4 },
+    { x: 5.52, z: -13.4 },
   ],
   portfolio: [
     { x: 1.9, z: -10.8 },
     { x: 0, z: -15.3 },
     { x: -0.8, z: -17.2 },
     { x: -3.8, z: -18.8 },
+    { x: -4.42, z: -18.8 },
   ],
   contact: [
     { x: -0.8, z: -17.2 },
     { x: 2.1, z: -18.6 },
     { x: 3.8, z: -24 },
+    { x: 4.42, z: -24 },
   ],
 };
 
@@ -984,11 +997,8 @@ export default function InteractiveStudioHero() {
                   </g>
                 ))}
 
-                {pathStops.map((item, index) => {
-                  const building = worldToMapPosition({
-                    x: item.target.x + (index % 2 === 0 ? -1 : 1) * 1.9,
-                    z: item.target.z,
-                  });
+                {pathStops.map((item) => {
+                  const building = worldToMapPosition(item.landmark);
                   return (
                     <g
                       key={`map-building-${item.id}`}

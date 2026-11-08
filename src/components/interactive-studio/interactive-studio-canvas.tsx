@@ -48,16 +48,15 @@ type StudioCanvasProps = {
 type Zone = {
   id: StudioZoneId;
   position: [number, number, number];
-  color: string;
 };
 
 const ZONES: Zone[] = [
-  { id: "about", position: [-4.8, 0.03, 0.8], color: "#49a8ff" },
-  { id: "skills", position: [4.6, 0.03, -3.6], color: "#38bdf8" },
-  { id: "certifications", position: [-4.6, 0.03, -8.9], color: "#6aaeff" },
-  { id: "services", position: [4.9, 0.03, -13.4], color: "#278cff" },
-  { id: "portfolio", position: [-3.8, 0.03, -18.8], color: "#57b8ff" },
-  { id: "contact", position: [3.8, 0.03, -24], color: "#30a7e8" },
+  { id: "about", position: [-4.8, 0.03, 0.8] },
+  { id: "skills", position: [4.6, 0.03, -3.6] },
+  { id: "certifications", position: [-4.6, 0.03, -8.9] },
+  { id: "services", position: [4.9, 0.03, -13.4] },
+  { id: "portfolio", position: [-3.8, 0.03, -18.8] },
+  { id: "contact", position: [3.8, 0.03, -24] },
 ];
 
 const SERVICE_NODE_POSITIONS: Array<[number, number]> = [
@@ -73,6 +72,9 @@ const STREAM_CENTER_Z = -15.65;
 const STREAM_HALF_WIDTH = 0.53;
 const MAIN_TRAIL_WIDTH = 2.45;
 const BRANCH_TRAIL_WIDTH = 1.68;
+const LANDMARK_OFFSET = 1.9;
+const LANDMARK_APPROACH_OFFSET = 0.62;
+const LANDMARK_TRIGGER_RADIUS = 1.65;
 
 const MEADOW_PATCHES: Array<[number, number]> = [
   [-11.2, 5.2],
@@ -135,7 +137,7 @@ const HILL_OBJECTS: Array<[number, number, number]> = [
 ];
 
 const STATION_OBJECTS = ZONES.map((zone, index) => ({
-  x: zone.position[0] + (index % 2 === 0 ? -1 : 1) * 1.9,
+  x: zone.position[0] + (index % 2 === 0 ? -1 : 1) * LANDMARK_OFFSET,
   z: zone.position[2],
 }));
 
@@ -1559,12 +1561,14 @@ function SectionLandmark({
   side,
   darkMode,
   pathEdge,
+  inputRef,
 }: {
   zone: Zone;
   index: number;
   side: number;
   darkMode: boolean;
   pathEdge: string;
+  inputRef: RefObject<StudioInput>;
 }) {
   const pale = "#fff1cb";
   const deep = darkMode ? "#32190d" : "#4b2813";
@@ -1575,7 +1579,24 @@ function SectionLandmark({
   const warmLight = "#ffd89a";
 
   return (
-    <group>
+    <group
+      onPointerDown={(event) => {
+        event.stopPropagation();
+        inputRef.current.route = [];
+        inputRef.current.target = {
+          x: zone.position[0] + side * LANDMARK_APPROACH_OFFSET,
+          z: zone.position[2],
+        };
+        inputRef.current.x = 0;
+        inputRef.current.z = 0;
+      }}
+      onPointerOver={() => {
+        document.body.style.cursor = "pointer";
+      }}
+      onPointerOut={() => {
+        document.body.style.cursor = "";
+      }}
+    >
       <mesh position={[0, 0.08, 0]}>
         <cylinderGeometry args={[0.82, 0.9, 0.16, 12]} />
         <meshStandardMaterial color={pathEdge} roughness={0.68} metalness={0.08} />
@@ -2458,7 +2479,11 @@ function PathEnvironment({
         station.id === hiddenZoneId ? null : (
           <group
             key={station.id}
-            position={[station.position[0] + station.side * 1.9, 0, station.position[2]]}
+            position={[
+              station.position[0] + station.side * LANDMARK_OFFSET,
+              0,
+              station.position[2],
+            ]}
           >
             <SectionLandmark
               zone={station}
@@ -2466,6 +2491,7 @@ function PathEnvironment({
               side={station.side}
               darkMode={darkMode}
               pathEdge={pathEdge}
+              inputRef={inputRef}
             />
           </group>
         ),
@@ -2706,67 +2732,6 @@ function StudioEnvironment({
   );
 }
 
-function ZoneBeacons({
-  inputRef,
-  darkMode,
-  hiddenZoneId,
-}: {
-  inputRef: RefObject<StudioInput>;
-  darkMode: boolean;
-  hiddenZoneId: StudioZoneId | null;
-}) {
-  return (
-    <group>
-      {ZONES.map((zone, index) =>
-        zone.id === hiddenZoneId ? null : (
-          <group
-            key={zone.id}
-            position={zone.position}
-            onPointerDown={(event) => {
-              event.stopPropagation();
-              if (inputRef.current) {
-                inputRef.current.route = [];
-                inputRef.current.target = { x: zone.position[0], z: zone.position[2] };
-              }
-            }}
-            onPointerOver={() => {
-              document.body.style.cursor = "pointer";
-            }}
-            onPointerOut={() => {
-              document.body.style.cursor = "";
-            }}
-          >
-            <mesh rotation={[-Math.PI / 2, 0, 0]}>
-              <torusGeometry args={[0.48, 0.025, 8, 42]} />
-              <meshStandardMaterial
-                color={zone.color}
-                emissive={zone.color}
-                emissiveIntensity={darkMode ? 1.15 : 0.3}
-              />
-            </mesh>
-            <mesh position={[0, 0.2, 0]}>
-              <cylinderGeometry args={[0.025, 0.05, 0.38, 10]} />
-              <meshStandardMaterial
-                color={zone.color}
-                emissive={zone.color}
-                emissiveIntensity={darkMode ? 0.9 : 0.2}
-              />
-            </mesh>
-            <mesh position={[0, 0.45, 0]}>
-              <sphereGeometry args={[0.075 + index * 0.002, 12, 8]} />
-              <meshStandardMaterial
-                color={zone.color}
-                emissive={zone.color}
-                emissiveIntensity={darkMode ? 1.4 : 0.35}
-              />
-            </mesh>
-          </group>
-        ),
-      )}
-    </group>
-  );
-}
-
 function StudioWorld({
   darkMode,
   reducedMotion,
@@ -2844,9 +2809,11 @@ function StudioWorld({
     }
 
     let nearest: StudioZoneId | null = null;
-    let nearestDistance = 1.18;
-    for (const zone of ZONES) {
-      const distance = Math.hypot(character.x - zone.position[0], character.z - zone.position[2]);
+    let nearestDistance = LANDMARK_TRIGGER_RADIUS;
+    for (const [index, zone] of ZONES.entries()) {
+      const landmark = STATION_OBJECTS[index];
+      if (!landmark) continue;
+      const distance = Math.hypot(character.x - landmark.x, character.z - landmark.z);
       if (distance < nearestDistance) {
         nearest = zone.id;
         nearestDistance = distance;
@@ -2890,11 +2857,6 @@ function StudioWorld({
         darkMode={darkMode}
         inputRef={inputRef}
         reducedMotion={reducedMotion || quality === "low"}
-        hiddenZoneId={showcase?.section ?? null}
-      />
-      <ZoneBeacons
-        inputRef={inputRef}
-        darkMode={darkMode}
         hiddenZoneId={showcase?.section ?? null}
       />
       <DigitalEngineer
