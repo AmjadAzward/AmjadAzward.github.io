@@ -19,7 +19,7 @@ import {
 } from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 
-import { certifications, socials } from "@/data/portfolio";
+import { certifications, projects, socials } from "@/data/portfolio";
 
 import type {
   ShowcaseSlide,
@@ -1301,9 +1301,10 @@ function VillageShowcaseScreen({
 
       const hasImage = Boolean(slide.image);
       const isCertificateSlide = section === "certifications" && hasImage;
+      const isProjectSlide = section === "portfolio" && hasImage;
       const mediaPanelX = 52;
       const mediaPanelY = 120;
-      const mediaPanelWidth = isCertificateSlide ? 520 : 430;
+      const mediaPanelWidth = isCertificateSlide ? 520 : isProjectSlide ? 500 : 430;
       const panelHeight = 548;
       const infoPanelX = hasImage ? mediaPanelX + mediaPanelWidth + 24 : 52;
       const infoPanelWidth = hasImage ? 1228 - infoPanelX : 1176;
@@ -1338,11 +1339,11 @@ function VillageShowcaseScreen({
         context.fillText("DOCUMENT PREVIEW", mediaPanelX + 28, mediaPanelY + 40);
         context.letterSpacing = "0px";
 
-        const boxInset = isCertificateSlide ? 18 : 24;
+        const boxInset = isCertificateSlide || isProjectSlide ? 18 : 24;
         const boxX = mediaPanelX + boxInset;
-        const boxY = mediaPanelY + (isCertificateSlide ? 52 : 62);
+        const boxY = mediaPanelY + (isCertificateSlide || isProjectSlide ? 52 : 62);
         const boxWidth = mediaPanelWidth - boxInset * 2;
-        const boxHeight = isCertificateSlide ? 410 : 420;
+        const boxHeight = isCertificateSlide ? 410 : isProjectSlide ? 430 : 420;
         context.save();
         context.beginPath();
         context.roundRect(boxX, boxY, boxWidth, boxHeight, 16);
@@ -1364,11 +1365,13 @@ function VillageShowcaseScreen({
           context.fillStyle = "#d7a665";
           context.font = "700 15px Arial, sans-serif";
           context.textAlign = "center";
-          context.fillText(
-            "PREPARING CERTIFICATE PREVIEW...",
-            boxX + boxWidth / 2,
-            boxY + boxHeight / 2,
-          );
+          const loadingLabel =
+            section === "certifications"
+              ? "PREPARING CERTIFICATE PREVIEW..."
+              : section === "portfolio"
+                ? "PREPARING PROJECT PREVIEW..."
+                : "PREPARING PREVIEW...";
+          context.fillText(loadingLabel, boxX + boxWidth / 2, boxY + boxHeight / 2);
           context.textAlign = "left";
         }
         context.restore();
@@ -1604,9 +1607,14 @@ function VillageShowcaseScreen({
   }, [section, slide, slideIndex, texture, total]);
 
   useEffect(() => {
-    if (section !== "certifications") return;
-    certifications.forEach((certificate) => {
-      if (certificate.image) loadShowcaseImage(certificate.image, "low");
+    const images =
+      section === "certifications"
+        ? certifications.map((certificate) => certificate.image)
+        : section === "portfolio"
+          ? projects.map((project) => project.previewImage ?? project.image)
+          : [];
+    images.forEach((image) => {
+      if (image) loadShowcaseImage(image, "low");
     });
   }, [section]);
 

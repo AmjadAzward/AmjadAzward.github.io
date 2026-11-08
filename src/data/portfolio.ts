@@ -34,6 +34,15 @@ import project06 from "../../projects/06.png?url";
 import project07 from "../../projects/07.png?url";
 import project08 from "../../projects/08.jpg?url";
 import project09 from "../../projects/09.jpg?url";
+import projectPreview01 from "../../projects/previews/01.jpg?url";
+import projectPreview02 from "../../projects/previews/02.jpg?url";
+import projectPreview03 from "../../projects/previews/03.jpg?url";
+import projectPreview04 from "../../projects/previews/04.jpg?url";
+import projectPreview05 from "../../projects/previews/05.jpg?url";
+import projectPreview06 from "../../projects/previews/06.jpg?url";
+import projectPreview07 from "../../projects/previews/07.jpg?url";
+import projectPreview08 from "../../projects/previews/08.jpg?url";
+import projectPreview09 from "../../projects/previews/09.jpg?url";
 
 export type NavItem = {
   label: string;
@@ -307,6 +316,17 @@ export const projects = [
     project07,
     project08,
     project09,
+  ][i],
+  previewImage: [
+    projectPreview01,
+    projectPreview02,
+    projectPreview03,
+    projectPreview04,
+    projectPreview05,
+    projectPreview06,
+    projectPreview07,
+    projectPreview08,
+    projectPreview09,
   ][i],
   github: "https://github.com/AmjadAzward",
 }));

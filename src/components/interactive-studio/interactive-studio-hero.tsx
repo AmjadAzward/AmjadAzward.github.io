@@ -249,7 +249,7 @@ const showcaseSlides: Record<StudioZoneId, ShowcaseSlide[]> = {
     title: project.title ?? "Selected project",
     description: project.desc ?? "A practical digital product built around a real problem.",
     metric: project.tag,
-    image: project.image,
+    image: project.previewImage ?? project.image,
     imageAlt: `Preview of ${project.title ?? "project"}`,
     chips: [project.tag ?? "Software project", "Designed and developed"],
     action: { label: "View source profile", href: project.github },
