@@ -1157,8 +1157,7 @@ export default function InteractiveStudioHero() {
           >
             <header className="path-tv-header">
               <div>
-                <span>AA VILLAGE NETWORK</span>
-                <strong>{activeShowcaseStop.short} channel</strong>
+                <strong>Amjad Azward | {activeShowcaseStop.short}</strong>
               </div>
               <div className="path-tv-status">
                 <i aria-hidden /> LIVE

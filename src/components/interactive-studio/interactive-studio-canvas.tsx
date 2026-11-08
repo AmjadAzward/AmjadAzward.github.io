@@ -59,6 +59,15 @@ const ZONES: Zone[] = [
   { id: "contact", position: [3.8, 0.03, -24] },
 ];
 
+const SHOWCASE_SECTION_NAMES: Record<StudioZoneId, string> = {
+  about: "About",
+  skills: "Skills",
+  certifications: "Certifications",
+  services: "Services",
+  portfolio: "Projects",
+  contact: "Contact",
+};
+
 const SERVICE_NODE_POSITIONS: Array<[number, number]> = [
   [-0.5, 0.38],
   [0.52, 0.34],
@@ -1252,7 +1261,7 @@ function VillageShowcaseScreen({
       context.fillStyle = "#e5b16b";
       context.font = "700 24px Arial, sans-serif";
       context.letterSpacing = "3px";
-      context.fillText(`AA VILLAGE / ${section.toUpperCase()}`, 62, 60);
+      context.fillText(`Amjad Azward | ${SHOWCASE_SECTION_NAMES[section]}`, 62, 60);
       context.letterSpacing = "0px";
       context.textAlign = "right";
       context.fillStyle = "#f1cf96";
