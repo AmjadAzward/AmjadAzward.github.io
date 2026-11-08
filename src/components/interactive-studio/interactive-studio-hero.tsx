@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import {
@@ -8,7 +7,6 @@ import {
   ChevronRight,
   CircleHelp,
   Facebook,
-  Footprints,
   Github,
   Instagram,
   Linkedin,
@@ -859,7 +857,7 @@ export default function InteractiveStudioHero() {
             <p>FIRST VISIT / CONTROLS</p>
             <h2 id="path-tutorial-title">Ready to explore?</h2>
             <span>
-              Use the village like a small adventure, or switch to Quick View at any time.
+              Use the village like a small adventure and follow the paths between landmarks.
             </span>
             <ul>
               <li>
@@ -881,9 +879,8 @@ export default function InteractiveStudioHero() {
             </ul>
             <div>
               <button type="button" onClick={() => finishTutorial(!journeyStarted)}>
-                {journeyStarted ? "Got it" : "Start exploring"} <Footprints aria-hidden />
+                {journeyStarted ? "Got it" : "Start exploring"}
               </button>
-              <Link to="/quick-view">Open Quick View</Link>
             </div>
           </section>
         </div>
@@ -903,15 +900,7 @@ export default function InteractiveStudioHero() {
             onPointerDown={(event) => event.stopPropagation()}
           >
             <header>
-              <div>
-                <div className="path-map-kicker-row">
-                  <p>VILLAGE MAP / LIVE POSITION</p>
-                  <span className="path-map-village-state">
-                    <i aria-hidden /> {darkMode ? "Evening village" : "Morning village"}
-                  </span>
-                </div>
-                <h2 id="trail-map-title">Choose your next stop.</h2>
-              </div>
+              <h2 id="trail-map-title">Choose your next stop.</h2>
               <button type="button" onClick={() => setMapOpen(false)} aria-label="Close trail map">
                 <X aria-hidden />
               </button>
@@ -1155,7 +1144,7 @@ export default function InteractiveStudioHero() {
           </strong>
           <div className="path-intro-actions">
             <button type="button" onClick={beginJourney}>
-              Start exploring <Footprints aria-hidden />
+              Start exploring
             </button>
             <button
               type="button"

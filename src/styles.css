@@ -776,14 +776,6 @@ body::before {
     font-size: clamp(1.4rem, 7vw, 1.75rem);
   }
 
-  .path-map-kicker-row {
-    gap: 0.3rem 0.55rem;
-  }
-
-  .path-map-village-state {
-    font-size: 0.42rem;
-  }
-
   .path-map-panel > header button,
   .path-map-canvas > button {
     min-width: 2.75rem;
@@ -2340,8 +2332,8 @@ body::before {
   --map-wood-light: #a66c3a;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  width: min(58rem, 96vw);
-  max-height: min(52rem, 94svh);
+  width: min(54rem, calc(100vw - 1.5rem));
+  height: min(44rem, calc(100svh - 1.5rem));
   padding: clamp(0.8rem, 1.8vw, 1.2rem);
   overflow: hidden;
   border: 0.48rem solid var(--map-wood-frame);
@@ -2380,48 +2372,14 @@ body::before {
 
 .path-map-panel > header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.25rem 0.25rem 0.85rem;
-}
-
-.path-map-panel > header p {
-  margin: 0;
-  color: #ffd28a;
-  font-family: var(--font-mono);
-  font-size: 0.56rem;
-  letter-spacing: 0.13em;
-}
-
-.path-map-kicker-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.45rem 0.8rem;
-}
-
-.path-map-village-state {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: #ead7b5;
-  font-family: var(--font-mono);
-  font-size: 0.48rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.path-map-village-state i {
-  width: 0.38rem;
-  height: 0.38rem;
-  border-radius: 50%;
-  background: #ffd17d;
-  box-shadow: 0 0 12px rgb(255 193 91 / 72%);
+  padding: 0.1rem 0.25rem 0.75rem;
 }
 
 .path-map-panel > header h2 {
-  margin: 0.28rem 0 0;
+  margin: 0;
   color: #fff0cc;
   font-family: var(--font-display);
   font-size: clamp(1.7rem, 3vw, 2.8rem);
@@ -2464,7 +2422,7 @@ body::before {
     0 0.32rem 0 #211006,
     0 0 0 0.12rem #a46d3d,
     inset 0 0 42px rgb(2 30 55 / 42%);
-  aspect-ratio: 16 / 10;
+  height: 100%;
 }
 
 .path-map-canvas > svg {
@@ -2793,7 +2751,7 @@ body::before {
 
   .path-map-panel {
     width: 100%;
-    max-height: calc(100svh - 1.1rem);
+    height: calc(100svh - 1.1rem);
     padding: 0.65rem;
     border-radius: 1.15rem;
   }
@@ -2807,7 +2765,7 @@ body::before {
   }
 
   .path-map-canvas {
-    aspect-ratio: 4 / 5;
+    height: 100%;
   }
 
   .path-map-canvas > svg {

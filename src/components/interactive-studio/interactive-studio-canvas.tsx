@@ -277,7 +277,7 @@ function isTrailSegmentOnLand(segment: TrailSegment) {
     (Math.abs(Math.sin(segment.rotation)) * width) / 2;
 
   return (
-    Math.abs(segment.position[2] - STREAM_CENTER_Z) - halfWorldZExtent > STREAM_HALF_WIDTH + 0.04
+    Math.abs(segment.position[2] - STREAM_CENTER_Z) - halfWorldZExtent > STREAM_HALF_WIDTH - 0.25
   );
 }
 
