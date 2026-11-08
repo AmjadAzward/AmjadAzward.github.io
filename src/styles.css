@@ -1104,6 +1104,119 @@ body::before {
 }
 
 /* Walkable portfolio trail */
+.path-landscape-gate {
+  display: none;
+}
+
+@media (max-width: 900px) and (orientation: portrait) and (pointer: coarse) {
+  .path-landscape-gate {
+    position: fixed;
+    z-index: 200;
+    inset: 0;
+    display: grid;
+    min-height: 100dvh;
+    padding: max(1.25rem, env(safe-area-inset-top)) max(1.25rem, env(safe-area-inset-right))
+      max(1.25rem, env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
+    place-content: center;
+    justify-items: center;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 42%, rgb(151 91 43 / 22%), transparent 34%), rgb(13 7 4 / 96%);
+    color: #fff0cc;
+    text-align: center;
+    backdrop-filter: blur(12px);
+  }
+
+  .path-landscape-gate::before {
+    position: absolute;
+    width: min(28rem, calc(100vw - 2rem));
+    height: min(31rem, calc(100dvh - 2rem));
+    border: 0.45rem solid #3a1e0d;
+    border-radius: 1.2rem;
+    background:
+      radial-gradient(circle at 12% 14%, #5e3418 0 0.18rem, transparent 0.21rem),
+      radial-gradient(circle at 88% 86%, #5e3418 0 0.18rem, transparent 0.21rem),
+      repeating-linear-gradient(
+        0deg,
+        transparent 0 4.5rem,
+        rgb(50 24 9 / 54%) 4.56rem 4.65rem,
+        rgb(220 161 94 / 24%) 4.68rem 4.72rem
+      ),
+      linear-gradient(105deg, #603719, #9d6233 54%, #74401e);
+    box-shadow:
+      0 0.6rem 0 #201006,
+      0 2.5rem 7rem rgb(0 0 0 / 58%),
+      inset 0 0 0 0.16rem #ad7542;
+    content: "";
+  }
+
+  .path-landscape-gate > * {
+    position: relative;
+    z-index: 1;
+    max-width: min(22rem, calc(100vw - 4rem));
+  }
+
+  .path-landscape-device {
+    position: relative;
+    display: grid;
+    width: 7.4rem;
+    height: 7.4rem;
+    margin-bottom: 1.2rem;
+    place-items: center;
+    border: 2px solid #d99a50;
+    border-radius: 50%;
+    background: rgb(56 29 12 / 44%);
+    box-shadow:
+      0 0 0 0.45rem rgb(255 191 101 / 8%),
+      inset 0 0 2rem rgb(255 193 105 / 12%);
+  }
+
+  .path-landscape-device svg:first-child {
+    width: 2.75rem;
+    height: 2.75rem;
+    transform: rotate(90deg);
+  }
+
+  .path-landscape-device svg:last-child {
+    position: absolute;
+    right: -0.25rem;
+    bottom: 0.2rem;
+    width: 2.1rem;
+    height: 2.1rem;
+    padding: 0.35rem;
+    border-radius: 50%;
+    background: #d18a43;
+    color: #2b1608;
+    box-shadow: 0 0.2rem 0 #351a09;
+  }
+
+  .path-landscape-gate p {
+    margin: 0 0 0.7rem;
+    color: #ffd38a;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+  }
+
+  .path-landscape-gate h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.35rem, 10vw, 3.4rem);
+    line-height: 0.95;
+    letter-spacing: -0.055em;
+    text-shadow:
+      0 2px 0 #3b200f,
+      0 4px 0 rgb(28 13 5 / 42%);
+  }
+
+  .path-landscape-gate > span {
+    margin-top: 1rem;
+    color: #f0d9b7;
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+}
+
 .studio-home {
   padding: 0.65rem clamp(0.75rem, 2vw, 1.5rem) 0.8rem;
 }

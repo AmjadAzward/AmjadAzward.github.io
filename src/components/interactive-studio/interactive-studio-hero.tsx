@@ -14,6 +14,8 @@ import {
   Moon,
   Map as MapIcon,
   MapPin,
+  RotateCw,
+  Smartphone,
   Sun,
   X,
 } from "lucide-react";
@@ -792,6 +794,24 @@ export default function InteractiveStudioHero() {
       className="interactive-studio path-experience"
       aria-label="Walkable portfolio path"
     >
+      <section
+        className="path-landscape-gate"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="path-landscape-title"
+      >
+        <div className="path-landscape-device" aria-hidden>
+          <Smartphone />
+          <RotateCw />
+        </div>
+        <p>MOBILE EXPLORATION</p>
+        <h2 id="path-landscape-title">Rotate to landscape</h2>
+        <span>
+          Turn your phone sideways for the best village experience. The world is loading while you
+          rotate.
+        </span>
+      </section>
+
       <div className="studio-viewport">
         {mode === "3d" ? (
           <Suspense fallback={<StudioStaticFallback darkMode={darkMode} />}>
