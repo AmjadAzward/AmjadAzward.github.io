@@ -1586,11 +1586,7 @@ function VillageShowcaseScreen({
 
   const openShowcaseAction = () => {
     if (!slide.action) return;
-    if (slide.action.href.startsWith("http")) {
-      window.open(slide.action.href, "_blank", "noopener,noreferrer");
-      return;
-    }
-    window.location.href = slide.action.href;
+    window.location.assign(slide.action.href);
   };
 
   return (
@@ -1628,7 +1624,7 @@ function VillageShowcaseScreen({
       </mesh>
       {section === "certifications" && slide.action ? (
         <mesh
-          position={[-1.063, 1.326, 0.14]}
+          position={[-1.063, 2.132, 0.24]}
           onPointerDown={(event) => {
             event.stopPropagation();
             openShowcaseAction();
@@ -1636,7 +1632,7 @@ function VillageShowcaseScreen({
           onPointerOver={handlePointerOver}
           onPointerOut={handlePointerOut}
         >
-          <planeGeometry args={[1.57, 0.18]} />
+          <planeGeometry args={[1.69, 1.91]} />
           <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
         </mesh>
       ) : null}
