@@ -397,6 +397,11 @@ const VILLAGE_TRAILS: Array<{ id: string; kind: "main" | "branch"; points: Studi
   },
 ];
 
+const MAP_LAMP_WORLD_POSITIONS = [3.8, -1.7, -7.1, -12.4, -19.1, -24.6].flatMap((z, index) => [
+  { x: -9.2 - (index % 2) * 0.25, z },
+  { x: 9.2 + ((index + 1) % 2) * 0.25, z: z - 0.35 },
+]);
+
 const MAP_TREES = Array.from({ length: 48 }, (_, index) => {
   const rightSide = index % 2 === 1;
   const row = Math.floor(index / 2);
@@ -408,7 +413,16 @@ const MAP_TREES = Array.from({ length: 48 }, (_, index) => {
       z: 5 - row * 1.43 + ((index * 7) % 5) * 0.2,
     }),
   };
-}).filter((tree) => tree.index % 4 < 2);
+}).filter(
+  (tree) =>
+    tree.index % 4 < 2 &&
+    MAP_LAMP_WORLD_POSITIONS.every((lamp) => {
+      const mappedLamp = worldToMapPosition(lamp);
+      return Math.hypot(tree.left - mappedLamp.left, tree.top - mappedLamp.top) > 2.8;
+    }),
+);
+
+const MAP_LAMPS = MAP_LAMP_WORLD_POSITIONS.map(worldToMapPosition);
 
 const MAP_HILLS = [
   { x: -10.4, z: 2.4 },
@@ -419,7 +433,7 @@ const MAP_HILLS = [
   { x: 10.1, z: -21.4 },
 ].map(worldToMapPosition);
 
-const SOCIAL_MAP_POSITION = worldToMapPosition({ x: 2.01, z: -25.55 });
+const SOCIAL_MAP_POSITION = worldToMapPosition({ x: 0, z: -25.55 });
 
 const mapSocialIcons: Record<string, typeof Github> = {
   LinkedIn: Linkedin,
@@ -837,10 +851,6 @@ export default function InteractiveStudioHero() {
                 <strong>Alternative movement</strong>
               </li>
               <li>
-                <kbd>E</kbd>
-                <strong>Explore a nearby landmark</strong>
-              </li>
-              <li>
                 <kbd>Esc</kbd>
                 <strong>Close maps and showcases</strong>
               </li>
@@ -918,13 +928,6 @@ export default function InteractiveStudioHero() {
                   stroke={darkMode ? "#4c8b55" : "#83bc72"}
                   strokeWidth="1.4"
                 />
-                <path
-                  d={`M8 ${streamMapY.toFixed(2)} C27 ${(streamMapY - 2).toFixed(2)} 35 ${(streamMapY + 2).toFixed(2)} 50 ${streamMapY.toFixed(2)} C65 ${(streamMapY - 2).toFixed(2)} 74 ${(streamMapY + 2).toFixed(2)} 93 ${streamMapY.toFixed(2)}`}
-                  fill="none"
-                  stroke="url(#map-river)"
-                  strokeLinecap="round"
-                  strokeWidth="4.2"
-                />
                 {VILLAGE_TRAILS.map((trail) => (
                   <polyline
                     key={trail.id}
@@ -932,6 +935,14 @@ export default function InteractiveStudioHero() {
                     points={mapTrailPoints(trail.points)}
                   />
                 ))}
+
+                <path
+                  d={`M8 ${streamMapY.toFixed(2)} C27 ${(streamMapY - 2).toFixed(2)} 35 ${(streamMapY + 2).toFixed(2)} 50 ${streamMapY.toFixed(2)} C65 ${(streamMapY - 2).toFixed(2)} 74 ${(streamMapY + 2).toFixed(2)} 93 ${streamMapY.toFixed(2)}`}
+                  fill="none"
+                  stroke="url(#map-river)"
+                  strokeLinecap="round"
+                  strokeWidth="4.2"
+                />
 
                 <g className="map-village-bridge" transform={`translate(50 ${streamMapY})`}>
                   <rect x="-5" y="-2.6" width="10" height="5.2" rx="0.8" />
@@ -959,6 +970,17 @@ export default function InteractiveStudioHero() {
                   >
                     <rect x="-0.24" y="0.4" width="0.48" height="1" rx="0.14" />
                     <circle r={0.9 + (tree.index % 3) * 0.12} />
+                  </g>
+                ))}
+
+                {MAP_LAMPS.map((lamp, index) => (
+                  <g
+                    key={`map-lamp-${index}`}
+                    className="map-village-lamp"
+                    transform={`translate(${lamp.left} ${lamp.top})`}
+                  >
+                    <line x1="0" y1="1.25" x2="0" y2="-0.35" />
+                    <circle cy="-0.7" r="0.62" />
                   </g>
                 ))}
 

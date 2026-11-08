@@ -139,6 +139,11 @@ const STATION_OBJECTS = ZONES.map((zone, index) => ({
   z: zone.position[2],
 }));
 
+const LAMP_OBJECTS = [3.8, -1.7, -7.1, -12.4, -19.1, -24.6].flatMap((z, index) => [
+  { x: -9.2 - (index % 2) * 0.25, z },
+  { x: 9.2 + ((index + 1) % 2) * 0.25, z: z - 0.35 },
+]);
+
 const VISIBLE_FOREST_OBJECTS = FOREST_OBJECTS.filter((tree) => {
   const clearOfLandmarks = STATION_OBJECTS.every(
     (station) => Math.hypot(tree.x - station.x, tree.z - station.z) > 3.05,
@@ -146,13 +151,11 @@ const VISIBLE_FOREST_OBJECTS = FOREST_OBJECTS.filter((tree) => {
   const clearOfApproaches = ZONES.every(
     (zone) => Math.hypot(tree.x - zone.position[0], tree.z - zone.position[2]) > 2.25,
   );
-  return clearOfLandmarks && clearOfApproaches;
+  const clearOfLamps = LAMP_OBJECTS.every(
+    (lamp) => Math.hypot(tree.x - lamp.x, tree.z - lamp.z) > 1.05,
+  );
+  return clearOfLandmarks && clearOfApproaches && clearOfLamps;
 });
-
-const LAMP_OBJECTS = Array.from({ length: 12 }, (_, index) => ({
-  x: (index % 2 === 0 ? -1 : 1) * 2.75,
-  z: -0.5 - Math.floor(index / 2) * 5.1,
-}));
 
 const SOCIAL_OBJECTS = socials.map((social, index) => ({
   ...social,
@@ -2468,11 +2471,9 @@ function PathEnvironment({
         ),
       )}
 
-      {Array.from({ length: 12 }, (_, index) => {
-        const side = index % 2 === 0 ? -1 : 1;
-        const z = -0.5 - Math.floor(index / 2) * 5.1;
+      {LAMP_OBJECTS.map((lamp, index) => {
         return (
-          <group key={`lamp-${index}`} position={[side * 2.75, 0, z]}>
+          <group key={`lamp-${index}`} position={[lamp.x, 0, lamp.z]}>
             <mesh position={[0, 0.75, 0]}>
               <cylinderGeometry args={[0.035, 0.055, 1.5, 10]} />
               <meshStandardMaterial color={structure} metalness={0.55} roughness={0.28} />
