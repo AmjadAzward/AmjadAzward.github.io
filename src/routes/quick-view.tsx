@@ -149,7 +149,7 @@ function QuickView() {
                 <span>{certificate.issuer}</span>
                 <h3>{certificate.title}</h3>
                 <a href={certificate.verify} target="_blank" rel="noreferrer">
-                  Verify <ArrowUpRight aria-hidden />
+                  {certificate.verificationLabel} <ArrowUpRight aria-hidden />
                 </a>
               </div>
             </article>

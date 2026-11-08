@@ -19,7 +19,7 @@ import {
 } from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 
-import { socials } from "@/data/portfolio";
+import { certifications, socials } from "@/data/portfolio";
 
 import type {
   ShowcaseSlide,
@@ -84,6 +84,23 @@ const BRANCH_TRAIL_WIDTH = 1.68;
 const LANDMARK_OFFSET = 1.9;
 const LANDMARK_APPROACH_OFFSET = 0.62;
 const LANDMARK_TRIGGER_RADIUS = 1.65;
+
+const showcaseImageCache = new Map<string, HTMLImageElement>();
+
+function loadShowcaseImage(src: string, priority: "high" | "low" = "low") {
+  if (typeof Image === "undefined") return null;
+  const cached = showcaseImageCache.get(src);
+  if (cached) {
+    if (priority === "high") cached.fetchPriority = "high";
+    return cached;
+  }
+  const image = new Image();
+  image.decoding = "async";
+  image.fetchPriority = priority;
+  image.src = src;
+  showcaseImageCache.set(src, image);
+  return image;
+}
 
 const MEADOW_PATCHES: Array<[number, number]> = [
   [-11.2, 5.2],
@@ -1282,7 +1299,7 @@ function VillageShowcaseScreen({
       );
       context.textAlign = "left";
 
-      const hasImage = Boolean(image);
+      const hasImage = Boolean(slide.image);
       const isCertificateSlide = section === "certifications" && hasImage;
       const mediaPanelX = 52;
       const mediaPanelY = 120;
@@ -1307,7 +1324,7 @@ function VillageShowcaseScreen({
       context.roundRect(infoPanelX + 8, mediaPanelY + 8, infoPanelWidth - 16, panelHeight - 16, 17);
       context.stroke();
 
-      if (image) {
+      if (slide.image) {
         context.fillStyle = "rgba(68,34,14,.62)";
         context.beginPath();
         context.roundRect(mediaPanelX, mediaPanelY, mediaPanelWidth, panelHeight, 22);
@@ -1332,16 +1349,28 @@ function VillageShowcaseScreen({
         context.clip();
         context.fillStyle = "#2d180b";
         context.fillRect(boxX, boxY, boxWidth, boxHeight);
-        const scale = Math.min(boxWidth / image.naturalWidth, boxHeight / image.naturalHeight);
-        const width = image.naturalWidth * scale;
-        const height = image.naturalHeight * scale;
-        context.drawImage(
-          image,
-          boxX + (boxWidth - width) / 2,
-          boxY + (boxHeight - height) / 2,
-          width,
-          height,
-        );
+        if (image?.naturalWidth) {
+          const scale = Math.min(boxWidth / image.naturalWidth, boxHeight / image.naturalHeight);
+          const width = image.naturalWidth * scale;
+          const height = image.naturalHeight * scale;
+          context.drawImage(
+            image,
+            boxX + (boxWidth - width) / 2,
+            boxY + (boxHeight - height) / 2,
+            width,
+            height,
+          );
+        } else {
+          context.fillStyle = "#d7a665";
+          context.font = "700 15px Arial, sans-serif";
+          context.textAlign = "center";
+          context.fillText(
+            "PREPARING CERTIFICATE PREVIEW...",
+            boxX + boxWidth / 2,
+            boxY + boxHeight / 2,
+          );
+          context.textAlign = "left";
+        }
         context.restore();
         context.strokeStyle = "rgba(229,177,107,.52)";
         context.lineWidth = 3;
@@ -1372,7 +1401,11 @@ function VillageShowcaseScreen({
           context.fillStyle = "#291609";
           context.font = "700 18px Arial, sans-serif";
           context.textAlign = "center";
-          context.fillText("VERIFY CERTIFICATE  ↗", actionX + actionWidth / 2, actionY + 31);
+          context.fillText(
+            `${slide.action.label.toUpperCase()}  ↗`,
+            actionX + actionWidth / 2,
+            actionY + 31,
+          );
           context.textAlign = "left";
         } else {
           context.fillStyle = "#ead8b7";
@@ -1550,17 +1583,32 @@ function VillageShowcaseScreen({
 
     draw();
     if (slide.image) {
-      const image = new Image();
-      image.onload = () => {
-        if (!cancelled) draw(image);
+      const image = loadShowcaseImage(slide.image, "high");
+      const handleLoad = () => {
+        if (!cancelled && image) draw(image);
       };
-      image.src = slide.image;
+      if (image?.complete && image.naturalWidth) {
+        draw(image);
+      } else {
+        image?.addEventListener("load", handleLoad, { once: true });
+      }
+      return () => {
+        cancelled = true;
+        image?.removeEventListener("load", handleLoad);
+      };
     }
 
     return () => {
       cancelled = true;
     };
   }, [section, slide, slideIndex, texture, total]);
+
+  useEffect(() => {
+    if (section !== "certifications") return;
+    certifications.forEach((certificate) => {
+      if (certificate.image) loadShowcaseImage(certificate.image, "low");
+    });
+  }, [section]);
 
   useEffect(
     () => () => {
@@ -2724,22 +2772,6 @@ function PathEnvironment({
       ))}
 
       <SocialLandmarks darkMode={darkMode} reducedMotion={reducedMotion} />
-
-      {darkMode
-        ? Array.from({ length: 18 }, (_, index) => (
-            <mesh
-              key={`firefly-${index}`}
-              position={[
-                -4.4 + ((index * 13) % 9) * 0.82,
-                0.75 + (index % 4) * 0.31,
-                4.5 - index * 1.55,
-              ]}
-            >
-              <sphereGeometry args={[0.025, 8, 6]} />
-              <meshBasicMaterial color={index % 2 === 0 ? "#7bd7ff" : "#bcecff"} />
-            </mesh>
-          ))
-        : null}
     </group>
   );
 }

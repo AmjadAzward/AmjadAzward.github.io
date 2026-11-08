@@ -206,24 +206,35 @@ const certificationImages = [
   certification08,
   certification09,
 ];
-export const certifications = [
-  "AI/ML Engineer Stage 2|SLIIT",
-  "Software Engineer Certificate|HackerRank",
-  "DevNet Associate|Cisco",
-  "LFS158: Intro to Kubernetes|Linux Foundation",
-  "IT Essentials|Cisco",
-  "Oracle Certified Foundations Associate|Oracle",
-  "Oracle Certified Generative AI Professional|Oracle",
-  "SQL Advanced|HackerRank",
-  "R Intermediate|HackerRank",
-].map((x, i) => {
-  const [title, issuer] = x.split("|");
+const certificationRecords: Array<{ title: string; issuer: string; verify?: string }> = [
+  { title: "AI/ML Engineer Stage 2", issuer: "SLIIT" },
+  {
+    title: "Software Engineer Certificate",
+    issuer: "HackerRank",
+    verify: "https://www.hackerrank.com/certificates/b405637ac777",
+  },
+  { title: "DevNet Associate", issuer: "Cisco" },
+  { title: "LFS158: Intro to Kubernetes", issuer: "Linux Foundation" },
+  { title: "IT Essentials", issuer: "Cisco" },
+  { title: "Oracle Certified Foundations Associate", issuer: "Oracle" },
+  { title: "Oracle Certified Generative AI Professional", issuer: "Oracle" },
+  {
+    title: "SQL Advanced",
+    issuer: "HackerRank",
+    verify: "https://www.hackerrank.com/certificates/4f1ae8b7a464",
+  },
+  { title: "R Intermediate", issuer: "HackerRank" },
+];
+
+export const certifications = certificationRecords.map((record, i) => {
+  const image = certificationImages[i]!;
   return {
-    title,
-    issuer,
+    title: record.title,
+    issuer: record.issuer,
     year: "2025",
-    image: certificationImages[i],
-    verify: "https://www.linkedin.com/in/amjadazward",
+    image,
+    verify: record.verify ?? image,
+    verificationLabel: record.verify ? "Verify certificate" : "View full certificate",
   };
 });
 export const services = [

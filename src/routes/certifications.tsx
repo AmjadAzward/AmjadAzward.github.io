@@ -128,7 +128,7 @@ function Certifications() {
                           target="_blank"
                           rel="noreferrer"
                         >
-                          Verify credential <ExternalIcon />
+                          {certificate.verificationLabel} <ExternalIcon />
                         </a>
                       </DialogContent>
                     </Dialog>
@@ -147,7 +147,7 @@ function Certifications() {
                     </div>
                     <h3>{certificate.title}</h3>
                     <a href={certificate.verify} target="_blank" rel="noreferrer">
-                      Verify credential
+                      {certificate.verificationLabel}
                       <ExternalIcon />
                     </a>
                   </div>
