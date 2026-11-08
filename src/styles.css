@@ -412,8 +412,21 @@ body::before {
   display: grid;
   overflow: hidden;
   place-items: center;
-  background: var(--background);
-  color: var(--foreground);
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 6.8rem,
+      rgb(29 13 5 / 82%) 6.84rem 6.98rem,
+      rgb(153 92 43 / 24%) 7rem 7.08rem
+    ),
+    repeating-linear-gradient(
+      92deg,
+      transparent 0 1.2rem,
+      rgb(255 222 161 / 3%) 1.28rem 1.34rem,
+      transparent 1.4rem 2.8rem
+    ),
+    linear-gradient(108deg, #241208, #3b2111 45%, #2b160b);
+  color: #fff0cc;
 }
 
 .site-loader::before,
@@ -425,27 +438,85 @@ body::before {
 }
 
 .site-loader::before {
-  opacity: calc(var(--atmosphere-opacity) * 1.15);
-  background-image:
-    linear-gradient(var(--foreground) 1px, transparent 1px),
-    linear-gradient(90deg, var(--foreground) 1px, transparent 1px);
-  background-size: 72px 72px;
-  mask-image: radial-gradient(circle at center, black, transparent 72%);
+  opacity: 0.48;
+  background:
+    radial-gradient(ellipse at 16% 22%, rgb(10 4 1 / 70%) 0 0.34rem, transparent 0.4rem),
+    radial-gradient(ellipse at 78% 68%, rgb(10 4 1 / 58%) 0 0.48rem, transparent 0.54rem),
+    radial-gradient(ellipse at 62% 13%, rgb(184 112 52 / 20%) 0 0.2rem, transparent 0.27rem);
+  background-size:
+    28rem 23rem,
+    32rem 27rem,
+    21rem 19rem;
 }
 
 .site-loader::after {
-  background: radial-gradient(
-    circle at center,
-    color-mix(in oklab, var(--primary) 13%, transparent),
-    transparent 48%
-  );
+  background:
+    radial-gradient(circle at center, rgb(255 186 83 / 13%), transparent 34%),
+    radial-gradient(circle at center, transparent 35%, rgb(8 3 1 / 48%) 100%);
 }
 
 .site-loader-content {
   position: relative;
   z-index: 1;
   display: grid;
+  width: min(22rem, calc(100vw - 2rem));
   justify-items: center;
+  padding: clamp(1.8rem, 5vw, 2.6rem) clamp(1.35rem, 6vw, 3rem);
+  overflow: hidden;
+  border: 0.45rem solid #2b160a;
+  border-radius: 0.9rem;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 4.65rem,
+      rgb(49 23 8 / 58%) 4.68rem 4.78rem,
+      rgb(205 145 82 / 30%) 4.8rem 4.86rem
+    ),
+    repeating-linear-gradient(
+      93deg,
+      transparent 0 0.72rem,
+      rgb(255 225 174 / 5%) 0.78rem 0.82rem,
+      transparent 0.88rem 1.55rem
+    ),
+    linear-gradient(102deg, #5c351a, #83502a 48%, #a26736);
+  box-shadow:
+    0 0.72rem 0 #160a04,
+    0 2.2rem 6rem rgb(0 0 0 / 55%),
+    inset 0 0 0 0.16rem #9e6738,
+    inset 0.45rem 0.45rem 1.1rem rgb(255 220 160 / 10%),
+    inset -0.5rem -0.5rem 1.1rem rgb(32 14 5 / 42%);
+}
+
+.site-loader-content::before {
+  position: absolute;
+  inset: 0.55rem;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at 0.16rem 0.16rem,
+      #d2a363 0 0.09rem,
+      #49301c 0.1rem 0.16rem,
+      transparent 0.17rem
+    ),
+    radial-gradient(
+      circle at calc(100% - 0.16rem) 0.16rem,
+      #d2a363 0 0.09rem,
+      #49301c 0.1rem 0.16rem,
+      transparent 0.17rem
+    ),
+    radial-gradient(
+      circle at 0.16rem calc(100% - 0.16rem),
+      #d2a363 0 0.09rem,
+      #49301c 0.1rem 0.16rem,
+      transparent 0.17rem
+    ),
+    radial-gradient(
+      circle at calc(100% - 0.16rem) calc(100% - 0.16rem),
+      #d2a363 0 0.09rem,
+      #49301c 0.1rem 0.16rem,
+      transparent 0.17rem
+    );
+  content: "";
 }
 
 .site-loader-orbit {
@@ -454,12 +525,17 @@ body::before {
   width: 7.75rem;
   aspect-ratio: 1;
   place-items: center;
-  border: 1px solid color-mix(in oklab, var(--primary) 22%, var(--border));
+  border: 0.28rem solid #3a1e0d;
   border-radius: 50%;
-  background: color-mix(in oklab, var(--card) 42%, transparent);
+  background:
+    radial-gradient(circle at 35% 28%, rgb(255 222 161 / 13%), transparent 36%),
+    repeating-radial-gradient(circle, transparent 0 0.65rem, rgb(43 20 7 / 13%) 0.7rem 0.76rem),
+    linear-gradient(135deg, #75451f, #4a2812);
   box-shadow:
-    inset 0 0 32px color-mix(in oklab, var(--primary) 8%, transparent),
-    0 0 52px color-mix(in oklab, var(--primary) 12%, transparent);
+    0 0 0 0.13rem #a46d3a,
+    0 0.38rem 0 #251106,
+    inset 0 0 2rem rgb(35 15 5 / 42%),
+    0 0 2.8rem rgb(255 181 75 / 10%);
 }
 
 .site-loader-orbit::after {
@@ -469,8 +545,8 @@ body::before {
   background: conic-gradient(
     from 20deg,
     transparent 0 64%,
-    var(--primary) 78%,
-    var(--secondary-accent) 92%,
+    #d89a4d 78%,
+    #ffe0a0 92%,
     transparent 100%
   );
   content: "";
@@ -481,12 +557,15 @@ body::before {
 .site-loader-mark {
   display: inline-flex;
   align-items: center;
-  color: var(--foreground);
+  color: #fff0cc;
   font-family: var(--font-display);
   font-size: 2.15rem;
   font-weight: 700;
   letter-spacing: -0.09em;
   line-height: 1;
+  text-shadow:
+    0 2px 0 #32190a,
+    0 3px 0 rgb(24 10 3 / 52%);
 }
 
 .site-loader-mark i {
@@ -494,28 +573,33 @@ body::before {
   height: 0.42rem;
   margin: 0.15rem 0 0 0.35rem;
   border-radius: 50%;
-  background: var(--primary);
-  box-shadow: 0 0 18px color-mix(in oklab, var(--primary) 72%, transparent);
+  background: #ffd17d;
+  box-shadow: 0 0 18px rgb(255 185 78 / 74%);
   animation: site-loader-pulse 0.8s ease-in-out infinite alternate;
 }
 
 .site-loader-content p {
   margin: 1.35rem 0 0;
-  color: var(--muted-foreground);
+  color: #ffe0a5;
   font-family: var(--font-mono);
   font-size: 0.62rem;
   font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+  text-shadow: 0 1px 0 #32190a;
 }
 
 .site-loader-track {
   width: 9rem;
-  height: 2px;
+  height: 0.34rem;
   margin-top: 0.85rem;
   overflow: hidden;
+  border: 1px solid #b1763e;
   border-radius: 999px;
-  background: color-mix(in oklab, var(--primary) 13%, var(--border));
+  background: #32190a;
+  box-shadow:
+    inset 0 1px 0 rgb(0 0 0 / 42%),
+    0 1px 0 rgb(255 224 168 / 12%);
 }
 
 .site-loader-track i {
@@ -523,8 +607,8 @@ body::before {
   width: 42%;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--primary), var(--secondary-accent));
-  box-shadow: 0 0 12px color-mix(in oklab, var(--primary) 52%, transparent);
+  background: linear-gradient(90deg, #b66f2e, #ffe09b);
+  box-shadow: 0 0 12px rgb(255 184 76 / 58%);
   animation: site-loader-progress 1.15s ease-in-out infinite;
 }
 
