@@ -202,13 +202,7 @@ const showcaseSlides: Record<StudioZoneId, ShowcaseSlide[]> = {
         "A third-year Computer Science undergraduate at NIBM, affiliated with Coventry University, freelancing as a software developer and gaining experience through AI-enabled engineering internships.",
       image: homePortrait,
       imageAlt: "Portrait of Amjad Azward",
-      chips: [
-        "Colombo, Sri Lanka",
-        "Software engineering",
-        "Data science",
-        "Open to collaboration",
-        ...stats.map((stat) => `${stat.value}${stat.suffix} ${stat.label}`),
-      ],
+      chips: stats.map((stat) => `${stat.value}${stat.suffix} ${stat.label}`),
     },
     ...education.map((item, index) => ({
       eyebrow: `EDUCATION / ${String(index + 1).padStart(2, "0")}`,
