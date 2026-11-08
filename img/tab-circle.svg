@@ -1,7 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <circle cx="32" cy="32" r="31.5" fill="#08111f"/>
-  <circle cx="32" cy="32" r="30.5" fill="none" stroke="#2d4260" stroke-width="2"/>
-  <path d="M5.5 44 15.5 17h6.2l10 27h-7l-2.2-6.4h-8.3L12 44H5.5Zm10.6-12.5h4.4l-2.2-7.1-2.2 7.1Z" fill="#f7f9fc"/>
-  <path d="M25.5 44 35.5 17h6.2l10 27h-7l-2.2-6.4h-8.3L32 44h-6.5Zm10.6-12.5h4.4l-2.2-7.1-2.2 7.1Z" fill="#f7f9fc"/>
-  <circle cx="53" cy="47" r="6.25" fill="#249fff" stroke="#d8efff" stroke-width="1.5"/>
+  <defs>
+    <linearGradient id="wood" x1="10" y1="7" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a66c3a"/>
+      <stop offset=".48" stop-color="#81502b"/>
+      <stop offset="1" stop-color="#4a2814"/>
+    </linearGradient>
+    <radialGradient id="shine" cx="0" cy="0" r="1" gradientTransform="translate(23 18) rotate(48) scale(37)">
+      <stop stop-color="#ffd99b" stop-opacity=".24"/>
+      <stop offset=".52" stop-color="#ffd99b" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="badge">
+      <circle cx="32" cy="32" r="26"/>
+    </clipPath>
+  </defs>
+
+  <circle cx="32" cy="32" r="31" fill="#251207"/>
+  <circle cx="32" cy="32" r="28.5" fill="url(#wood)" stroke="#d6a15d" stroke-width="3"/>
+
+  <g clip-path="url(#badge)" fill="none" stroke-linecap="round">
+    <path d="M5 20c12-5 20 4 33-1 9-3 15-2 23 1" stroke="#e1a965" stroke-opacity=".25" stroke-width="1.4"/>
+    <path d="M3 35c11-4 20 4 31 0 11-4 19-3 29 1" stroke="#32190a" stroke-opacity=".35" stroke-width="1.6"/>
+    <path d="M7 48c12-3 19 3 29 0 10-3 17-2 24 1" stroke="#e1a965" stroke-opacity=".2" stroke-width="1.2"/>
+  </g>
+
+  <circle cx="32" cy="32" r="26" fill="url(#shine)"/>
+  <path
+    d="M12.5 49 26.4 14.5h11.2L51.5 49H41.3l-2.5-7H25.2l-2.5 7H12.5Zm15.7-15.5h7.6L32 22.8l-3.8 10.7Z"
+    fill="#fff0cc"
+    fill-rule="evenodd"
+    stroke="#3a1d0c"
+    stroke-linejoin="round"
+    stroke-width="1.2"
+  />
+  <circle cx="32" cy="32" r="30" fill="none" stroke="#9b6334" stroke-width="1"/>
 </svg>
