@@ -1283,12 +1283,13 @@ function VillageShowcaseScreen({
       context.textAlign = "left";
 
       const hasImage = Boolean(image);
+      const isCertificateSlide = section === "certifications" && hasImage;
       const mediaPanelX = 52;
       const mediaPanelY = 120;
-      const mediaPanelWidth = 430;
+      const mediaPanelWidth = isCertificateSlide ? 520 : 430;
       const panelHeight = 548;
-      const infoPanelX = hasImage ? 506 : 52;
-      const infoPanelWidth = hasImage ? 722 : 1176;
+      const infoPanelX = hasImage ? mediaPanelX + mediaPanelWidth + 24 : 52;
+      const infoPanelWidth = hasImage ? 1228 - infoPanelX : 1176;
       const copyX = infoPanelX + 36;
       const copyWidth = infoPanelWidth - 72;
 
@@ -1320,10 +1321,11 @@ function VillageShowcaseScreen({
         context.fillText("DOCUMENT PREVIEW", mediaPanelX + 28, mediaPanelY + 40);
         context.letterSpacing = "0px";
 
-        const boxX = mediaPanelX + 24;
-        const boxY = mediaPanelY + 62;
-        const boxWidth = mediaPanelWidth - 48;
-        const boxHeight = 420;
+        const boxInset = isCertificateSlide ? 18 : 24;
+        const boxX = mediaPanelX + boxInset;
+        const boxY = mediaPanelY + (isCertificateSlide ? 52 : 62);
+        const boxWidth = mediaPanelWidth - boxInset * 2;
+        const boxHeight = isCertificateSlide ? 410 : 420;
         context.save();
         context.beginPath();
         context.roundRect(boxX, boxY, boxWidth, boxHeight, 16);
@@ -1347,9 +1349,36 @@ function VillageShowcaseScreen({
         context.roundRect(boxX, boxY, boxWidth, boxHeight, 16);
         context.stroke();
 
-        context.fillStyle = "#ead8b7";
-        context.font = "600 16px Arial, sans-serif";
-        context.fillText("Verified portfolio document", mediaPanelX + 28, mediaPanelY + 520);
+        if (isCertificateSlide && slide.action) {
+          const actionX = mediaPanelX + 18;
+          const actionY = mediaPanelY + 482;
+          const actionWidth = mediaPanelWidth - 36;
+          const actionHeight = 48;
+          const actionGradient = context.createLinearGradient(
+            0,
+            actionY,
+            0,
+            actionY + actionHeight,
+          );
+          actionGradient.addColorStop(0, "#e1ab63");
+          actionGradient.addColorStop(1, "#b97935");
+          context.fillStyle = actionGradient;
+          context.beginPath();
+          context.roundRect(actionX, actionY, actionWidth, actionHeight, 24);
+          context.fill();
+          context.strokeStyle = "#42210e";
+          context.lineWidth = 3;
+          context.stroke();
+          context.fillStyle = "#291609";
+          context.font = "700 18px Arial, sans-serif";
+          context.textAlign = "center";
+          context.fillText("VERIFY CERTIFICATE  ↗", actionX + actionWidth / 2, actionY + 31);
+          context.textAlign = "left";
+        } else {
+          context.fillStyle = "#ead8b7";
+          context.font = "600 16px Arial, sans-serif";
+          context.fillText("Verified portfolio document", mediaPanelX + 28, mediaPanelY + 520);
+        }
       }
 
       context.fillStyle = "#e5b16b";
@@ -1555,6 +1584,15 @@ function VillageShowcaseScreen({
     document.body.style.cursor = "";
   };
 
+  const openShowcaseAction = () => {
+    if (!slide.action) return;
+    if (slide.action.href.startsWith("http")) {
+      window.open(slide.action.href, "_blank", "noopener,noreferrer");
+      return;
+    }
+    window.location.href = slide.action.href;
+  };
+
   return (
     <group
       ref={screenGroupRef}
@@ -1588,6 +1626,20 @@ function VillageShowcaseScreen({
         <planeGeometry args={[4.15, 2.5]} />
         <meshBasicMaterial map={texture} toneMapped={false} />
       </mesh>
+      {section === "certifications" && slide.action ? (
+        <mesh
+          position={[-1.063, 1.326, 0.14]}
+          onPointerDown={(event) => {
+            event.stopPropagation();
+            openShowcaseAction();
+          }}
+          onPointerOver={handlePointerOver}
+          onPointerOut={handlePointerOut}
+        >
+          <planeGeometry args={[1.57, 0.18]} />
+          <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
+        </mesh>
+      ) : null}
       <pointLight position={[0, 2.2, 1.3]} color={warmGlow} intensity={1.8} distance={5} />
       <pointLight
         position={[-side * SHOWCASE_SCREEN_OFFSET, 1.75, 0.65]}

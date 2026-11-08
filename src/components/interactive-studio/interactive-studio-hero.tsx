@@ -240,7 +240,7 @@ const showcaseSlides: Record<StudioZoneId, ShowcaseSlide[]> = {
     image: item.image,
     imageAlt: `${item.title ?? "Certification"} certificate`,
     chips: [item.issuer ?? "Verified learning", item.year],
-    action: { label: "Verify credential", href: item.verify },
+    action: { label: "Verify certificate", href: item.verify },
   })),
   services: services.map((service, index) => ({
     eyebrow: `SERVICE / ${String(index + 1).padStart(2, "0")}`,
