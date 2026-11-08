@@ -542,7 +542,6 @@ export default function InteractiveStudioHero() {
   const [journeyStarted, setJourneyStarted] = useState(false);
   const [guidedJourneyIndex, setGuidedJourneyIndex] = useState<number | null>(null);
   const [showcase, setShowcase] = useState<{ section: StudioZoneId; slide: number } | null>(null);
-  const [mapSelection, setMapSelection] = useState<StudioZoneId | "welcome" | null>(null);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [guidanceEnabled, setGuidanceEnabled] = useState(true);
 
@@ -603,22 +602,20 @@ export default function InteractiveStudioHero() {
     if (startWalking) startGuidedJourney();
   };
 
-  const travelFromMap = (kind: "walk" | "spawn") => {
-    if (!mapSelection) return;
+  const teleportFromMap = (destinationId: StudioZoneId | "welcome") => {
     const target =
-      mapSelection === "welcome"
+      destinationId === "welcome"
         ? { x: 0, z: 5 }
-        : pathStops.find((item) => item.id === mapSelection)?.target;
+        : pathStops.find((item) => item.id === destinationId)?.target;
     if (!target) return;
-    if (kind === "spawn") inputRef.current.spawn = target;
-    else inputRef.current.target = target;
+    inputRef.current.spawn = { ...target };
+    inputRef.current.target = null;
     inputRef.current.route = [];
     inputRef.current.x = 0;
     inputRef.current.z = 0;
     setJourneyStarted(true);
     setGuidedJourneyIndex(null);
     setMapOpen(false);
-    setMapSelection(null);
   };
 
   const toggleGuidance = () => {
@@ -854,10 +851,7 @@ export default function InteractiveStudioHero() {
       <button
         type="button"
         className="path-map-trigger"
-        onClick={() => {
-          setMapSelection(null);
-          setMapOpen(true);
-        }}
+        onClick={() => setMapOpen(true)}
         aria-label="Open trail map and fast travel"
       >
         <MapIcon aria-hidden />
@@ -1038,13 +1032,13 @@ export default function InteractiveStudioHero() {
 
               <button
                 type="button"
-                className={`path-map-welcome ${mapSelection === "welcome" ? "is-selected" : ""}`}
+                className="path-map-welcome"
                 style={{
                   left: `${welcomeMapPosition.left}%`,
                   top: `${welcomeMapPosition.top}%`,
                 }}
-                onClick={() => setMapSelection("welcome")}
-                aria-label="Select Welcome Plaza"
+                onClick={() => teleportFromMap("welcome")}
+                aria-label="Teleport to Welcome Plaza"
               >
                 <span>
                   <i>00</i>
@@ -1056,19 +1050,13 @@ export default function InteractiveStudioHero() {
                 <button
                   key={`map-${item.id}`}
                   type="button"
-                  className={
-                    item.id === mapSelection
-                      ? "is-selected"
-                      : item.id === activeZone
-                        ? "is-current"
-                        : undefined
-                  }
+                  className={item.id === activeZone ? "is-current" : undefined}
                   style={{
                     left: `${worldToMapPosition(item.target).left}%`,
                     top: `${worldToMapPosition(item.target).top}%`,
                   }}
-                  onClick={() => setMapSelection(item.id)}
-                  aria-label={`Select ${item.short}`}
+                  onClick={() => teleportFromMap(item.id)}
+                  aria-label={`Teleport to ${item.short}`}
                 >
                   <span>
                     <i>{item.number}</i>
@@ -1111,43 +1099,6 @@ export default function InteractiveStudioHero() {
                 <strong>Social plaza</strong>
               </div>
             </div>
-
-            {mapSelection ? (
-              <div className="path-map-choice" role="group" aria-label="Travel method">
-                <div>
-                  <span>DESTINATION SELECTED</span>
-                  <strong>
-                    {mapSelection === "welcome"
-                      ? "Welcome Plaza"
-                      : pathStops.find((item) => item.id === mapSelection)?.short}
-                  </strong>
-                </div>
-                <button type="button" onClick={() => travelFromMap("walk")}>
-                  Walk there
-                </button>
-                <button type="button" onClick={() => travelFromMap("spawn")}>
-                  Fast travel
-                </button>
-              </div>
-            ) : null}
-
-            <footer>
-              <span>
-                <i className="map-legend-pin" /> Select a destination and travel method
-              </span>
-              <span>
-                <i className="map-legend-route" /> Walking trail
-              </span>
-              <span>
-                <i className="map-legend-water" /> Coast and water
-              </span>
-              <span>
-                <i className="map-legend-you" /> You are here
-              </span>
-              <span>
-                <i className="map-legend-social" /> Social plaza
-              </span>
-            </footer>
           </section>
         </div>
       ) : null}
