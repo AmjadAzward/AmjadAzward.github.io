@@ -327,6 +327,7 @@ function DigitalEngineer({
   positionRef,
   headingRef,
   mapPositionRef,
+  showcaseActive,
   reducedMotion,
   darkMode,
 }: {
@@ -334,6 +335,7 @@ function DigitalEngineer({
   positionRef: RefObject<Vector3>;
   headingRef: RefObject<number>;
   mapPositionRef: RefObject<StudioPosition>;
+  showcaseActive: boolean;
   reducedMotion: boolean;
   darkMode: boolean;
 }) {
@@ -416,6 +418,8 @@ function DigitalEngineer({
       const targetRotation = Math.atan2(direction.x, direction.z);
       root.rotation.y = MathUtils.lerp(root.rotation.y, targetRotation, 0.13);
     }
+
+    if (showcaseActive) root.rotation.y = 0;
 
     positionRef.current?.copy(root.position);
     headingRef.current = root.rotation.y;
@@ -700,11 +704,13 @@ function DigitalEngineer({
 function RobotCompanion({
   positionRef,
   headingRef,
+  showcaseActive,
   darkMode,
   reducedMotion,
 }: {
   positionRef: RefObject<Vector3>;
   headingRef: RefObject<number>;
+  showcaseActive: boolean;
   darkMode: boolean;
   reducedMotion: boolean;
 }) {
@@ -742,11 +748,15 @@ function RobotCompanion({
     robot.position.y = reducedMotion
       ? 0.08
       : 0.09 + Math.sin(state.clock.elapsedTime * 2.8) * 0.045;
-    const rotationDelta = Math.atan2(
-      Math.sin(heading - robot.rotation.y),
-      Math.cos(heading - robot.rotation.y),
-    );
-    robot.rotation.y += rotationDelta * (reducedMotion ? 0.2 : 0.11);
+    if (showcaseActive) {
+      robot.rotation.y = 0;
+    } else {
+      const rotationDelta = Math.atan2(
+        Math.sin(heading - robot.rotation.y),
+        Math.cos(heading - robot.rotation.y),
+      );
+      robot.rotation.y += rotationDelta * (reducedMotion ? 0.2 : 0.11);
+    }
   });
 
   return (
@@ -2978,12 +2988,14 @@ function StudioWorld({
         positionRef={characterPositionRef}
         headingRef={characterHeadingRef}
         mapPositionRef={explorerPositionRef}
+        showcaseActive={showcase !== null}
         reducedMotion={reducedMotion}
         darkMode={darkMode}
       />
       <RobotCompanion
         positionRef={characterPositionRef}
         headingRef={characterHeadingRef}
+        showcaseActive={showcase !== null}
         darkMode={darkMode}
         reducedMotion={reducedMotion}
       />
