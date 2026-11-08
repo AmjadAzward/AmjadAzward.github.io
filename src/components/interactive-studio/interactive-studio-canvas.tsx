@@ -222,6 +222,18 @@ function isWorldBlocked(x: number, z: number) {
   return insideStream && !onBridge;
 }
 
+function getCharacterSurfaceLift(x: number, z: number) {
+  const onStreamBridge =
+    x > -1.05 && x < 1.35 && Math.abs(z - STREAM_CENTER_Z) < STREAM_HALF_WIDTH + 0.3;
+  if (onStreamBridge) return 0.225;
+
+  const welcomeDistance = Math.hypot(x, z - 5);
+  if (welcomeDistance < 1.52) return 0.188;
+  if (welcomeDistance < 1.8) return 0.133;
+
+  return 0;
+}
+
 type TrailSegment = {
   key: string;
   position: [number, number, number];
@@ -407,8 +419,15 @@ function DigitalEngineer({
     const stride = moving && !reducedMotion ? Math.sin(time * 9.5) : 0;
     const idle = reducedMotion ? 0 : Math.sin(time * 1.6) * 0.012;
 
-    if (bodyRef.current)
-      bodyRef.current.position.y = idle + (moving ? Math.abs(stride) * 0.025 : 0);
+    if (bodyRef.current) {
+      const surfaceLift = getCharacterSurfaceLift(root.position.x, root.position.z);
+      const targetBodyY = surfaceLift + idle + (moving ? Math.abs(stride) * 0.025 : 0);
+      bodyRef.current.position.y = MathUtils.lerp(
+        bodyRef.current.position.y,
+        targetBodyY,
+        reducedMotion ? 0.32 : 0.18,
+      );
+    }
     if (leftLegRef.current) leftLegRef.current.rotation.x = stride * 0.5;
     if (rightLegRef.current) rightLegRef.current.rotation.x = -stride * 0.5;
     if (leftArmRef.current) {
