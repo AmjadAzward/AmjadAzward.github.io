@@ -415,24 +415,31 @@ const MAP_LAMP_WORLD_POSITIONS = [3.8, -1.7, -7.1, -12.4, -19.1, -24.6].flatMap(
   { x: 9.2 + ((index + 1) % 2) * 0.25, z: z - 0.35 },
 ]);
 
+const MAP_SHOWCASE_WORLD_POSITIONS = pathStops.map((stop, index) => ({
+  x: stop.landmark.x + (index % 2 === 0 ? -1 : 1) * 1.35,
+  z: stop.landmark.z + 0.22,
+}));
+
 const MAP_TREES = Array.from({ length: 48 }, (_, index) => {
   const rightSide = index % 2 === 1;
   const row = Math.floor(index / 2);
   const edgeOffset = ((index * 5) % 4) * 0.72;
+  const x = (rightSide ? 1 : -1) * (8.35 + edgeOffset);
+  const z = 5 - row * 1.43 + ((index * 7) % 5) * 0.2;
   return {
     index,
-    ...worldToMapPosition({
-      x: (rightSide ? 1 : -1) * (8.35 + edgeOffset),
-      z: 5 - row * 1.43 + ((index * 7) % 5) * 0.2,
-    }),
+    x,
+    z,
+    ...worldToMapPosition({ x, z }),
   };
 }).filter(
   (tree) =>
     tree.index % 4 < 2 &&
-    MAP_LAMP_WORLD_POSITIONS.every((lamp) => {
-      const mappedLamp = worldToMapPosition(lamp);
-      return Math.hypot(tree.left - mappedLamp.left, tree.top - mappedLamp.top) > 2.8;
-    }),
+    MAP_LAMP_WORLD_POSITIONS.every((lamp) => Math.hypot(tree.x - lamp.x, tree.z - lamp.z) > 1.05) &&
+    MAP_SHOWCASE_WORLD_POSITIONS.every(
+      (screen) =>
+        Math.abs(tree.x - screen.x) > 3.15 || tree.z < screen.z - 1.6 || tree.z > screen.z + 4.4,
+    ),
 );
 
 const MAP_LAMPS = MAP_LAMP_WORLD_POSITIONS.map(worldToMapPosition);

@@ -141,6 +141,11 @@ const STATION_OBJECTS = ZONES.map((zone, index) => ({
   z: zone.position[2],
 }));
 
+const SHOWCASE_OBJECTS = ZONES.map((zone, index) => ({
+  x: zone.position[0] + (index % 2 === 0 ? -1 : 1) * SHOWCASE_SCREEN_OFFSET,
+  z: zone.position[2] + 0.22,
+}));
+
 const LAMP_OBJECTS = [3.8, -1.7, -7.1, -12.4, -19.1, -24.6].flatMap((z, index) => [
   { x: -9.2 - (index % 2) * 0.25, z },
   { x: 9.2 + ((index + 1) % 2) * 0.25, z: z - 0.35 },
@@ -156,7 +161,11 @@ const VISIBLE_FOREST_OBJECTS = FOREST_OBJECTS.filter((tree) => {
   const clearOfLamps = LAMP_OBJECTS.every(
     (lamp) => Math.hypot(tree.x - lamp.x, tree.z - lamp.z) > 1.05,
   );
-  return clearOfLandmarks && clearOfApproaches && clearOfLamps;
+  const clearOfShowcases = SHOWCASE_OBJECTS.every(
+    (screen) =>
+      Math.abs(tree.x - screen.x) > 3.15 || tree.z < screen.z - 1.6 || tree.z > screen.z + 4.4,
+  );
+  return clearOfLandmarks && clearOfApproaches && clearOfLamps && clearOfShowcases;
 });
 
 const SOCIAL_OBJECTS = socials.map((social, index) => ({
