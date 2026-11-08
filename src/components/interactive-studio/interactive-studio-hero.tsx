@@ -207,6 +207,7 @@ const showcaseSlides: Record<StudioZoneId, ShowcaseSlide[]> = {
         "Software engineering",
         "Data science",
         "Open to collaboration",
+        ...stats.map((stat) => `${stat.value}${stat.suffix} ${stat.label}`),
       ],
     },
     ...education.map((item, index) => ({
@@ -223,13 +224,6 @@ const showcaseSlides: Record<StudioZoneId, ShowcaseSlide[]> = {
       metric: item.date,
       chips: ["Practical delivery", "Industry experience"],
     })),
-    {
-      eyebrow: "PROFILE / SELECTED NUMBERS",
-      title: "Learning by building.",
-      description:
-        "A snapshot of practical work, continuous learning, academic progress, and experience.",
-      chips: stats.map((stat) => `${stat.value}${stat.suffix} ${stat.label}`),
-    },
   ],
   skills: skillGroups.map((group, index) => ({
     eyebrow: `SKILL DISCIPLINE / ${String(index + 1).padStart(2, "0")}`,
