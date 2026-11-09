@@ -1384,7 +1384,7 @@ function VillageShowcaseScreen({
       const isProjectSlide = section === "portfolio" && hasImage;
       const mediaPanelX = 52;
       const mediaPanelY = 120;
-      const mediaPanelWidth = isCertificateSlide ? 520 : isProjectSlide ? 500 : 430;
+      const mediaPanelWidth = isCertificateSlide ? 520 : isProjectSlide ? 620 : 430;
       const panelHeight = 548;
       const infoPanelX = hasImage ? mediaPanelX + mediaPanelWidth + 24 : 52;
       const infoPanelWidth = hasImage ? 1228 - infoPanelX : 1176;
@@ -1423,7 +1423,7 @@ function VillageShowcaseScreen({
         const boxX = mediaPanelX + boxInset;
         const boxY = mediaPanelY + (isCertificateSlide || isProjectSlide ? 52 : 62);
         const boxWidth = mediaPanelWidth - boxInset * 2;
-        const boxHeight = isCertificateSlide ? 410 : isProjectSlide ? 430 : 420;
+        const boxHeight = isCertificateSlide ? 410 : isProjectSlide ? 448 : 420;
         context.save();
         context.beginPath();
         context.roundRect(boxX, boxY, boxWidth, boxHeight, 16);
@@ -1494,6 +1494,32 @@ function VillageShowcaseScreen({
           context.fillStyle = "#ead8b7";
           context.font = "600 16px Arial, sans-serif";
           context.fillText("Verified portfolio document", mediaPanelX + 28, mediaPanelY + 520);
+        }
+
+        if (isProjectSlide && slide.action) {
+          const actionX = infoPanelX + 36;
+          const actionY = mediaPanelY + panelHeight - 78;
+          const actionWidth = Math.min(300, infoPanelWidth - 72);
+          const actionHeight = 48;
+          const actionGradient = context.createLinearGradient(0, actionY, 0, actionY + actionHeight);
+          actionGradient.addColorStop(0, "#e1ab63");
+          actionGradient.addColorStop(1, "#b97935");
+          context.fillStyle = actionGradient;
+          context.beginPath();
+          context.roundRect(actionX, actionY, actionWidth, actionHeight, 14);
+          context.fill();
+          context.strokeStyle = "#42210e";
+          context.lineWidth = 3;
+          context.stroke();
+          context.fillStyle = "#291609";
+          context.font = "700 18px Arial, sans-serif";
+          context.textAlign = "center";
+          context.fillText(
+            `${slide.action.label.toUpperCase()}  ↗`,
+            actionX + actionWidth / 2,
+            actionY + 31,
+          );
+          context.textAlign = "left";
         }
       }
 
@@ -1722,7 +1748,11 @@ function VillageShowcaseScreen({
 
   const openShowcaseAction = () => {
     if (!slide.action) return;
-    window.location.assign(slide.action.href);
+    if (slide.action.href.startsWith("http")) {
+      window.open(slide.action.href, "_blank", "noopener,noreferrer");
+    } else {
+      window.location.assign(slide.action.href);
+    }
   };
 
   return (
@@ -1769,6 +1799,20 @@ function VillageShowcaseScreen({
           onPointerOut={handlePointerOut}
         >
           <planeGeometry args={[1.69, 1.91]} />
+          <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
+        </mesh>
+      ) : null}
+      {section === "portfolio" && slide.action ? (
+        <mesh
+          position={[0.43, 1.62, 0.24]}
+          onPointerDown={(event) => {
+            event.stopPropagation();
+            openShowcaseAction();
+          }}
+          onPointerOver={handlePointerOver}
+          onPointerOut={handlePointerOut}
+        >
+          <planeGeometry args={[0.98, 0.19]} />
           <meshBasicMaterial transparent opacity={0.001} depthWrite={false} />
         </mesh>
       ) : null}
@@ -2408,7 +2452,7 @@ function NaturalLife({ darkMode, reducedMotion }: { darkMode: boolean; reducedMo
       >
         <planeGeometry args={[0.8, 0.8]} />
         <meshBasicMaterial
-          map={leafTexture ?? undefined}
+          map={leafTexture}
           transparent
           alphaTest={0.02}
           side={DoubleSide}

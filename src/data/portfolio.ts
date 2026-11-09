@@ -328,5 +328,16 @@ export const projects = [
     projectPreview08,
     projectPreview09,
   ][i],
-  github: "https://github.com/AmjadAzward",
+  github: [
+    "https://github.com/AmjadAzward/Mind_Map_Builder",
+    "https://github.com/AmjadAzward/Complaint-chain-LK",
+    "https://github.com/AmjadAzward/Object_detection",
+    "https://github.com/AmjadAzward/MedSynora",
+    "https://github.com/AmjadAzward/Tution-Hub",
+    "https://github.com/AmjadAzward/Car-Rent-System",
+    "https://github.com/AmjadAzward/Spice-World",
+    "https://github.com/AmjadAzward/Online-Recipe-Collection",
+    "https://github.com/AmjadAzward",
+  ][i]!,
+  githubLabel: i === 8 ? "View GitHub profile" : "View repository",
 }));

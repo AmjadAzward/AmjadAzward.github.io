@@ -255,7 +255,7 @@ const showcaseSlides: Record<StudioZoneId, ShowcaseSlide[]> = {
     image: project.previewImage ?? project.image,
     imageAlt: `Preview of ${project.title ?? "project"}`,
     chips: [project.tag ?? "Software project", "Designed and developed"],
-    action: { label: "View source profile", href: project.github },
+    action: { label: project.githubLabel, href: project.github },
   })),
   contact: [
     {
