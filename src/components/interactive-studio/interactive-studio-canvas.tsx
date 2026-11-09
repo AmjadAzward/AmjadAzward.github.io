@@ -2451,12 +2451,10 @@ function NaturalLife({ darkMode, reducedMotion }: { darkMode: boolean; reducedMo
         frustumCulled={false}
       >
         <planeGeometry args={[0.8, 0.8]} />
-        <meshStandardMaterial
+        <meshBasicMaterial
           map={leafTexture ?? undefined}
           transparent
-          alphaTest={0.08}
-          roughness={0.9}
-          metalness={0.02}
+          alphaTest={0.02}
           side={DoubleSide}
         />
       </instancedMesh>
