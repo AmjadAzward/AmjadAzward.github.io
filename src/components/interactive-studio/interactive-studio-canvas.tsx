@@ -1501,7 +1501,12 @@ function VillageShowcaseScreen({
           const actionY = mediaPanelY + panelHeight - 78;
           const actionWidth = Math.min(300, infoPanelWidth - 72);
           const actionHeight = 48;
-          const actionGradient = context.createLinearGradient(0, actionY, 0, actionY + actionHeight);
+          const actionGradient = context.createLinearGradient(
+            0,
+            actionY,
+            0,
+            actionY + actionHeight,
+          );
           actionGradient.addColorStop(0, "#e1ab63");
           actionGradient.addColorStop(1, "#b97935");
           context.fillStyle = actionGradient;
@@ -2451,12 +2456,7 @@ function NaturalLife({ darkMode, reducedMotion }: { darkMode: boolean; reducedMo
         frustumCulled={false}
       >
         <planeGeometry args={[0.8, 0.8]} />
-        <meshBasicMaterial
-          map={leafTexture}
-          transparent
-          alphaTest={0.02}
-          side={DoubleSide}
-        />
+        <meshBasicMaterial map={leafTexture} transparent alphaTest={0.02} side={DoubleSide} />
       </instancedMesh>
       {MEADOW_PATCHES.filter((_, index) => index % 2 === 0).map(([x, z], index) => (
         <group key={`wildflower-${x}-${z}`} position={[x + 0.35, 0, z - 0.22]}>
