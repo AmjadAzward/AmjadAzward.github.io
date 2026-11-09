@@ -99,119 +99,67 @@ function makeLeafTexture() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.translate(canvas.width / 2, canvas.height / 2);
 
-  const outer = [
-    { x: -48, y: -400 },
-    { x: -104, y: -330 },
-    { x: -200, y: -286 },
-    { x: -294, y: -210 },
-    { x: -372, y: -118 },
-    { x: -372, y: -18 },
-    { x: -314, y: 84 },
-    { x: -220, y: 184 },
-    { x: -146, y: 300 },
-    { x: -62, y: 390 },
-    { x: 0, y: 442 },
-    { x: 52, y: 390 },
-    { x: 138, y: 300 },
-    { x: 222, y: 180 },
-    { x: 314, y: 84 },
-    { x: 370, y: -18 },
-    { x: 370, y: -118 },
-    { x: 294, y: -210 },
-    { x: 200, y: -286 },
-    { x: 104, y: -330 },
-    { x: 48, y: -400 },
-    { x: 18, y: -330 },
-    { x: 0, y: -420 },
-    { x: -18, y: -330 },
-  ];
+  const leafShape = new Path2D();
+  leafShape.moveTo(0, 430);
+  leafShape.bezierCurveTo(-42, 340, -135, 252, -270, 166);
+  leafShape.bezierCurveTo(-390, 86, -452, -28, -450, -158);
+  leafShape.bezierCurveTo(-447, -270, -382, -362, -286, -435);
+  leafShape.bezierCurveTo(-200, -495, -85, -532, 0, -550);
+  leafShape.bezierCurveTo(85, -532, 200, -495, 286, -435);
+  leafShape.bezierCurveTo(382, -362, 447, -270, 450, -158);
+  leafShape.bezierCurveTo(452, -28, 390, 86, 270, 166);
+  leafShape.bezierCurveTo(135, 252, 42, 340, 0, 430);
+  leafShape.closePath();
 
-  const facets = [
-    [outer[0], outer[1], outer[20], { x: 0, y: -330 }, { x: -10, y: -220 }],
-    [outer[1], outer[2], outer[3], { x: -120, y: -220 }, { x: -60, y: -120 }],
-    [outer[2], outer[3], outer[4], { x: -220, y: -140 }, { x: -160, y: -40 }],
-    [outer[3], outer[4], outer[5], { x: -300, y: -40 }, { x: -240, y: 76 }],
-    [outer[4], outer[5], outer[6], { x: -300, y: 20 }, { x: -222, y: 150 }],
-    [outer[5], outer[6], outer[7], { x: -210, y: 100 }, { x: -150, y: 220 }],
-    [outer[6], outer[7], outer[8], { x: -150, y: 188 }, { x: -70, y: 290 }],
-    [outer[7], outer[8], outer[9], { x: -80, y: 245 }, { x: -26, y: 330 }],
-    [outer[8], outer[9], outer[10], { x: -20, y: 320 }, { x: 0, y: 382 }],
-    [outer[9], outer[10], outer[11], { x: 20, y: 320 }, { x: 0, y: 382 }],
-    [outer[10], outer[11], outer[12], { x: 80, y: 245 }, { x: 26, y: 330 }],
-    [outer[11], outer[12], outer[13], { x: 150, y: 188 }, { x: 70, y: 290 }],
-    [outer[12], outer[13], outer[14], { x: 210, y: 100 }, { x: 150, y: 220 }],
-    [outer[13], outer[14], outer[15], { x: 300, y: 20 }, { x: 222, y: 150 }],
-    [outer[14], outer[15], outer[16], { x: 300, y: -40 }, { x: 240, y: 76 }],
-    [outer[15], outer[16], outer[17], { x: 220, y: -140 }, { x: 160, y: -40 }],
-    [outer[16], outer[17], outer[18], { x: 120, y: -220 }, { x: 60, y: -120 }],
-    [outer[17], outer[18], outer[19], { x: 0, y: -330 }, { x: 10, y: -220 }],
-    [outer[18], outer[19], outer[20], { x: 0, y: -330 }, { x: 0, y: -220 }],
-  ];
+  ctx.save();
+  ctx.clip(leafShape);
 
-  const fillStops = [
-    ["#e6a946", "#d67d2a", "#c55d1d"],
-    ["#efae49", "#ea8a31", "#d86524"],
-    ["#f2bf61", "#ef8d36", "#dd6d2d"],
-  ];
+  const leafGradient = ctx.createLinearGradient(0, -540, 0, 430);
+  leafGradient.addColorStop(0, "#edf9a0");
+  leafGradient.addColorStop(0.24, "#c9e878");
+  leafGradient.addColorStop(0.58, "#7cc86d");
+  leafGradient.addColorStop(1, "#2d7c3b");
+  ctx.fillStyle = leafGradient;
+  ctx.fillRect(-512, -512, 1024, 1024);
 
-  facets.forEach((facet, index) => {
-    ctx.beginPath();
-    ctx.moveTo(facet[0].x, facet[0].y);
-    facet.slice(1).forEach((point) => ctx.lineTo(point.x, point.y));
-    ctx.closePath();
-
-    const gradient = ctx.createLinearGradient(0, -420, 0, 430);
-    const tone = fillStops[index % fillStops.length];
-    gradient.addColorStop(0, tone[0]);
-    gradient.addColorStop(0.52, tone[1]);
-    gradient.addColorStop(1, tone[2]);
-    ctx.fillStyle = gradient;
-    ctx.fill();
-  });
-
+  ctx.lineWidth = 9;
+  ctx.strokeStyle = "rgba(255,255,255,0.34)";
   ctx.beginPath();
-  ctx.moveTo(0, 442);
-  ctx.lineTo(0, 215);
-  ctx.lineTo(16, 120);
-  ctx.quadraticCurveTo(8, 30, 0, -245);
-  ctx.quadraticCurveTo(-8, 30, -16, 120);
-  ctx.lineTo(0, 215);
-  ctx.closePath();
-  ctx.fillStyle = "#cb6d27";
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.moveTo(0, 442);
-  ctx.lineTo(0, 110);
-  ctx.lineWidth = 10;
-  ctx.strokeStyle = "rgba(93, 39, 12, 0.5)";
+  ctx.moveTo(0, 410);
+  ctx.lineTo(0, -430);
+  ctx.moveTo(0, -40);
+  ctx.lineTo(-195, 28);
+  ctx.moveTo(0, -40);
+  ctx.lineTo(195, 28);
+  ctx.moveTo(0, 104);
+  ctx.lineTo(-166, 180);
+  ctx.moveTo(0, 104);
+  ctx.lineTo(166, 180);
+  ctx.moveTo(0, 222);
+  ctx.lineTo(-118, 252);
+  ctx.moveTo(0, 222);
+  ctx.lineTo(118, 252);
   ctx.stroke();
 
-  ctx.lineWidth = 4;
-  ctx.strokeStyle = "rgba(255, 238, 196, 0.55)";
+  ctx.restore();
+
   ctx.beginPath();
-  ctx.moveTo(0, -390);
-  ctx.lineTo(0, 420);
+  ctx.moveTo(0, 430);
+  ctx.lineTo(0, -530);
+  ctx.lineWidth = 18;
+  ctx.strokeStyle = "rgba(55, 92, 38, 0.82)";
   ctx.stroke();
 
   ctx.beginPath();
-  ctx.moveTo(0, -30);
-  ctx.lineTo(-160, 38);
-  ctx.moveTo(0, -30);
-  ctx.lineTo(160, 38);
-  ctx.moveTo(0, 118);
-  ctx.lineTo(-120, 160);
-  ctx.moveTo(0, 118);
-  ctx.lineTo(120, 160);
-  ctx.moveTo(0, 244);
-  ctx.lineTo(-90, 236);
-  ctx.moveTo(0, 244);
-  ctx.lineTo(90, 236);
+  ctx.moveTo(0, -530);
+  ctx.quadraticCurveTo(-8, -580, 0, -610);
+  ctx.strokeStyle = "rgba(57, 78, 28, 0.92)";
+  ctx.lineWidth = 14;
   ctx.stroke();
 
   ctx.beginPath();
-  ctx.arc(0, -360, 30, 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(255, 216, 122, 0.28)";
+  ctx.arc(0, -640, 24, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(214, 239, 138, 0.42)";
   ctx.fill();
 
   const texture = new CanvasTexture(canvas);
