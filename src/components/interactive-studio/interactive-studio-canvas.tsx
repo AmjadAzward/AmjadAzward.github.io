@@ -2252,15 +2252,23 @@ function SwayingForest({ darkMode, reducedMotion }: { darkMode: boolean; reduced
       transform.updateMatrix();
       lowerCanopies.setMatrixAt(index, transform.matrix);
 
-      transform.position.set(
-        tree.x + 0.18 * tree.scale,
-        1.82 * tree.scale,
-        tree.z - 0.05 * tree.scale,
-      );
-      transform.rotation.set(swayX * 1.15, 0, swayZ * 1.2);
-      transform.scale.set(0.5 * tree.scale, 0.64 * tree.scale, 0.5 * tree.scale);
-      transform.updateMatrix();
-      upperCanopies.setMatrixAt(index, transform.matrix);
+      const crownClusters = [
+        [-0.38, 1.58, 0.02, 0.43, 0.52, 0.43],
+        [0.34, 1.62, -0.08, 0.45, 0.56, 0.44],
+        [0.02, 1.94, 0, 0.46, 0.61, 0.46],
+      ] as const;
+      crownClusters.forEach(([offsetX, height, offsetZ, scaleX, scaleY, scaleZ], clusterIndex) => {
+        const cluster = index * crownClusters.length + clusterIndex;
+        transform.position.set(
+          tree.x + (offsetX + swayX * 0.7) * tree.scale,
+          height * tree.scale,
+          tree.z + (offsetZ + swayZ * 0.7) * tree.scale,
+        );
+        transform.rotation.set(swayX * 1.15, 0, swayZ * 1.2);
+        transform.scale.set(scaleX * tree.scale, scaleY * tree.scale, scaleZ * tree.scale);
+        transform.updateMatrix();
+        upperCanopies.setMatrixAt(cluster, transform.matrix);
+      });
     });
 
     trunks.instanceMatrix.needsUpdate = true;
@@ -2288,10 +2296,10 @@ function SwayingForest({ darkMode, reducedMotion }: { darkMode: boolean; reduced
       </instancedMesh>
       <instancedMesh
         ref={upperCanopiesRef}
-        args={[undefined, undefined, VISIBLE_FOREST_OBJECTS.length]}
+        args={[undefined, undefined, VISIBLE_FOREST_OBJECTS.length * 3]}
         frustumCulled={false}
       >
-        <icosahedronGeometry args={[0.48, 1]} />
+        <sphereGeometry args={[0.48, 12, 10]} />
         <meshStandardMaterial color={darkMode ? "#28623a" : "#62a557"} roughness={0.89} />
       </instancedMesh>
     </group>
