@@ -731,6 +731,16 @@ export default function InteractiveStudioHero() {
     setMapOpen(false);
   };
 
+  const openMap = () => {
+    inputRef.current.target = null;
+    inputRef.current.route = [];
+    inputRef.current.x = 0;
+    inputRef.current.z = 0;
+    setGuidedJourneyIndex(null);
+    setShowcase(null);
+    setMapOpen(true);
+  };
+
   const toggleTheme = () => {
     const nextDark = !document.documentElement.classList.contains("dark");
     document.documentElement.classList.toggle("dark", nextDark);
@@ -940,7 +950,7 @@ export default function InteractiveStudioHero() {
       <button
         type="button"
         className="path-map-trigger"
-        onClick={() => setMapOpen(true)}
+        onClick={openMap}
         aria-label="Open trail map and fast travel"
       >
         <MapIcon aria-hidden />
