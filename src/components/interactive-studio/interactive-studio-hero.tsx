@@ -727,6 +727,7 @@ export default function InteractiveStudioHero() {
     inputRef.current.z = 0;
     setJourneyStarted(true);
     setGuidedJourneyIndex(null);
+    setShowcase(null);
     setMapOpen(false);
   };
 
