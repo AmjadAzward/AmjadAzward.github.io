@@ -3,9 +3,9 @@ const SOCIAL_IMAGE = `${SITE_URL}/profile-clean.png`;
 
 export const makeHead = (title: string, description: string, path: string) => () => ({
   meta: [
-    { title: `${title} - Amjad Azward` },
+    { title: `Amjad Azward | ${title}` },
     { name: "description", content: description },
-    { property: "og:title", content: `${title} - Amjad Azward` },
+    { property: "og:title", content: `Amjad Azward | ${title}` },
     { property: "og:description", content: description },
     { property: "og:type", content: "website" },
     { property: "og:url", content: `${SITE_URL}${path}` },

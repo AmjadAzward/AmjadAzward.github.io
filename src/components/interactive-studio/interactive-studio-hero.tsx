@@ -1,8 +1,8 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { useReducedMotion } from "motion/react";
 import {
   ArrowRight,
-  Bot,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   CircleHelp,
@@ -11,10 +11,13 @@ import {
   Instagram,
   Linkedin,
   LocateFixed,
+  LoaderCircle,
   Moon,
   Map as MapIcon,
   MapPin,
   Sun,
+  Send,
+  ShieldCheck,
   X,
 } from "lucide-react";
 
@@ -256,37 +259,162 @@ const showcaseSlides: Record<StudioZoneId, ShowcaseSlide[]> = {
   })),
   contact: [
     {
-      eyebrow: "CONTACT / OPEN CHANNEL",
+      eyebrow: "CONTACT / DIRECT MESSAGE",
       title: "Let's make something useful.",
       description:
-        "For thoughtful products, engineering opportunities, freelance work, or ambitious ideas, send a message directly from the village.",
-      chips: [
-        "Project enquiries",
-        "Freelance work",
-        "Engineering opportunities",
-        "Remote collaboration",
-      ],
-      action: { label: "Email Amjad", href: "mailto:amjadazward693@gmail.com" },
+        "Send a project enquiry, collaboration proposal, or opportunity directly from the village.",
+      chips: ["Real contact form", "Secure delivery", "Direct reply"],
     },
-    ...socials.map((social, index) => ({
-      eyebrow: `SOCIAL CHANNEL / ${String(index + 1).padStart(2, "0")}`,
-      title: social.label,
-      description: `Continue the conversation with Amjad Azward on ${social.label}.`,
-      metric: "Online",
-      chips: ["Social profile", "Opens in a new tab"],
-      action: { label: `Open ${social.label}`, href: social.href },
-    })),
   ],
 };
 
-const robotGuidance: Record<StudioZoneId, string> = {
-  about: "This welcome house shares Amjad's background and journey.",
-  skills: "The technology lab maps the tools used across real projects.",
-  certifications: "The learning academy holds verified credentials and education.",
-  services: "The creative studio shows the ways Amjad can help build a product.",
-  portfolio: "The innovation workshop contains the complete project collection.",
-  contact: "The communication tower opens the direct contact and social channels.",
-};
+const CONTACT_EMAIL = "amjadazward693@gmail.com";
+const CONTACT_ENDPOINT = "https://api.web3forms.com/submit";
+const CONTACT_ACCESS_KEY = "b2c720b0-5dfd-4a15-9f50-0368f17c7298";
+
+function VillageContactShowcase({ onClose }: { onClose: () => void }) {
+  const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setState("sending");
+    const form = event.currentTarget;
+
+    try {
+      const response = await fetch(CONTACT_ENDPOINT, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: new FormData(form),
+      });
+      const result = (await response.json()) as { success?: boolean };
+      if (!response.ok || !result.success) throw new Error("Message delivery failed");
+      form.reset();
+      setState("sent");
+    } catch {
+      setState("error");
+    }
+  }
+
+  return (
+    <div className="path-contact-overlay" role="presentation" onPointerDown={onClose}>
+      <section
+        className="path-contact-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="village-contact-title"
+        onPointerDown={(event) => event.stopPropagation()}
+      >
+        <header className="path-contact-header">
+          <strong>Amjad Azward | Contact</strong>
+          <span>01 / 01</span>
+          <button type="button" onClick={onClose} aria-label="Close contact form">
+            <X aria-hidden />
+          </button>
+        </header>
+
+        <div className="path-contact-screen">
+          <div className="path-contact-intro">
+            <p>CONTACT / DIRECT MESSAGE</p>
+            <h2 id="village-contact-title">Let's make something useful.</h2>
+            <span>
+              Share your idea, opportunity, or project. This form sends your message directly to
+              Amjad.
+            </span>
+            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+          </div>
+
+          <form
+            action={CONTACT_ENDPOINT}
+            method="POST"
+            onSubmit={submit}
+            className="path-contact-form"
+            aria-label="Contact Amjad Azward"
+          >
+            <input type="hidden" name="access_key" value={CONTACT_ACCESS_KEY} />
+            <input type="hidden" name="from_name" value="Amjad Azward Portfolio Village" />
+            <input type="hidden" name="subject" value="New village portfolio enquiry" />
+            <input
+              type="checkbox"
+              name="botcheck"
+              tabIndex={-1}
+              className="hidden"
+              aria-hidden="true"
+            />
+            <div className="path-contact-fields">
+              <label>
+                Name
+                <input
+                  name="name"
+                  type="text"
+                  required
+                  minLength={2}
+                  autoComplete="name"
+                  placeholder="Your name"
+                />
+              </label>
+              <label>
+                Email
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                />
+              </label>
+            </div>
+            <label>
+              Subject
+              <input
+                name="enquiry_topic"
+                type="text"
+                required
+                minLength={2}
+                placeholder="What would you like to build?"
+              />
+            </label>
+            <label>
+              Message
+              <textarea
+                name="message"
+                required
+                minLength={20}
+                rows={4}
+                placeholder="Tell me about your idea, goals, and timeline."
+              />
+            </label>
+            <div className="path-contact-submit">
+              <button type="submit" disabled={state === "sending"}>
+                {state === "sending" ? (
+                  <>
+                    Sending <LoaderCircle className="animate-spin" aria-hidden />
+                  </>
+                ) : (
+                  <>
+                    Send message <Send aria-hidden />
+                  </>
+                )}
+              </button>
+              <span>
+                <ShieldCheck aria-hidden /> Secure message delivery
+              </span>
+            </div>
+            {state === "sent" ? (
+              <p className="path-contact-status is-success" role="status" aria-live="polite">
+                <CheckCircle2 aria-hidden /> Message sent. Amjad will reply soon.
+              </p>
+            ) : null}
+            {state === "error" ? (
+              <p className="path-contact-status is-error" role="alert">
+                Delivery failed. Please try again or email {CONTACT_EMAIL}.
+              </p>
+            ) : null}
+          </form>
+        </div>
+      </section>
+    </div>
+  );
+}
 
 const WORLD_BOUNDS = { minX: -12.8, maxX: 12.8, northZ: 7.2, southZ: -28.5 };
 
@@ -529,11 +657,9 @@ export default function InteractiveStudioHero() {
   const [guidedJourneyIndex, setGuidedJourneyIndex] = useState<number | null>(null);
   const [showcase, setShowcase] = useState<{ section: StudioZoneId; slide: number } | null>(null);
   const [tutorialOpen, setTutorialOpen] = useState(false);
-  const [guidanceEnabled, setGuidanceEnabled] = useState(true);
 
   useEffect(() => {
     setMode(supportsWebGL() && !prefersLightweightScene() ? "3d" : "static");
-    setGuidanceEnabled(window.localStorage.getItem("aa-village-guidance") !== "off");
   }, []);
 
   useEffect(() => {
@@ -602,14 +728,6 @@ export default function InteractiveStudioHero() {
     setJourneyStarted(true);
     setGuidedJourneyIndex(null);
     setMapOpen(false);
-  };
-
-  const toggleGuidance = () => {
-    setGuidanceEnabled((enabled) => {
-      const next = !enabled;
-      window.localStorage.setItem("aa-village-guidance", next ? "on" : "off");
-      return next;
-    });
   };
 
   const toggleTheme = () => {
@@ -800,6 +918,8 @@ export default function InteractiveStudioHero() {
           <StudioStaticFallback darkMode={darkMode} />
         )}
       </div>
+
+      {showcase?.section === "contact" ? <VillageContactShowcase onClose={closeShowcase} /> : null}
 
       <div className="path-world-tools" aria-label="Village options">
         <button
@@ -1121,20 +1241,11 @@ export default function InteractiveStudioHero() {
         </aside>
       ) : null}
 
-      {activeZone && guidanceEnabled && !mapOpen && !showcase && !tutorialOpen ? (
-        <aside className="path-robot-guidance" aria-live="polite">
-          <Bot aria-hidden />
-          <div>
-            <span>ROBOT COMPANION</span>
-            <p>{robotGuidance[activeZone]}</p>
-          </div>
-          <button type="button" onClick={toggleGuidance} aria-label="Disable robot guidance">
-            <X aria-hidden />
-          </button>
-        </aside>
-      ) : null}
-
-      {mode !== "3d" && showcase && activeShowcaseSlide && activeShowcaseStop ? (
+      {mode !== "3d" &&
+      showcase &&
+      showcase.section !== "contact" &&
+      activeShowcaseSlide &&
+      activeShowcaseStop ? (
         <div className="path-tv-overlay" role="presentation" onPointerDown={closeShowcase}>
           <section
             className="path-tv"
