@@ -91,57 +91,128 @@ function makeLeafTexture() {
   if (typeof document === "undefined") return null;
 
   const canvas = document.createElement("canvas");
-  canvas.width = 512;
-  canvas.height = 512;
+  canvas.width = 1024;
+  canvas.height = 1024;
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.translate(256, 256);
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+
+  const outer = [
+    { x: -48, y: -400 },
+    { x: -104, y: -330 },
+    { x: -200, y: -286 },
+    { x: -294, y: -210 },
+    { x: -372, y: -118 },
+    { x: -372, y: -18 },
+    { x: -314, y: 84 },
+    { x: -220, y: 184 },
+    { x: -146, y: 300 },
+    { x: -62, y: 390 },
+    { x: 0, y: 442 },
+    { x: 52, y: 390 },
+    { x: 138, y: 300 },
+    { x: 222, y: 180 },
+    { x: 314, y: 84 },
+    { x: 370, y: -18 },
+    { x: 370, y: -118 },
+    { x: 294, y: -210 },
+    { x: 200, y: -286 },
+    { x: 104, y: -330 },
+    { x: 48, y: -400 },
+    { x: 18, y: -330 },
+    { x: 0, y: -420 },
+    { x: -18, y: -330 },
+  ];
+
+  const facets = [
+    [outer[0], outer[1], outer[20], { x: 0, y: -330 }, { x: -10, y: -220 }],
+    [outer[1], outer[2], outer[3], { x: -120, y: -220 }, { x: -60, y: -120 }],
+    [outer[2], outer[3], outer[4], { x: -220, y: -140 }, { x: -160, y: -40 }],
+    [outer[3], outer[4], outer[5], { x: -300, y: -40 }, { x: -240, y: 76 }],
+    [outer[4], outer[5], outer[6], { x: -300, y: 20 }, { x: -222, y: 150 }],
+    [outer[5], outer[6], outer[7], { x: -210, y: 100 }, { x: -150, y: 220 }],
+    [outer[6], outer[7], outer[8], { x: -150, y: 188 }, { x: -70, y: 290 }],
+    [outer[7], outer[8], outer[9], { x: -80, y: 245 }, { x: -26, y: 330 }],
+    [outer[8], outer[9], outer[10], { x: -20, y: 320 }, { x: 0, y: 382 }],
+    [outer[9], outer[10], outer[11], { x: 20, y: 320 }, { x: 0, y: 382 }],
+    [outer[10], outer[11], outer[12], { x: 80, y: 245 }, { x: 26, y: 330 }],
+    [outer[11], outer[12], outer[13], { x: 150, y: 188 }, { x: 70, y: 290 }],
+    [outer[12], outer[13], outer[14], { x: 210, y: 100 }, { x: 150, y: 220 }],
+    [outer[13], outer[14], outer[15], { x: 300, y: 20 }, { x: 222, y: 150 }],
+    [outer[14], outer[15], outer[16], { x: 300, y: -40 }, { x: 240, y: 76 }],
+    [outer[15], outer[16], outer[17], { x: 220, y: -140 }, { x: 160, y: -40 }],
+    [outer[16], outer[17], outer[18], { x: 120, y: -220 }, { x: 60, y: -120 }],
+    [outer[17], outer[18], outer[19], { x: 0, y: -330 }, { x: 10, y: -220 }],
+    [outer[18], outer[19], outer[20], { x: 0, y: -330 }, { x: 0, y: -220 }],
+  ];
+
+  const fillStops = [
+    ["#e6a946", "#d67d2a", "#c55d1d"],
+    ["#efae49", "#ea8a31", "#d86524"],
+    ["#f2bf61", "#ef8d36", "#dd6d2d"],
+  ];
+
+  facets.forEach((facet, index) => {
+    ctx.beginPath();
+    ctx.moveTo(facet[0].x, facet[0].y);
+    facet.slice(1).forEach((point) => ctx.lineTo(point.x, point.y));
+    ctx.closePath();
+
+    const gradient = ctx.createLinearGradient(0, -420, 0, 430);
+    const tone = fillStops[index % fillStops.length];
+    gradient.addColorStop(0, tone[0]);
+    gradient.addColorStop(0.52, tone[1]);
+    gradient.addColorStop(1, tone[2]);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+  });
 
   ctx.beginPath();
-  ctx.moveTo(0, 170);
-  ctx.bezierCurveTo(-70, 100, -180, 30, -220, -65);
-  ctx.bezierCurveTo(-235, -110, -170, -200, -110, -195);
-  ctx.bezierCurveTo(-90, -190, -60, -120, -20, -70);
-  ctx.bezierCurveTo(-15, -125, -8, -170, 0, -220);
-  ctx.bezierCurveTo(8, -170, 15, -125, 20, -70);
-  ctx.bezierCurveTo(60, -120, 90, -190, 110, -195);
-  ctx.bezierCurveTo(170, -200, 235, -110, 220, -65);
-  ctx.bezierCurveTo(180, 30, 70, 100, 0, 170);
+  ctx.moveTo(0, 442);
+  ctx.lineTo(0, 215);
+  ctx.lineTo(16, 120);
+  ctx.quadraticCurveTo(8, 30, 0, -245);
+  ctx.quadraticCurveTo(-8, 30, -16, 120);
+  ctx.lineTo(0, 215);
   ctx.closePath();
-
-  const fill = ctx.createRadialGradient(0, 0, 30, 0, 0, 240);
-  fill.addColorStop(0, "#ffe7a3");
-  fill.addColorStop(0.3, "#fbbf54");
-  fill.addColorStop(0.72, "#f07a3f");
-  fill.addColorStop(1, "#b9372b");
-
-  ctx.fillStyle = fill;
-  ctx.shadowColor = "rgba(79, 32, 11, 0.3)";
-  ctx.shadowBlur = 18;
+  ctx.fillStyle = "#cb6d27";
   ctx.fill();
-  ctx.shadowBlur = 0;
 
   ctx.beginPath();
-  ctx.moveTo(0, 170);
-  ctx.lineTo(0, -210);
-  ctx.strokeStyle = "rgba(255,245,212,0.85)";
+  ctx.moveTo(0, 442);
+  ctx.lineTo(0, 110);
   ctx.lineWidth = 10;
+  ctx.strokeStyle = "rgba(93, 39, 12, 0.5)";
+  ctx.stroke();
+
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = "rgba(255, 238, 196, 0.55)";
+  ctx.beginPath();
+  ctx.moveTo(0, -390);
+  ctx.lineTo(0, 420);
   ctx.stroke();
 
   ctx.beginPath();
-  ctx.moveTo(-15, 50);
-  ctx.lineTo(-145, -25);
-  ctx.moveTo(15, 50);
-  ctx.lineTo(145, -25);
-  ctx.moveTo(-12, -20);
-  ctx.lineTo(-95, -110);
-  ctx.moveTo(12, -20);
-  ctx.lineTo(95, -110);
-  ctx.strokeStyle = "rgba(255,236,178,0.7)";
-  ctx.lineWidth = 6;
+  ctx.moveTo(0, -30);
+  ctx.lineTo(-160, 38);
+  ctx.moveTo(0, -30);
+  ctx.lineTo(160, 38);
+  ctx.moveTo(0, 118);
+  ctx.lineTo(-120, 160);
+  ctx.moveTo(0, 118);
+  ctx.lineTo(120, 160);
+  ctx.moveTo(0, 244);
+  ctx.lineTo(-90, 236);
+  ctx.moveTo(0, 244);
+  ctx.lineTo(90, 236);
   ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(0, -360, 30, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(255, 216, 122, 0.28)";
+  ctx.fill();
 
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = SRGBColorSpace;
