@@ -87,6 +87,67 @@ const LANDMARK_TRIGGER_RADIUS = 1.65;
 
 const showcaseImageCache = new Map<string, HTMLImageElement>();
 
+function makeLeafTexture() {
+  if (typeof document === "undefined") return null;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.translate(256, 256);
+
+  ctx.beginPath();
+  ctx.moveTo(0, 170);
+  ctx.bezierCurveTo(-70, 100, -180, 30, -220, -65);
+  ctx.bezierCurveTo(-235, -110, -170, -200, -110, -195);
+  ctx.bezierCurveTo(-90, -190, -60, -120, -20, -70);
+  ctx.bezierCurveTo(-15, -125, -8, -170, 0, -220);
+  ctx.bezierCurveTo(8, -170, 15, -125, 20, -70);
+  ctx.bezierCurveTo(60, -120, 90, -190, 110, -195);
+  ctx.bezierCurveTo(170, -200, 235, -110, 220, -65);
+  ctx.bezierCurveTo(180, 30, 70, 100, 0, 170);
+  ctx.closePath();
+
+  const fill = ctx.createRadialGradient(0, 0, 30, 0, 0, 240);
+  fill.addColorStop(0, "#ffe7a3");
+  fill.addColorStop(0.3, "#fbbf54");
+  fill.addColorStop(0.72, "#f07a3f");
+  fill.addColorStop(1, "#b9372b");
+
+  ctx.fillStyle = fill;
+  ctx.shadowColor = "rgba(79, 32, 11, 0.3)";
+  ctx.shadowBlur = 18;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  ctx.beginPath();
+  ctx.moveTo(0, 170);
+  ctx.lineTo(0, -210);
+  ctx.strokeStyle = "rgba(255,245,212,0.85)";
+  ctx.lineWidth = 10;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(-15, 50);
+  ctx.lineTo(-145, -25);
+  ctx.moveTo(15, 50);
+  ctx.lineTo(145, -25);
+  ctx.moveTo(-12, -20);
+  ctx.lineTo(-95, -110);
+  ctx.moveTo(12, -20);
+  ctx.lineTo(95, -110);
+  ctx.strokeStyle = "rgba(255,236,178,0.7)";
+  ctx.lineWidth = 6;
+  ctx.stroke();
+
+  const texture = new CanvasTexture(canvas);
+  texture.colorSpace = SRGBColorSpace;
+  return texture;
+}
+
 function loadShowcaseImage(src: string, priority: "high" | "low" = "low") {
   if (typeof Image === "undefined") return null;
   const cached = showcaseImageCache.get(src);
@@ -1721,24 +1782,26 @@ function VillageShowcaseScreen({
       </group>
 
       <group position={[0, 0.55, 0.12]}>
-        <group
-          position={[-0.78, 0, 0]}
-          onPointerDown={(event) => {
-            event.stopPropagation();
-            onPrevious();
-          }}
-          onPointerOver={handlePointerOver}
-          onPointerOut={handlePointerOut}
-        >
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.28, 0.28, 0.14, 24]} />
-            <meshStandardMaterial color={woodMid} roughness={0.78} metalness={0.04} />
-          </mesh>
-          <mesh position={[0, 0, 0.09]} rotation={[0, 0, Math.PI / 2]}>
-            <coneGeometry args={[0.11, 0.24, 3]} />
-            <meshBasicMaterial color="#ffe6b7" />
-          </mesh>
-        </group>
+        {total > 1 ? (
+          <group
+            position={[-0.78, 0, 0]}
+            onPointerDown={(event) => {
+              event.stopPropagation();
+              onPrevious();
+            }}
+            onPointerOver={handlePointerOver}
+            onPointerOut={handlePointerOut}
+          >
+            <mesh rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.28, 0.28, 0.14, 24]} />
+              <meshStandardMaterial color={woodMid} roughness={0.78} metalness={0.04} />
+            </mesh>
+            <mesh position={[0, 0, 0.09]} rotation={[0, 0, Math.PI / 2]}>
+              <coneGeometry args={[0.11, 0.24, 3]} />
+              <meshBasicMaterial color="#ffe6b7" />
+            </mesh>
+          </group>
+        ) : null}
         <group
           onPointerDown={(event) => {
             event.stopPropagation();
@@ -1760,24 +1823,26 @@ function VillageShowcaseScreen({
             <meshBasicMaterial color="#f4bf78" />
           </mesh>
         </group>
-        <group
-          position={[0.78, 0, 0]}
-          onPointerDown={(event) => {
-            event.stopPropagation();
-            onNext();
-          }}
-          onPointerOver={handlePointerOver}
-          onPointerOut={handlePointerOut}
-        >
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.28, 0.28, 0.14, 24]} />
-            <meshStandardMaterial color={woodMid} roughness={0.78} metalness={0.04} />
-          </mesh>
-          <mesh position={[0, 0, 0.09]} rotation={[0, 0, -Math.PI / 2]}>
-            <coneGeometry args={[0.11, 0.24, 3]} />
-            <meshBasicMaterial color="#ffe6b7" />
-          </mesh>
-        </group>
+        {total > 1 ? (
+          <group
+            position={[0.78, 0, 0]}
+            onPointerDown={(event) => {
+              event.stopPropagation();
+              onNext();
+            }}
+            onPointerOver={handlePointerOver}
+            onPointerOut={handlePointerOut}
+          >
+            <mesh rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.28, 0.28, 0.14, 24]} />
+              <meshStandardMaterial color={woodMid} roughness={0.78} metalness={0.04} />
+            </mesh>
+            <mesh position={[0, 0, 0.09]} rotation={[0, 0, -Math.PI / 2]}>
+              <coneGeometry args={[0.11, 0.24, 3]} />
+              <meshBasicMaterial color="#ffe6b7" />
+            </mesh>
+          </group>
+        ) : null}
       </group>
     </group>
   );
@@ -2219,6 +2284,7 @@ function NaturalLife({ darkMode, reducedMotion }: { darkMode: boolean; reducedMo
   const leavesRef = useRef<InstancedMesh>(null);
   const lastUpdateRef = useRef(-1);
   const transform = useMemo(() => new Object3D(), []);
+  const leafTexture = useMemo(() => makeLeafTexture(), []);
   const grass = useMemo(
     () =>
       Array.from({ length: MEADOW_PATCHES.length * 9 }, (_, index) => {
@@ -2313,10 +2379,13 @@ function NaturalLife({ darkMode, reducedMotion }: { darkMode: boolean; reducedMo
         args={[undefined, undefined, leaves.length]}
         frustumCulled={false}
       >
-        <planeGeometry args={[0.11, 0.18]} />
+        <planeGeometry args={[0.8, 0.8]} />
         <meshStandardMaterial
-          color={darkMode ? "#9e7e3f" : "#b38345"}
-          roughness={0.86}
+          map={leafTexture ?? undefined}
+          transparent
+          alphaTest={0.08}
+          roughness={0.9}
+          metalness={0.02}
           side={DoubleSide}
         />
       </instancedMesh>
