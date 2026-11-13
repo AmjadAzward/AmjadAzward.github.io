@@ -3444,8 +3444,12 @@ body::before {
 }
 
 .path-intro-card > span {
+  display: block;
+  max-width: 20.5rem;
   color: #ead8b7;
+  line-height: 1.45;
   text-shadow: 0 1px 0 rgb(48 25 11 / 70%);
+  text-wrap: pretty;
 }
 
 .path-intro-card .path-intro-identity {
@@ -3460,6 +3464,7 @@ body::before {
 .path-intro-identity strong,
 .path-intro-identity span {
   display: block;
+  white-space: nowrap;
 }
 
 .path-intro-identity strong {
