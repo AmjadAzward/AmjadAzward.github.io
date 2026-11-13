@@ -1209,9 +1209,10 @@ export default function InteractiveStudioHero() {
             Step into an interactive island where every destination tells a story about my skills,
             projects, experience, and journey in technology.
           </span>
-          <strong className="path-intro-identity">
-            Amjad Azward <i aria-hidden /> Software Engineer &amp; Data Science Undergraduate
-          </strong>
+          <div className="path-intro-identity">
+            <strong>Amjad Azward</strong>
+            <span>Software Engineer &amp; Data Science Undergraduate</span>
+          </div>
           <div className="path-intro-actions">
             <button type="button" onClick={beginJourney}>
               Start exploring

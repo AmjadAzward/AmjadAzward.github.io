@@ -3449,13 +3449,28 @@ body::before {
 }
 
 .path-intro-card .path-intro-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+  margin-top: 1.15rem;
   color: #fff0cc;
   text-shadow: 0 1px 0 rgb(48 25 11 / 76%);
 }
 
-.path-intro-identity i {
-  background: #ffd17f;
-  box-shadow: 0 0 12px rgb(255 191 85 / 75%);
+.path-intro-identity strong,
+.path-intro-identity span {
+  display: block;
+}
+
+.path-intro-identity strong {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.path-intro-identity span {
+  color: #ead8b7;
+  font-size: 0.78rem;
+  line-height: 1.5;
 }
 
 .path-intro-card button {
