@@ -10,8 +10,6 @@ import {
   Linkedin,
   Menu,
   Moon,
-  RotateCw,
-  Smartphone,
   Sun,
   X,
   Facebook,
@@ -22,61 +20,6 @@ import { navItems, socials } from "@/data/portfolio";
 import { cn } from "@/lib/utils";
 
 const cinematicEase = [0.16, 1, 0.3, 1] as const;
-
-function MobileLandscapeGate({ active }: { active: boolean }) {
-  const [portraitMobile, setPortraitMobile] = useState(false);
-
-  useEffect(() => {
-    if (!active) {
-      setPortraitMobile(false);
-      return;
-    }
-
-    const portraitQuery = window.matchMedia("(orientation: portrait)");
-    const mobileDevice =
-      navigator.maxTouchPoints > 0 ||
-      /Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(navigator.userAgent);
-    const update = () =>
-      setPortraitMobile(
-        mobileDevice && (portraitQuery.matches || window.innerHeight >= window.innerWidth),
-      );
-
-    update();
-    if (portraitQuery.addEventListener) portraitQuery.addEventListener("change", update);
-    else portraitQuery.addListener(update);
-    window.addEventListener("orientationchange", update);
-    window.addEventListener("resize", update);
-
-    return () => {
-      if (portraitQuery.removeEventListener) portraitQuery.removeEventListener("change", update);
-      else portraitQuery.removeListener(update);
-      window.removeEventListener("orientationchange", update);
-      window.removeEventListener("resize", update);
-    };
-  }, [active]);
-
-  if (!portraitMobile) return null;
-
-  return (
-    <section
-      className="path-landscape-gate"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="path-landscape-title"
-    >
-      <div className="path-landscape-device" aria-hidden>
-        <Smartphone />
-        <RotateCw />
-      </div>
-      <p>MOBILE EXPLORATION</p>
-      <h2 id="path-landscape-title">Rotate to landscape</h2>
-      <span>
-        Turn your phone sideways to enter the village. Exploration becomes available automatically
-        in landscape.
-      </span>
-    </section>
-  );
-}
 
 function InitialLoader({ waitForStudio }: { waitForStudio: boolean }) {
   const reduce = useReducedMotion();
@@ -510,7 +453,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <>
       <InitialLoader waitForStudio={isHome} />
-      <MobileLandscapeGate active={isHome} />
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
