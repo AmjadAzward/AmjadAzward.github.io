@@ -3356,7 +3356,8 @@ body::before {
 }
 
 .path-intro-card {
-  width: min(26.5rem, calc(100% - 2rem));
+  width: min(18.5rem, calc(100% - 2rem));
+  min-height: 27rem;
 }
 
 :is(.path-intro-card, .path-destination-card)::before,
@@ -3587,7 +3588,7 @@ body::before {
 
 @media (max-width: 1023px) {
   .path-intro-card {
-    width: min(25rem, calc(100% - 2rem));
+    width: min(18.5rem, calc(100% - 2rem));
   }
 }
 
@@ -3603,7 +3604,8 @@ body::before {
   }
 
   .path-intro-card {
-    width: min(18.5rem, calc(100% - 1.4rem));
+    width: min(17.5rem, calc(100% - 1.4rem));
+    min-height: 24rem;
   }
 }
 
