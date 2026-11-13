@@ -1383,15 +1383,17 @@ body::before {
   min-width: 0;
   width: 100%;
   display: flex;
-  flex-direction: column;
-  line-height: 0.9;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  line-height: 1;
   padding-top: 0.7rem;
   padding-bottom: 0.7rem;
 }
 
 .path-intro-card > div > button span,
 .path-intro-card > div > a span {
-  display: block;
+  display: inline;
 }
 
 .path-open-showcase {

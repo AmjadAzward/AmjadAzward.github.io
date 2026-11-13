@@ -1214,12 +1214,10 @@ export default function InteractiveStudioHero() {
           </strong>
           <div className="path-intro-actions">
             <button type="button" onClick={beginJourney}>
-              Start
-              <span>exploring</span>
+              Start exploring
             </button>
             <a href="/cv.pdf" download className="path-secondary-action">
-              Download
-              <span>resume</span>
+              Download resume
             </a>
           </div>
         </section>
