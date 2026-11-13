@@ -1386,10 +1386,10 @@ body::before {
   z-index: 14;
   inset: 0;
   display: grid;
-  padding: 1rem;
+  padding: clamp(0.8rem, 2vw, 1.5rem);
   place-items: center;
-  background: rgb(2 8 18 / 76%);
-  backdrop-filter: blur(7px);
+  background: rgb(3 10 18 / 24%);
+  backdrop-filter: blur(1.5px);
   animation: path-map-fade 0.22s ease both;
 }
 
@@ -1398,8 +1398,8 @@ body::before {
   --contact-wood-mid: #70401f;
   --contact-wood-light: #a56a35;
   display: flex;
-  width: min(62rem, 100%);
-  height: min(39rem, calc(100% - 1rem));
+  width: min(68rem, 100%);
+  height: min(40rem, calc(100% - 1.2rem));
   min-height: 31rem;
   flex-direction: column;
   overflow: hidden;
@@ -1415,6 +1415,11 @@ body::before {
     inset 0 0 0 0.16rem #bd7d43;
   color: #fff1cb;
   animation: path-map-panel-in 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.path-showcase-shell {
+  max-width: min(68rem, 100%);
+  min-height: 31rem;
 }
 
 .path-contact-header {

@@ -298,7 +298,7 @@ function VillageContactShowcase({ onClose }: { onClose: () => void }) {
   return (
     <div className="path-contact-overlay" role="presentation" onPointerDown={onClose}>
       <section
-        className="path-contact-panel"
+        className="path-contact-panel path-showcase-shell"
         role="dialog"
         aria-modal="true"
         aria-labelledby="village-contact-title"
