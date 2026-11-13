@@ -1365,52 +1365,6 @@ export default function InteractiveStudioHero() {
           </section>
         </div>
       ) : null}
-
-      <div
-        className="studio-mobile-controls path-mobile-controls"
-        aria-label="Character movement controls"
-      >
-        <button
-          type="button"
-          aria-label="Move forward"
-          onPointerDown={() => setDirection(0, -1)}
-          onPointerUp={clearDirection}
-          onPointerCancel={clearDirection}
-          onPointerLeave={clearDirection}
-        >
-          ↑
-        </button>
-        <button
-          type="button"
-          aria-label="Move left"
-          onPointerDown={() => setDirection(-1, 0)}
-          onPointerUp={clearDirection}
-          onPointerCancel={clearDirection}
-          onPointerLeave={clearDirection}
-        >
-          ←
-        </button>
-        <button
-          type="button"
-          aria-label="Move backward"
-          onPointerDown={() => setDirection(0, 1)}
-          onPointerUp={clearDirection}
-          onPointerCancel={clearDirection}
-          onPointerLeave={clearDirection}
-        >
-          ↓
-        </button>
-        <button
-          type="button"
-          aria-label="Move right"
-          onPointerDown={() => setDirection(1, 0)}
-          onPointerUp={clearDirection}
-          onPointerCancel={clearDirection}
-          onPointerLeave={clearDirection}
-        >
-          →
-        </button>
-      </div>
     </div>
   );
 }
