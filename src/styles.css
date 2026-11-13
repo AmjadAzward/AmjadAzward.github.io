@@ -2601,7 +2601,8 @@ body::before {
 /* Keep the explorer visible while contextual content is open. */
 .path-intro-card {
   top: 4.25rem;
-  width: min(22rem, calc(100% - 2rem));
+  width: min(20rem, calc(100% - 2rem));
+  min-height: 24rem;
   padding: 1.3rem;
 }
 
@@ -2652,7 +2653,8 @@ body::before {
   .path-intro-card {
     top: 4rem;
     left: 0.7rem;
-    width: min(18.5rem, calc(100% - 1.4rem));
+    width: min(18rem, calc(100% - 1.4rem));
+    min-height: 21rem;
     padding: 0.9rem;
   }
 

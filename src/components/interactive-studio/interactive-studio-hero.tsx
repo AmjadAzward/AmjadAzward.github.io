@@ -1216,13 +1216,9 @@ export default function InteractiveStudioHero() {
             <button type="button" onClick={beginJourney}>
               Start exploring
             </button>
-            <button
-              type="button"
-              className="path-secondary-action"
-              onClick={() => openShowcase("portfolio")}
-            >
-              View projects
-            </button>
+            <a href="/cv.pdf" download className="path-secondary-action">
+              Download resume
+            </a>
           </div>
         </section>
       ) : null}
