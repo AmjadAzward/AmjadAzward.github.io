@@ -87,86 +87,6 @@ const LANDMARK_TRIGGER_RADIUS = 1.65;
 
 const showcaseImageCache = new Map<string, HTMLImageElement>();
 
-function makeLeafTexture() {
-  if (typeof document === "undefined") return null;
-
-  const canvas = document.createElement("canvas");
-  canvas.width = 1024;
-  canvas.height = 1024;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return null;
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.translate(canvas.width / 2, canvas.height / 2);
-
-  const leafShape = new Path2D();
-  leafShape.moveTo(0, 430);
-  leafShape.bezierCurveTo(-42, 340, -135, 252, -270, 166);
-  leafShape.bezierCurveTo(-390, 86, -452, -28, -450, -158);
-  leafShape.bezierCurveTo(-447, -270, -382, -362, -286, -435);
-  leafShape.bezierCurveTo(-200, -495, -85, -532, 0, -550);
-  leafShape.bezierCurveTo(85, -532, 200, -495, 286, -435);
-  leafShape.bezierCurveTo(382, -362, 447, -270, 450, -158);
-  leafShape.bezierCurveTo(452, -28, 390, 86, 270, 166);
-  leafShape.bezierCurveTo(135, 252, 42, 340, 0, 430);
-  leafShape.closePath();
-
-  ctx.save();
-  ctx.clip(leafShape);
-
-  const leafGradient = ctx.createLinearGradient(0, -540, 0, 430);
-  leafGradient.addColorStop(0, "#edf9a0");
-  leafGradient.addColorStop(0.24, "#c9e878");
-  leafGradient.addColorStop(0.58, "#7cc86d");
-  leafGradient.addColorStop(1, "#2d7c3b");
-  ctx.fillStyle = leafGradient;
-  ctx.fillRect(-512, -512, 1024, 1024);
-
-  ctx.lineWidth = 9;
-  ctx.strokeStyle = "rgba(255,255,255,0.34)";
-  ctx.beginPath();
-  ctx.moveTo(0, 410);
-  ctx.lineTo(0, -430);
-  ctx.moveTo(0, -40);
-  ctx.lineTo(-195, 28);
-  ctx.moveTo(0, -40);
-  ctx.lineTo(195, 28);
-  ctx.moveTo(0, 104);
-  ctx.lineTo(-166, 180);
-  ctx.moveTo(0, 104);
-  ctx.lineTo(166, 180);
-  ctx.moveTo(0, 222);
-  ctx.lineTo(-118, 252);
-  ctx.moveTo(0, 222);
-  ctx.lineTo(118, 252);
-  ctx.stroke();
-
-  ctx.restore();
-
-  ctx.beginPath();
-  ctx.moveTo(0, 430);
-  ctx.lineTo(0, -530);
-  ctx.lineWidth = 18;
-  ctx.strokeStyle = "rgba(55, 92, 38, 0.82)";
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(0, -530);
-  ctx.quadraticCurveTo(-8, -580, 0, -610);
-  ctx.strokeStyle = "rgba(57, 78, 28, 0.92)";
-  ctx.lineWidth = 14;
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.arc(0, -640, 24, 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(214, 239, 138, 0.42)";
-  ctx.fill();
-
-  const texture = new CanvasTexture(canvas);
-  texture.colorSpace = SRGBColorSpace;
-  return texture;
-}
-
 function loadShowcaseImage(src: string, priority: "high" | "low" = "low") {
   if (typeof Image === "undefined") return null;
   const cached = showcaseImageCache.get(src);
@@ -2357,10 +2277,8 @@ function SwayingForest({ darkMode, reducedMotion }: { darkMode: boolean; reduced
 
 function NaturalLife({ darkMode, reducedMotion }: { darkMode: boolean; reducedMotion: boolean }) {
   const grassRef = useRef<InstancedMesh>(null);
-  const leavesRef = useRef<InstancedMesh>(null);
   const lastUpdateRef = useRef(-1);
   const transform = useMemo(() => new Object3D(), []);
-  const leafTexture = useMemo(() => makeLeafTexture(), []);
   const grass = useMemo(
     () =>
       Array.from({ length: MEADOW_PATCHES.length * 9 }, (_, index) => {
@@ -2377,22 +2295,9 @@ function NaturalLife({ darkMode, reducedMotion }: { darkMode: boolean; reducedMo
       }),
     [],
   );
-  const leaves = useMemo(
-    () =>
-      Array.from({ length: 34 }, (_, index) => ({
-        x: -8.7 + ((index * 47) % 174) * 0.1,
-        z: 5.5 - ((index * 71) % 325) * 0.1,
-        startY: 0.5 + ((index * 29) % 46) * 0.1,
-        speed: 0.22 + (index % 7) * 0.035,
-        phase: index * 0.71,
-        scale: 0.7 + (index % 5) * 0.09,
-      })),
-    [],
-  );
 
   useEffect(() => {
     grassRef.current?.instanceMatrix.setUsage(DynamicDrawUsage);
-    leavesRef.current?.instanceMatrix.setUsage(DynamicDrawUsage);
   }, []);
 
   useFrame((state) => {
@@ -2411,29 +2316,6 @@ function NaturalLife({ darkMode, reducedMotion }: { darkMode: boolean; reducedMo
       });
       grassMesh.instanceMatrix.needsUpdate = true;
     }
-
-    const leafMesh = leavesRef.current;
-    if (leafMesh) {
-      leaves.forEach((leaf, index) => {
-        const fallSpan = 5.2;
-        const fallingY =
-          0.28 + ((((leaf.startY - time * leaf.speed) % fallSpan) + fallSpan) % fallSpan);
-        transform.position.set(
-          leaf.x + Math.sin(time * 0.72 + leaf.phase) * 0.42,
-          fallingY,
-          leaf.z + Math.cos(time * 0.48 + leaf.phase) * 0.28,
-        );
-        transform.rotation.set(
-          time * 0.8 + leaf.phase,
-          time * 0.55 + leaf.phase * 0.6,
-          Math.sin(time + leaf.phase) * 0.9,
-        );
-        transform.scale.set(leaf.scale, leaf.scale, leaf.scale);
-        transform.updateMatrix();
-        leafMesh.setMatrixAt(index, transform.matrix);
-      });
-      leafMesh.instanceMatrix.needsUpdate = true;
-    }
   });
 
   return (
@@ -2449,14 +2331,6 @@ function NaturalLife({ darkMode, reducedMotion }: { darkMode: boolean; reducedMo
           roughness={0.9}
           side={DoubleSide}
         />
-      </instancedMesh>
-      <instancedMesh
-        ref={leavesRef}
-        args={[undefined, undefined, leaves.length]}
-        frustumCulled={false}
-      >
-        <planeGeometry args={[0.8, 0.8]} />
-        <meshBasicMaterial map={leafTexture} transparent alphaTest={0.02} side={DoubleSide} />
       </instancedMesh>
       {MEADOW_PATCHES.filter((_, index) => index % 2 === 0).map(([x, z], index) => (
         <group key={`wildflower-${x}-${z}`} position={[x + 0.35, 0, z - 0.22]}>
