@@ -395,9 +395,6 @@ function VillageContactShowcase({ onClose }: { onClose: () => void }) {
                   </>
                 )}
               </button>
-              <span>
-                <ShieldCheck aria-hidden /> Secure message delivery
-              </span>
             </div>
             {state === "sent" ? (
               <p className="path-contact-status is-success" role="status" aria-live="polite">
