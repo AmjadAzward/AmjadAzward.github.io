@@ -2601,14 +2601,14 @@ body::before {
 /* Keep the explorer visible while contextual content is open. */
 .path-intro-card {
   top: 4.25rem;
-  width: min(20rem, calc(100% - 2rem));
-  min-height: 24rem;
-  padding: 1.3rem;
+  width: min(18.5rem, calc(100% - 2rem));
+  min-height: 27rem;
+  padding: 1.3rem 1.2rem 1.25rem;
 }
 
 .path-intro-card h1 {
-  font-size: clamp(2.45rem, 3.5vw, 3.3rem);
-  line-height: 0.94;
+  font-size: clamp(2.4rem, 3.2vw, 3.1rem);
+  line-height: 0.93;
 }
 
 .path-intro-card > span {
@@ -2653,8 +2653,8 @@ body::before {
   .path-intro-card {
     top: 4rem;
     left: 0.7rem;
-    width: min(18rem, calc(100% - 1.4rem));
-    min-height: 21rem;
+    width: min(17rem, calc(100% - 1.4rem));
+    min-height: 24rem;
     padding: 0.9rem;
   }
 
